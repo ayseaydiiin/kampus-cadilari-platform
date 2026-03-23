@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" role="img" aria-label="Kadinlar Dunyasi 1913 kapak">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8edd9"/>
+      <stop offset="100%" stop-color="#ead8b7"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="url(#bg)"/>
+  <rect x="45" y="45" width="810" height="1110" rx="24" fill="#fffaf0" stroke="#5b2c84" stroke-width="6"/>
+  <text x="450" y="180" text-anchor="middle" font-family="Georgia, serif" font-size="64" font-weight="700" fill="#5b2c84">KADINLAR DUNYASI</text>
+  <text x="450" y="245" text-anchor="middle" font-family="Georgia, serif" font-size="30" fill="#7a5c3e">Ozel Sayi - Esit Yurttaslik</text>
+  <rect x="110" y="300" width="680" height="2" fill="#5b2c84" opacity="0.35"/>
+  <text x="120" y="380" font-family="Arial, sans-serif" font-size="28" fill="#2f264d">- Secme ve secilme hakki dosyasi</text>
+  <text x="120" y="430" font-family="Arial, sans-serif" font-size="28" fill="#2f264d">- Kadin emegi ve kamusal temsil</text>
+  <text x="120" y="480" font-family="Arial, sans-serif" font-size="28" fill="#2f264d">- Kampuslerden dayanisma notlari</text>
+  <rect x="120" y="560" width="660" height="430" fill="#f3e6ff" stroke="#5b2c84" stroke-width="3"/>
+  <text x="450" y="780" text-anchor="middle" font-family="Georgia, serif" font-size="120" fill="#5b2c84" opacity="0.8">1913</text>
+  <circle cx="720" cy="1030" r="70" fill="#f4c95d"/>
+  <text x="720" y="1038" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#2f264d">ONAYLI</text>
+</svg>
+

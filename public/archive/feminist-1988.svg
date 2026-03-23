@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" role="img" aria-label="Feminist 1988 kapak">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f3e8ff"/>
+      <stop offset="100%" stop-color="#e2cff5"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="url(#bg)"/>
+  <rect x="48" y="48" width="804" height="1104" rx="24" fill="#fffdf8" stroke="#4b1f6f" stroke-width="6"/>
+  <text x="450" y="190" text-anchor="middle" font-family="Georgia, serif" font-size="76" font-weight="700" fill="#4b1f6f">FEMINIST</text>
+  <text x="450" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" fill="#6f4a92">Dayanisma ve Isci Haklari Dosyasi</text>
+  <rect x="100" y="300" width="700" height="300" fill="#4b1f6f" rx="16"/>
+  <text x="450" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="40" font-weight="700" fill="#f8edd9">EMEK</text>
+  <text x="450" y="470" text-anchor="middle" font-family="Arial, sans-serif" font-size="40" font-weight="700" fill="#f8edd9">DAYANISMA</text>
+  <text x="450" y="520" text-anchor="middle" font-family="Arial, sans-serif" font-size="40" font-weight="700" fill="#f8edd9">KOLEKTIF GUC</text>
+  <rect x="100" y="650" width="700" height="360" fill="#fff6e6" stroke="#c89f4b" stroke-width="3" rx="14"/>
+  <text x="120" y="730" font-family="Arial, sans-serif" font-size="28" fill="#2f264d">- Sendikal orgutlenme raporu</text>
+  <text x="120" y="780" font-family="Arial, sans-serif" font-size="28" fill="#2f264d">- Kampuslerden direnis notlari</text>
+  <text x="120" y="830" font-family="Arial, sans-serif" font-size="28" fill="#2f264d">- Feminist ekonomi analizi</text>
+  <text x="450" y="1000" text-anchor="middle" font-family="Georgia, serif" font-size="104" fill="#4b1f6f" opacity="0.85">1988</text>
+</svg>
+

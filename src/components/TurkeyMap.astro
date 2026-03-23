@@ -1,0 +1,134 @@
+---
+import { provinces } from '../data/provinces';
+
+interface Props {
+  activeProvinces?: string[];
+}
+
+const { activeProvinces = [] } = Astro.props;
+const activeSet = new Set(activeProvinces.map((item) => item.toLowerCase()));
+const initialProvince =
+  provinces.find((province) => activeSet.has(province.name.toLowerCase())) ??
+  provinces.find((province) => province.status === 'active') ??
+  provinces[0];
+---
+
+<div class="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+  <section class="rounded-[1.75rem] bg-white p-6 shadow-xl ring-1 ring-slate-200">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <p class="text-sm font-bold uppercase tracking-[0.2em] text-purple-700">Il agi</p>
+        <h2 class="mt-2 text-3xl font-black text-slate-900">Tikla, ogren, basvur</h2>
+      </div>
+      <div class="rounded-full bg-fuchsia-100 px-4 py-2 text-sm font-semibold text-fuchsia-700">81 il listesi</div>
+    </div>
+
+    <div class="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      {provinces.map((province) => {
+        const isFeatured = activeSet.has(province.name.toLowerCase()) || province.status === 'active';
+        const statusLabel =
+          province.status === 'active' ? 'Aktif' : province.status === 'growing' ? 'Kuruluyor' : 'Basvuruya acik';
+
+        return (
+          <button
+            class={`province-card rounded-2xl border p-4 text-left transition hover:-translate-y-1 hover:shadow-lg ${
+              isFeatured ? 'border-purple-500 bg-purple-50' : 'border-slate-200 bg-white'
+            }`}
+            data-name={province.name}
+            data-region={province.region}
+            data-status={statusLabel}
+            data-note={province.note}
+            data-contact={province.contact}
+          >
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-lg font-black text-slate-900">{province.name}</p>
+                <p class="mt-1 text-sm text-slate-500">{province.region}</p>
+              </div>
+              <span class={`rounded-full px-3 py-1 text-xs font-bold ${
+                province.status === 'active'
+                  ? 'bg-purple-600 text-white'
+                  : province.status === 'growing'
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'bg-slate-100 text-slate-600'
+              }`}>
+                {statusLabel}
+              </span>
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  </section>
+
+  <aside class="rounded-[1.75rem] bg-slate-950 p-6 text-white shadow-2xl">
+    <p class="text-sm font-bold uppercase tracking-[0.2em] text-fuchsia-300">Secili il</p>
+    <div class="mt-6 rounded-[1.5rem] bg-white/5 p-6 ring-1 ring-white/10">
+      <div class="flex items-center justify-between gap-4">
+        <h3 id="province-name" class="text-3xl font-black">{initialProvince.name}</h3>
+        <span id="province-status" class="rounded-full bg-fuchsia-400/15 px-4 py-2 text-sm font-semibold text-fuchsia-200">
+          {initialProvince.status === 'active' ? 'Aktif' : initialProvince.status === 'growing' ? 'Kuruluyor' : 'Basvuruya acik'}
+        </span>
+      </div>
+
+      <p class="mt-4 text-sm uppercase tracking-[0.18em] text-white/50">Bolge</p>
+      <p id="province-region" class="mt-1 text-lg text-white/90">{initialProvince.region}</p>
+
+      <p class="mt-6 text-sm uppercase tracking-[0.18em] text-white/50">Durum</p>
+      <p id="province-note" class="mt-2 leading-7 text-white/85">{initialProvince.note}</p>
+
+      <div class="mt-6 rounded-2xl bg-amber-300/10 p-4 ring-1 ring-amber-200/20">
+        <p class="text-sm font-bold uppercase tracking-[0.18em] text-amber-200">Basvuru tipi</p>
+        <p id="province-contact" class="mt-2 text-sm leading-6 text-white/90">{initialProvince.contact}</p>
+      </div>
+
+      <div class="mt-8 rounded-2xl border border-dashed border-white/15 bg-white/5 p-4">
+        <p class="text-sm font-bold uppercase tracking-[0.18em] text-white/60">SVG harita notu</p>
+        <p class="mt-2 text-sm leading-6 text-white/80">
+          Interaktif SVG harita kisa sure icinde eklenecek; her il geometrik alanindan tiklanabilir olacak. Bu surumde ayni akis il kartlariyla calisiyor.
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-6 grid grid-cols-3 gap-3 text-center">
+      <div class="rounded-2xl bg-white/5 p-4">
+        <div class="text-2xl font-black text-white">{provinces.filter((item) => item.status === 'active').length}</div>
+        <p class="mt-1 text-xs uppercase tracking-wide text-white/60">Aktif</p>
+      </div>
+      <div class="rounded-2xl bg-white/5 p-4">
+        <div class="text-2xl font-black text-white">{provinces.filter((item) => item.status === 'growing').length}</div>
+        <p class="mt-1 text-xs uppercase tracking-wide text-white/60">Kurulan</p>
+      </div>
+      <div class="rounded-2xl bg-white/5 p-4">
+        <div class="text-2xl font-black text-white">{provinces.filter((item) => item.status === 'open').length}</div>
+        <p class="mt-1 text-xs uppercase tracking-wide text-white/60">Acik</p>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+  const detailName = document.getElementById('province-name');
+  const detailStatus = document.getElementById('province-status');
+  const detailRegion = document.getElementById('province-region');
+  const detailNote = document.getElementById('province-note');
+  const detailContact = document.getElementById('province-contact');
+
+  document.querySelectorAll('.province-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.province-card').forEach((item) => {
+        item.classList.remove('border-purple-500', 'bg-purple-50', 'shadow-lg');
+        item.classList.add('border-slate-200', 'bg-white');
+      });
+
+      card.classList.remove('border-slate-200', 'bg-white');
+      card.classList.add('border-purple-500', 'bg-purple-50', 'shadow-lg');
+
+      detailName.textContent = card.dataset.name || '';
+      detailStatus.textContent = card.dataset.status || '';
+      detailRegion.textContent = card.dataset.region || '';
+      detailNote.textContent = card.dataset.note || '';
+      detailContact.textContent = card.dataset.contact || '';
+    });
+  });
+</script>

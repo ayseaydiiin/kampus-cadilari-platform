@@ -1,0 +1,674 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const articlesDir = path.join(process.cwd(), 'content', 'articles');
+const eventsDir = path.join(process.cwd(), 'content', 'events');
+const articleCount = fs.existsSync(articlesDir) ? fs.readdirSync(articlesDir).filter((item) => item.endsWith('.md') || item.endsWith('.mdx')).length : 0;
+const eventCount = fs.existsSync(eventsDir) ? fs.readdirSync(eventsDir).filter((item) => item.endsWith('.md') || item.endsWith('.mdx')).length : 0;
+const archiveCount = 0;
+---
+
+<MainLayout title="Admin Paneli - Kampus Cadilari" currentLang="tr">
+  <section class="mx-auto max-w-6xl">
+    <div id="admin-loading" class="rounded-[1.75rem] bg-gradient-to-br from-purple-700 to-pink-600 p-8 text-white shadow-2xl">
+      <p class="text-sm font-bold uppercase tracking-[0.2em] text-purple-100">Dashboard</p>
+      <h1 class="mt-3 text-4xl font-black">Dijital Karargah aciliyor</h1>
+      <p class="mt-4 max-w-2xl text-white/85">Kimlik dogrulaniyor, yonetim paneli yukleniyor.</p>
+    </div>
+
+    <div id="admin-panel" class="hidden">
+      <section class="rounded-[1.75rem] bg-gradient-to-br from-purple-700 to-pink-600 p-8 text-white shadow-2xl">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p class="text-sm font-bold uppercase tracking-[0.22em] text-purple-100">Ana dashboard</p>
+            <h1 class="mt-3 text-4xl font-black">Hos geldin, <span id="admin-name">admin</span></h1>
+            <p class="mt-4 max-w-2xl text-white/85">Post it duvari, yazi kutucuklari ve admin bildirimlerini buradan yonet.</p>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <button id="notif-toggle-btn" class="relative rounded-full border border-white/40 bg-white/15 px-5 py-3 font-bold text-white transition hover:bg-white/25">
+              Bildirimler
+              <span id="notif-badge" class="ml-2 hidden rounded-full bg-amber-300 px-2 py-0.5 text-xs font-bold text-amber-900">0</span>
+            </button>
+            <button id="logout-button" class="rounded-full bg-white px-6 py-3 font-bold text-purple-700 transition hover:bg-amber-100">Cikis yap</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-8 grid gap-4 md:grid-cols-4">
+        <article class="rounded-[1.5rem] bg-white p-6 shadow-lg ring-1 ring-slate-200">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Oturum</p>
+          <p id="admin-email" class="mt-3 text-lg font-black text-slate-900"></p>
+          <p id="admin-role" class="mt-1 text-sm text-slate-600"></p>
+        </article>
+        <article class="rounded-[1.5rem] bg-white p-6 shadow-lg ring-1 ring-slate-200">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-purple-700">Toplam yazi</p>
+          <p id="stat-articles" class="mt-3 text-4xl font-black text-slate-900">{articleCount}</p>
+        </article>
+        <article class="rounded-[1.5rem] bg-white p-6 shadow-lg ring-1 ring-slate-200">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Toplam arsiv kaydi</p>
+          <p id="stat-archive" class="mt-3 text-4xl font-black text-slate-900">{archiveCount}</p>
+        </article>
+        <article class="rounded-[1.5rem] bg-white p-6 shadow-lg ring-1 ring-slate-200">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-rose-600">Toplam etkinlik</p>
+          <p id="stat-events" class="mt-3 text-4xl font-black text-slate-900">{eventCount}</p>
+        </article>
+      </section>
+
+      <section class="mt-8 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <div class="grid gap-6">
+          <article class="rounded-[1.75rem] bg-white p-6 shadow-lg ring-1 ring-slate-200">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <p class="text-sm font-bold uppercase tracking-[0.2em] text-purple-700">Post it Duvari</p>
+                <h2 class="mt-2 text-2xl font-black text-slate-900">Not, yorum ve duzenleme gecmisi</h2>
+              </div>
+              <button id="postit-add-btn" class="rounded-full bg-purple-600 px-4 py-2 text-white font-bold hover:bg-purple-700">Yeni Not Kutucugu</button>
+            </div>
+            <div id="postit-list" class="mt-6 grid gap-4 md:grid-cols-2"></div>
+          </article>
+
+          <article class="rounded-[1.75rem] bg-white p-6 shadow-lg ring-1 ring-slate-200">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-sm font-bold uppercase tracking-[0.2em] text-fuchsia-700">Icerik Yonetimi</p>
+                <p class="text-slate-600 mt-1 text-sm">Yeni yazi icin kutucuk ac, tum alanlari doldur ve kaydet.</p>
+              </div>
+              <button id="article-add-btn" class="rounded-full bg-fuchsia-600 px-4 py-2 text-white font-bold hover:bg-fuchsia-700">Yeni Yazi Kutucugu</button>
+            </div>
+            <div id="article-list" class="mt-5 space-y-3"></div>
+          </article>
+        </div>
+
+        <div class="grid gap-6">
+          <article class="rounded-[1.75rem] bg-white p-6 shadow-lg ring-1 ring-slate-200">
+            <p class="text-sm font-bold uppercase tracking-[0.2em] text-rose-600">Hizli erisim</p>
+            <div class="mt-5 grid gap-3">
+              <a href="/articles" class="rounded-2xl bg-slate-50 px-4 py-4 font-semibold text-slate-800 transition hover:bg-purple-50">Icerik arsivine git</a>
+              <a href="/archive" class="rounded-2xl bg-slate-50 px-4 py-4 font-semibold text-slate-800 transition hover:bg-purple-50">Gazete arsivini ac</a>
+              <a href="/events" class="rounded-2xl bg-slate-50 px-4 py-4 font-semibold text-slate-800 transition hover:bg-purple-50">Etkinlik takvimini ac</a>
+              <a href="/admin/submissions" class="rounded-2xl bg-purple-100 px-4 py-4 font-semibold text-purple-800 transition hover:bg-purple-200">-> Basvurular ve onay akislari</a>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <aside id="notif-panel" class="fixed right-4 top-24 z-50 hidden w-full max-w-md rounded-2xl border border-gray-200 bg-white p-4 shadow-2xl">
+    <div class="mb-3 flex items-center justify-between">
+      <h2 class="text-lg font-black text-gray-900">Admin Bildirimleri</h2>
+      <button id="notif-close-btn" class="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold text-gray-600 hover:bg-gray-200">Kapat</button>
+    </div>
+    <div class="mb-3 flex flex-wrap gap-2">
+      <button id="notif-mark-all-btn" class="rounded-lg bg-purple-100 px-3 py-1.5 text-xs font-bold text-purple-800 hover:bg-purple-200">Tumunu okundu yap</button>
+      <button id="notif-delete-selected-btn" class="rounded-lg bg-rose-100 px-3 py-1.5 text-xs font-bold text-rose-800 hover:bg-rose-200">Sec ve sil</button>
+    </div>
+    <div id="notif-list" class="max-h-[60vh] space-y-2 overflow-auto"></div>
+  </aside>
+
+  <div id="postit-create-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
+    <div class="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl">
+      <h3 class="text-2xl font-black text-slate-900">Yeni Post it Notu</h3>
+      <form id="postit-create-form" class="mt-5 space-y-4">
+        <div>
+          <label class="text-sm font-semibold text-slate-700">Not adi</label>
+          <input name="title" required class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2" />
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-slate-700">Not icerigi</label>
+          <textarea name="text" required rows="5" class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2"></textarea>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button id="postit-create-cancel" type="button" class="rounded-xl border border-slate-300 px-4 py-2 font-semibold text-slate-700">Iptal</button>
+          <button type="submit" class="rounded-xl bg-purple-600 px-4 py-2 font-semibold text-white hover:bg-purple-700">Paylas</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="postit-edit-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
+    <div class="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl">
+      <h3 class="text-2xl font-black text-slate-900">Post it Notunu Duzenle</h3>
+      <form id="postit-edit-form" class="mt-5 space-y-4">
+        <input type="hidden" name="id" />
+        <div>
+          <label class="text-sm font-semibold text-slate-700">Not adi</label>
+          <input name="title" required class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2" />
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-slate-700">Not icerigi</label>
+          <textarea name="text" required rows="5" class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2"></textarea>
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-slate-700">Degistirme sebebi</label>
+          <input name="reason" required class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2" />
+        </div>
+        <div class="flex justify-end gap-3">
+          <button id="postit-edit-cancel" type="button" class="rounded-xl border border-slate-300 px-4 py-2 font-semibold text-slate-700">Vazgec</button>
+          <button type="submit" class="rounded-xl bg-purple-600 px-4 py-2 font-semibold text-white hover:bg-purple-700">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="postit-detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
+    <div class="w-full max-w-3xl rounded-2xl bg-white p-6 shadow-2xl">
+      <div class="mb-4 flex items-center justify-between">
+        <h3 id="postit-detail-title" class="text-2xl font-black text-slate-900">Post it Detayi</h3>
+        <button id="postit-detail-close" class="rounded-full bg-slate-100 px-3 py-1 text-sm font-bold text-slate-600">Kapat</button>
+      </div>
+      <p id="postit-detail-meta" class="text-xs font-semibold uppercase tracking-wide text-slate-500"></p>
+      <p id="postit-detail-text" class="mt-3 whitespace-pre-wrap rounded-xl bg-slate-50 p-4 text-sm leading-7 text-slate-700"></p>
+
+      <div class="mt-5 grid gap-5 md:grid-cols-2">
+        <div>
+          <h4 class="text-sm font-bold uppercase tracking-wide text-slate-600">Yorumlar</h4>
+          <div id="postit-detail-comments" class="mt-2 max-h-52 space-y-2 overflow-auto"></div>
+          <form id="postit-comment-form" class="mt-3 flex gap-2">
+            <input type="hidden" name="postitId" />
+            <input name="comment" required placeholder="Not altina yorum yaz..." class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+            <button type="submit" class="rounded-lg bg-purple-600 px-3 py-2 text-xs font-bold text-white">Paylas</button>
+          </form>
+        </div>
+        <div>
+          <h4 class="text-sm font-bold uppercase tracking-wide text-slate-600">Duzenleme gecmisi</h4>
+          <div id="postit-detail-history" class="mt-2 max-h-60 space-y-2 overflow-auto"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="article-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
+    <div class="w-full max-w-3xl rounded-2xl bg-white p-6 shadow-2xl">
+      <div class="mb-4 flex items-center justify-between">
+        <h3 id="article-modal-title" class="text-2xl font-black text-slate-900">Yeni Yazi</h3>
+        <button id="article-modal-close" class="rounded-full bg-slate-100 px-3 py-1 text-sm font-bold text-slate-600">Kapat</button>
+      </div>
+      <form id="article-form" class="grid gap-4 md:grid-cols-2">
+        <input type="hidden" name="id" />
+        <div>
+          <label class="text-sm font-semibold text-slate-700">Baslik</label>
+          <input name="title" required class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2" />
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-slate-700">Fotograf URL</label>
+          <input name="image_url" class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2" placeholder="https://..." />
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-slate-700">Slug (URL)</label>
+          <input name="slug" required class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2" placeholder="yazi-basligi" />
+          <p class="mt-1 text-xs text-slate-500">Slug, yazinin adresinde gorunen SEO dostu kisa kimliktir.</p>
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-slate-700">Kategori</label>
+          <select name="category" class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2">
+            <option value="Hukuk">Hukuk</option>
+            <option value="Roportaj">Roportaj</option>
+            <option value="Gorunmeyen Kadinlar">Gorunmeyen Kadinlar</option>
+            <option value="Kultur Sanat">Kultur Sanat</option>
+            <option value="Psikoloji">Psikoloji</option>
+            <option value="Cadi Medya Kolektifi">Cadi Medya Kolektifi</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-slate-700">Durum</label>
+          <select name="status" class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2">
+            <option value="draft">Taslak</option>
+            <option value="pending_approval">Admin onayi bekliyor</option>
+            <option value="published">Yayinda</option>
+          </select>
+        </div>
+        <div class="md:col-span-2">
+          <label class="text-sm font-semibold text-slate-700">Icerik (Kisa metin)</label>
+          <textarea name="excerpt" rows="3" required class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2"></textarea>
+        </div>
+        <div class="md:col-span-2">
+          <label class="text-sm font-semibold text-slate-700">Uzun metin</label>
+          <textarea name="body" rows="8" required class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2"></textarea>
+        </div>
+        <div class="md:col-span-2 flex justify-end gap-3">
+          <button id="article-modal-cancel" type="button" class="rounded-xl border border-slate-300 px-4 py-2 font-semibold text-slate-700">Vazgec</button>
+          <button type="submit" class="rounded-xl bg-fuchsia-600 px-4 py-2 font-semibold text-white hover:bg-fuchsia-700">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const loadingBox = document.getElementById('admin-loading');
+    const panel = document.getElementById('admin-panel');
+    const adminName = document.getElementById('admin-name');
+    const adminEmail = document.getElementById('admin-email');
+    const adminRole = document.getElementById('admin-role');
+    const logoutButton = document.getElementById('logout-button');
+    const postitList = document.getElementById('postit-list');
+    const postitAddBtn = document.getElementById('postit-add-btn');
+    const postitCreateModal = document.getElementById('postit-create-modal');
+    const postitCreateForm = document.getElementById('postit-create-form');
+    const postitCreateCancel = document.getElementById('postit-create-cancel');
+    const postitEditModal = document.getElementById('postit-edit-modal');
+    const postitEditForm = document.getElementById('postit-edit-form');
+    const postitEditCancel = document.getElementById('postit-edit-cancel');
+    const postitDetailModal = document.getElementById('postit-detail-modal');
+    const postitDetailTitle = document.getElementById('postit-detail-title');
+    const postitDetailMeta = document.getElementById('postit-detail-meta');
+    const postitDetailText = document.getElementById('postit-detail-text');
+    const postitDetailComments = document.getElementById('postit-detail-comments');
+    const postitDetailHistory = document.getElementById('postit-detail-history');
+    const postitDetailClose = document.getElementById('postit-detail-close');
+    const postitCommentForm = document.getElementById('postit-comment-form');
+    const articleList = document.getElementById('article-list');
+    const articleAddBtn = document.getElementById('article-add-btn');
+    const articleModal = document.getElementById('article-modal');
+    const articleModalTitle = document.getElementById('article-modal-title');
+    const articleModalClose = document.getElementById('article-modal-close');
+    const articleModalCancel = document.getElementById('article-modal-cancel');
+    const articleForm = document.getElementById('article-form');
+    const notifToggleBtn = document.getElementById('notif-toggle-btn');
+    const notifBadge = document.getElementById('notif-badge');
+    const notifPanel = document.getElementById('notif-panel');
+    const notifList = document.getElementById('notif-list');
+    const notifCloseBtn = document.getElementById('notif-close-btn');
+    const notifMarkAllBtn = document.getElementById('notif-mark-all-btn');
+    const notifDeleteSelectedBtn = document.getElementById('notif-delete-selected-btn');
+    const statArticles = document.getElementById('stat-articles');
+    const statArchive = document.getElementById('stat-archive');
+    const statEvents = document.getElementById('stat-events');
+
+    let currentAdmin = null;
+
+    function escapeHtml(value) {
+      return String(value || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+    }
+    function openModal(node) { node?.classList.remove('hidden'); node?.classList.add('flex'); }
+    function closeModal(node) { node?.classList.add('hidden'); node?.classList.remove('flex'); }
+
+    function bootAdminPanel() {
+      const token = localStorage.getItem('admin_auth_token');
+      const userRaw = localStorage.getItem('admin_auth_user');
+      if (!token || !userRaw) return window.location.replace('/admin/login-email');
+      currentAdmin = JSON.parse(userRaw);
+      adminName.textContent = currentAdmin.username || 'admin';
+      adminEmail.textContent = currentAdmin.email || '';
+      adminRole.textContent = `Rol: ${currentAdmin.role || 'editor'}`;
+      loadingBox.classList.add('hidden');
+      panel.classList.remove('hidden');
+    }
+
+    logoutButton?.addEventListener('click', async () => {
+      localStorage.removeItem('admin_auth_token');
+      localStorage.removeItem('admin_auth_user');
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.replace('/admin/login-email');
+    });
+
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/admin/stats');
+        const json = await res.json();
+        if (!json.success) return;
+        if (statArticles) statArticles.textContent = json.articles ?? statArticles.textContent;
+        if (statArchive) statArchive.textContent = json.archive?.total ?? statArchive.textContent;
+        if (statEvents) statEvents.textContent = json.proposals?.total ?? statEvents.textContent;
+      } catch {}
+    }
+
+    async function loadNotifications() {
+      if (!currentAdmin?.email) return;
+      const res = await fetch(`/api/admin/notifications?adminEmail=${encodeURIComponent(currentAdmin.email)}&limit=40`);
+      const json = await res.json();
+      if (!json.success) return;
+      const unread = Number(json.unreadCount || 0);
+      notifBadge.textContent = unread;
+      notifBadge.classList.toggle('hidden', unread === 0);
+      if (!json.notifications.length) {
+        notifList.innerHTML = '<p class="rounded-lg bg-gray-50 p-3 text-sm text-gray-500">Bildirim yok.</p>';
+        return;
+      }
+      notifList.innerHTML = json.notifications.map((item) => `
+        <label class="block rounded-xl border p-3 ${item.is_read ? 'border-slate-200 bg-white' : 'border-purple-200 bg-purple-50'}">
+          <div class="flex items-start gap-3">
+            <input type="checkbox" class="notif-select mt-1" value="${item.id}" />
+            <div class="flex-1">
+              <p class="text-xs font-bold uppercase tracking-wide">${escapeHtml(item.type)}</p>
+              <p class="mt-1 text-sm font-semibold text-slate-900">${escapeHtml(item.title || 'Bildirim')}</p>
+              <p class="mt-1 text-xs text-slate-600">${escapeHtml(item.message || '')}</p>
+            </div>
+          </div>
+        </label>
+      `).join('');
+    }
+
+    notifToggleBtn?.addEventListener('click', () => notifPanel.classList.toggle('hidden'));
+    notifCloseBtn?.addEventListener('click', () => notifPanel.classList.add('hidden'));
+    notifMarkAllBtn?.addEventListener('click', async () => {
+      await fetch('/api/admin/notifications', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adminEmail: currentAdmin?.email, markAll: true }) });
+      loadNotifications();
+    });
+    notifDeleteSelectedBtn?.addEventListener('click', async () => {
+      const ids = Array.from(document.querySelectorAll('.notif-select:checked')).map((el) => Number(el.value));
+      if (!ids.length) return alert('Lutfen silmek icin bildirim sec.');
+      await fetch('/api/admin/notifications', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adminEmail: currentAdmin?.email, notificationIds: ids }) });
+      loadNotifications();
+    });
+
+    async function loadPostits() {
+      postitList.innerHTML = '<div class="text-sm text-gray-500">Yukleniyor...</div>';
+      const res = await fetch('/api/admin/postits');
+      const json = await res.json();
+      if (!json.success) return (postitList.innerHTML = `<div class="text-sm text-red-600">${escapeHtml(json.error || 'Hata')}</div>`);
+      if (!json.data.length) return (postitList.innerHTML = '<div class="text-sm text-gray-500">Henuz not yok.</div>');
+      postitList.innerHTML = json.data.map((item) => `
+        <article class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-base font-black text-slate-900">${escapeHtml(item.title || 'Duyuru')}</h3>
+            <span class="rounded-full bg-purple-100 px-2 py-0.5 text-[11px] font-bold text-purple-800">${item.is_edited ? 'Duzenlendi' : 'Yeni'}</span>
+          </div>
+          <p class="mt-2 line-clamp-3 text-sm text-slate-700">${escapeHtml(item.text)}</p>
+          <p class="mt-2 text-xs text-slate-500">${escapeHtml(item.author || item.created_by || '-')} • ${new Date(item.created_at).toLocaleDateString('tr-TR')} • ${item.comment_count || 0} yorum</p>
+          <div class="mt-3 flex gap-2">
+            <button data-id="${item.id}" class="postit-detail rounded bg-white px-3 py-1 text-xs font-bold text-slate-700 border border-slate-200">Detay</button>
+            <button data-id="${item.id}" class="postit-edit rounded bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">Duzenle</button>
+            <button data-id="${item.id}" class="postit-del rounded bg-red-100 px-3 py-1 text-xs font-bold text-red-700">Sil</button>
+          </div>
+        </article>
+      `).join('');
+      postitList.querySelectorAll('.postit-detail').forEach((btn) => {
+        btn.addEventListener('click', () => openPostitDetail(Number(btn.dataset.id)));
+      });
+      postitList.querySelectorAll('.postit-edit').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const detail = await fetch(`/api/admin/postits?id=${btn.dataset.id}`).then((r) => r.json());
+          if (!detail.success || !detail.data) return;
+          postitEditForm.elements.id.value = detail.data.id;
+          postitEditForm.elements.title.value = detail.data.title || '';
+          postitEditForm.elements.text.value = detail.data.text || '';
+          postitEditForm.elements.reason.value = '';
+          openModal(postitEditModal);
+        });
+      });
+      postitList.querySelectorAll('.postit-del').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Bu notu silmek istiyor musun?')) return;
+          await fetch('/api/admin/postits', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: Number(btn.dataset.id) }) });
+          loadPostits();
+        });
+      });
+    }
+
+    async function openPostitDetail(postitId) {
+      const detail = await fetch(`/api/admin/postits?id=${postitId}`).then((r) => r.json());
+      if (!detail.success || !detail.data) return;
+      const item = detail.data;
+      postitDetailTitle.textContent = item.title || 'Duyuru';
+      postitDetailMeta.textContent = `${item.author || item.created_by || '-'} • ${new Date(item.created_at).toLocaleString('tr-TR')}`;
+      postitDetailText.textContent = item.text || '';
+      postitCommentForm.elements.postitId.value = item.id;
+
+      postitDetailComments.innerHTML = (item.comments || []).length
+        ? item.comments.map((comment) => `
+            <article class="rounded-lg border border-slate-200 bg-white p-3">
+              <p class="text-sm text-slate-700">${escapeHtml(comment.comment)}</p>
+              <p class="mt-1 text-[11px] font-semibold text-slate-500">${escapeHtml(comment.author || 'admin')} • ${new Date(comment.created_at).toLocaleString('tr-TR')}</p>
+            </article>
+          `).join('')
+        : '<p class="rounded-lg bg-slate-50 p-3 text-sm text-slate-500">Henuz yorum yok.</p>';
+
+      postitDetailHistory.innerHTML = (item.revisions || []).length
+        ? item.revisions.map((rev) => `
+            <article class="rounded-lg border border-slate-200 bg-white p-3">
+              <p class="text-xs font-bold uppercase tracking-wide text-slate-500">${new Date(rev.edited_at).toLocaleString('tr-TR')}</p>
+              <p class="mt-1 text-xs text-slate-600">Duzenleyen: ${escapeHtml(rev.edited_by || '-')}</p>
+              <p class="text-xs text-slate-600">Sebep: ${escapeHtml(rev.reason || '-')}</p>
+            </article>
+          `).join('')
+        : '<p class="rounded-lg bg-slate-50 p-3 text-sm text-slate-500">Duzenleme gecmisi yok.</p>';
+
+      openModal(postitDetailModal);
+    }
+
+    postitAddBtn?.addEventListener('click', () => {
+      postitCreateForm.reset();
+      openModal(postitCreateModal);
+    });
+    postitCreateCancel?.addEventListener('click', () => {
+      if (confirm('Not eklemek istemediginize emin misiniz?')) closeModal(postitCreateModal);
+    });
+    postitCreateForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const payload = { title: postitCreateForm.elements.title.value, text: postitCreateForm.elements.text.value, color: 'yellow', author: currentAdmin?.email || 'admin', status: 'active' };
+      const res = await fetch('/api/admin/postits', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const json = await res.json();
+      if (!res.ok || !json.success) return alert(json.error || 'Kayit basarisiz');
+      closeModal(postitCreateModal);
+      loadPostits();
+      loadNotifications();
+    });
+    postitEditCancel?.addEventListener('click', () => closeModal(postitEditModal));
+    postitEditForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const payload = {
+        id: Number(postitEditForm.elements.id.value),
+        title: postitEditForm.elements.title.value,
+        text: postitEditForm.elements.text.value,
+        reason: postitEditForm.elements.reason.value,
+        color: 'yellow',
+        status: 'active',
+        editor: currentAdmin?.email || 'admin',
+      };
+      const res = await fetch('/api/admin/postits', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const json = await res.json();
+      if (!res.ok || !json.success) return alert(json.error || 'Guncelleme basarisiz');
+      closeModal(postitEditModal);
+      loadPostits();
+      loadNotifications();
+    });
+
+    postitDetailClose?.addEventListener('click', () => closeModal(postitDetailModal));
+
+    postitCommentForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const payload = {
+        action: 'comment',
+        postitId: Number(postitCommentForm.elements.postitId.value),
+        comment: postitCommentForm.elements.comment.value,
+        author: currentAdmin?.email || 'admin',
+      };
+      const res = await fetch('/api/admin/postits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) return alert(json.error || 'Yorum eklenemedi');
+      postitCommentForm.reset();
+      openPostitDetail(payload.postitId);
+      loadPostits();
+      loadNotifications();
+    });
+
+    async function loadArticles() {
+      articleList.innerHTML = '<div class="text-sm text-gray-500">Yukleniyor...</div>';
+      const res = await fetch('/api/admin/articles');
+      const json = await res.json();
+      if (!json.success) {
+        articleList.innerHTML = `<div class="text-sm text-red-600">${escapeHtml(json.error || 'Hata')}</div>`;
+        return;
+      }
+      if (!json.data.length) {
+        articleList.innerHTML = '<div class="text-sm text-gray-500">Henuz yazi yok.</div>';
+        return;
+      }
+
+      articleList.innerHTML = json.data.map((a) => `
+        <article class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="font-bold text-slate-900">${escapeHtml(a.title)}</p>
+              <p class="text-xs text-slate-500 mt-1">/${escapeHtml(a.slug)} - ${escapeHtml(a.status)}</p>
+              <p class="text-xs text-slate-500">${escapeHtml(a.category || 'Kategori yok')}</p>
+              <p class="mt-1 text-[11px] font-semibold text-slate-500">Onay: ${a.approval_summary?.approvedCount || 0}/${a.approval_summary?.adminCount || 0} - Red: ${a.approval_summary?.rejectedCount || 0}</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button data-id="${a.id}" class="article-detail rounded border border-slate-300 bg-white px-3 py-1 text-xs font-bold text-slate-700">Detay</button>
+              <button data-id="${a.id}" class="article-comment rounded bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">Yorum</button>
+              <button data-id="${a.id}" class="article-approve rounded bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">Onayla</button>
+              <button data-id="${a.id}" class="article-reject rounded bg-rose-100 px-3 py-1 text-xs font-bold text-rose-800">Reddet</button>
+              <button data-id="${a.id}" class="article-edit rounded bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">Duzenle</button>
+              <button data-id="${a.id}" class="article-del rounded bg-red-100 px-3 py-1 text-xs font-bold text-red-700">Sil</button>
+            </div>
+          </div>
+        </article>
+      `).join('');
+
+      articleList.querySelectorAll('.article-detail').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const detail = await fetch(`/api/admin/articles?id=${btn.dataset.id}`).then((r) => r.json());
+          if (!detail.success || !detail.data) return;
+          const item = detail.data;
+          const approvals = (item.approvals || []).map((entry) => `${entry.admin_email}: ${entry.decision}${entry.comment ? ` (${entry.comment})` : ''}`).join('\n') || 'Henuz karar yok';
+          const comments = (item.comments || []).map((entry) => `${entry.admin_email}: ${entry.comment}`).join('\n') || 'Henuz yorum yok';
+          alert(`Yazi: ${item.title}\nDurum: ${item.status}\nSlug: /${item.slug}\n\nAdmin kararlari:\n${approvals}\n\nAdmin yorumlari:\n${comments}`);
+        });
+      });
+
+      articleList.querySelectorAll('.article-comment').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const comment = prompt('Admin yorumu:');
+          if (!comment || !comment.trim()) return;
+          const response = await fetch('/api/admin/articles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'comment',
+              articleId: Number(btn.dataset.id),
+              adminEmail: currentAdmin?.email,
+              comment: comment.trim(),
+            }),
+          });
+          const payload = await response.json();
+          if (!response.ok || !payload.success) return alert(payload.error || 'Yorum eklenemedi');
+          loadArticles();
+          loadNotifications();
+        });
+      });
+
+      articleList.querySelectorAll('.article-approve').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const comment = prompt('Onay notu (opsiyonel):') || null;
+          const response = await fetch(`/api/admin/articles/${btn.dataset.id}/approve`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminEmail: currentAdmin?.email, comment }),
+          });
+          const payload = await response.json();
+          if (!response.ok || !payload.success) return alert(payload.error || 'Onay islemi basarisiz');
+          loadArticles();
+          loadNotifications();
+          loadStats();
+        });
+      });
+
+      articleList.querySelectorAll('.article-reject').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const comment = prompt('Red sebebi (opsiyonel):') || null;
+          const response = await fetch(`/api/admin/articles/${btn.dataset.id}/reject`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminEmail: currentAdmin?.email, comment }),
+          });
+          const payload = await response.json();
+          if (!response.ok || !payload.success) return alert(payload.error || 'Red islemi basarisiz');
+          loadArticles();
+          loadNotifications();
+          loadStats();
+        });
+      });
+
+      articleList.querySelectorAll('.article-edit').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const article = json.data.find((row) => Number(row.id) === Number(btn.dataset.id));
+          if (!article) return;
+          articleModalTitle.textContent = 'Yaziyi Duzenle';
+          articleForm.elements.id.value = article.id;
+          articleForm.elements.title.value = article.title || '';
+          articleForm.elements.image_url.value = article.image_url || '';
+          articleForm.elements.slug.value = article.slug || '';
+          articleForm.elements.category.value = article.category || '';
+          articleForm.elements.status.value = article.status === 'published' ? 'pending_approval' : (article.status || 'draft');
+          articleForm.elements.excerpt.value = article.excerpt || '';
+          articleForm.elements.body.value = article.body || '';
+          openModal(articleModal);
+        });
+      });
+
+      articleList.querySelectorAll('.article-del').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Bu yaziyi silmek istiyor musun?')) return;
+          await fetch('/api/admin/articles', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: Number(btn.dataset.id) }),
+          });
+          loadArticles();
+          loadStats();
+        });
+      });
+    }
+
+    articleAddBtn?.addEventListener('click', () => {
+      articleModalTitle.textContent = 'Yeni Yazi';
+      articleForm.reset();
+      articleForm.elements.id.value = '';
+      articleForm.elements.status.value = 'pending_approval';
+      openModal(articleModal);
+    });
+
+    function closeArticleModal() {
+      closeModal(articleModal);
+    }
+
+    articleModalClose?.addEventListener('click', closeArticleModal);
+    articleModalCancel?.addEventListener('click', closeArticleModal);
+
+    articleForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const payload = {
+        id: articleForm.elements.id.value ? Number(articleForm.elements.id.value) : undefined,
+        title: articleForm.elements.title.value,
+        image_url: articleForm.elements.image_url.value,
+        slug: articleForm.elements.slug.value,
+        category: articleForm.elements.category.value,
+        status: articleForm.elements.status.value,
+        excerpt: articleForm.elements.excerpt.value,
+        body: articleForm.elements.body.value,
+        adminEmail: currentAdmin?.email,
+      };
+
+      const res = await fetch('/api/admin/articles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) return alert(json.error || 'Yazi kaydedilemedi');
+      closeArticleModal();
+      loadArticles();
+      loadStats();
+    });
+
+    [postitCreateModal, postitEditModal, postitDetailModal, articleModal].forEach((node) => {
+      node?.addEventListener('click', (event) => {
+        if (event.target === node) closeModal(node);
+      });
+    });
+
+    bootAdminPanel();
+    loadStats();
+    loadPostits();
+    loadArticles();
+    loadNotifications();
+  </script>
+</MainLayout>

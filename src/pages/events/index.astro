@@ -1,0 +1,82 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import EventProposalForm from '../../components/EventProposalForm.astro';
+---
+
+<MainLayout title="Etkinlikler">
+  <div class="bg-gradient-to-r from-purple-600 to-purple-700 py-12 text-white">
+    <div class="mx-auto max-w-6xl px-4 text-center">
+      <h1 class="mb-4 text-4xl font-bold">Kampus Cadilari Etkinlikleri</h1>
+      <p class="text-lg text-purple-100">Onayli etkinlikleri incele, katil veya yeni bir etkinlik oner.</p>
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-6xl px-4 py-12">
+    <section class="mb-12">
+      <h2 class="mb-6 text-2xl font-bold text-gray-900">Yayindaki Etkinlikler</h2>
+      <div id="eventsList" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div class="col-span-full py-12 text-center text-gray-500">
+          <p>Etkinlikler yukleniyor...</p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="my-12" />
+
+    <section id="proposeSection" class="py-8">
+      <h2 class="mb-8 text-center text-3xl font-bold text-gray-900">Etkinlik Onerisinde Bulun</h2>
+      <p class="mx-auto mb-8 max-w-2xl text-center text-gray-600">
+        Etkinlik oneriniz tum aktif adminlerin onayina gider. Tum onaylar tamamlaninca etkinlik yayina alinir.
+      </p>
+      <EventProposalForm />
+    </section>
+  </div>
+</MainLayout>
+
+<script>
+  async function loadEvents() {
+    const list = document.getElementById('eventsList');
+    if (!list) return;
+
+    try {
+      const response = await fetch('/api/events/list');
+      const data = await response.json();
+
+      if (!data?.events?.length) {
+        list.innerHTML = `
+          <div class="col-span-full py-12 text-center text-gray-500">
+            <p>Onayli etkinlik henuz yok.</p>
+            <p class="text-sm">Yeni oneriler formdan gonderildiginde burada listelenecek.</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = data.events.map((event) => `
+        <article class="overflow-hidden rounded-lg border border-gray-200 bg-white transition hover:shadow-lg">
+          <div class="bg-purple-100 p-4">
+            <h3 class="text-lg font-bold text-gray-900">${event.title}</h3>
+            <p class="mt-1 text-sm text-gray-600">${event.category || 'Etkinlik'}</p>
+          </div>
+          <div class="space-y-3 p-4">
+            <p class="text-sm text-gray-700">${(event.description || '').slice(0, 120)}...</p>
+            <p class="text-sm text-gray-600">Sehir: ${event.province || '-'}</p>
+            <p class="text-sm text-gray-600">Katilim: ${event.joined_count || 0} (${event.capacity_label || 'Sinirsiz kontenjan'})</p>
+            <a href="/events/${event.id}" class="block rounded bg-purple-600 px-4 py-2 text-center text-white transition hover:bg-purple-700">
+              Detaylari Gor
+            </a>
+          </div>
+        </article>
+      `).join('');
+    } catch (error) {
+      list.innerHTML = `
+        <div class="col-span-full py-12 text-center text-red-500">
+          <p>Etkinlikler yuklenirken hata olustu.</p>
+        </div>
+      `;
+      console.error('Events load failed:', error);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', loadEvents);
+</script>

@@ -1,0 +1,349 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+
+// Turkish provinces data
+const provinces = [
+  { code: 'istanbul', name: 'İstanbul', region: 'Marmara', status: 'active', members: 145, contacts: ['Zeynep Kaya', 'Ayşe Yılmaz'] },
+  { code: 'ankara', name: 'Ankara', region: 'Central Anatolia', status: 'active', members: 89, contacts: ['Fatma Demir', 'Gülsüm Alp'] },
+  { code: 'izmir', name: 'İzmir', region: 'Aegean', status: 'growing', members: 67, contacts: ['Müzeyyen Senar'] },
+  { code: 'bursa', name: 'Bursa', region: 'Marmara', status: 'active', members: 54, contacts: ['Emine Kara'] },
+  { code: 'gaziantep', name: 'Gaziantep', region: 'Southeast Anatolia', status: 'growing', members: 42, contacts: ['Leyla Şahin'] },
+  { code: 'adana', name: 'Adana', region: 'Mediterranean', status: 'starting', members: 28, contacts: [] },
+  { code: 'eskisehir', name: 'Eskişehir', region: 'Central Anatolia', status: 'active', members: 51, contacts: ['Sevim Aydın'] },
+  { code: 'mersin', name: 'Mersin', region: 'Mediterranean', status: 'growing', members: 35, contacts: [] },
+];
+---
+
+<MainLayout title="Bize Katıl - Kampüs Cadıları" currentLang="tr">
+  <!-- Hero Section -->
+  <section class="mb-12 rounded-2xl bg-gradient-to-r from-purple-700 to-pink-600 p-8 text-white md:p-12">
+    <h1 class="text-4xl md:text-5xl font-black mb-4">Bize Katıl</h1>
+    <p class="text-lg text-white/90 max-w-2xl">
+      Ülkenin 82 ilinde organize olan feminist ağımıza katıl. Başvurmak için ilini seç, bize hakkında bilgi ver ve ekibe katıl.
+    </p>
+  </section>
+
+  <!-- Main Content: Province Selection + Form -->
+  <section class="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-8 mb-12">
+    <!-- Left: Province Selection & Details -->
+    <div class="space-y-6">
+      <!-- Province Dropdown -->
+      <div class="bg-white rounded-2xl p-6 shadow-lg ring-1 ring-gray-200">
+        <label class="block text-sm font-bold uppercase text-gray-600 mb-3">
+          1️⃣ İl Seç
+        </label>
+        <select id="province-select" class="w-full px-4 py-3 rounded-lg border-2 border-purple-300 font-semibold focus:border-purple-600 focus:outline-none">
+          <option value="">-- İlini Seç --</option>
+          {provinces.map(p => (
+            <option value={p.code}>{p.name}</option>
+          ))}
+        </select>
+      </div>
+
+      <!-- Province Details Panel -->
+      <div id="province-details" class="hidden bg-white rounded-2xl p-6 shadow-lg ring-1 ring-gray-200 space-y-4">
+        <label class="text-sm font-bold uppercase text-gray-600">
+          2️⃣ İl Bilgileri
+        </label>
+        
+        <div id="details-content" class="space-y-4">
+          <!-- Details will be populated by JavaScript -->
+        </div>
+
+        <button id="select-province-btn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition">
+          ✓ Bu İli Seç
+        </button>
+      </div>
+
+      <!-- Info Box -->
+      <div class="bg-purple-50 rounded-2xl p-6 border-2 border-purple-200">
+        <p class="text-sm font-bold text-purple-700 uppercase mb-3">💡 Bilgi</p>
+        <p class="text-gray-700 text-sm leading-6">
+          Başvurun alındıktan sonra, seçtiğin ildeki sorumlu kişi veya ekip seninle en kısa sürede iletişime geçecek. 
+          Aktif illerimiz için yerel ekibe, kuruluş aşamasında olan illerimiz için ise kurucu gönüllü havuzuna yönlendirileceksin.
+        </p>
+      </div>
+    </div>
+
+    <!-- Right: Application Form -->
+    <div class="bg-white rounded-2xl p-6 shadow-lg ring-1 ring-gray-200">
+      <label class="text-sm font-bold uppercase text-gray-600 mb-6 block">
+        3️⃣ Başvuru Formu
+      </label>
+
+      <form id="application-form" class="space-y-4">
+        <!-- Province (auto-filled, disabled) -->
+        <div>
+          <label class="block text-xs font-bold uppercase text-gray-600 mb-2">
+            İl (Otomatik)
+          </label>
+          <input 
+            id="form-province" 
+            type="text" 
+            disabled
+            class="w-full px-4 py-3 rounded-lg bg-gray-100 text-gray-700 border-2 border-gray-300 font-semibold"
+            placeholder="İl seçilmesini bekliyor..."
+          />
+        </div>
+
+        <!-- Name -->
+        <div>
+          <label class="block text-xs font-bold uppercase text-gray-600 mb-2">
+            Ad Soyadı *
+          </label>
+          <input 
+            type="text" 
+            name="name"
+            required
+            class="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-purple-600 focus:outline-none font-semibold"
+            placeholder="Adını ve soyadını gir"
+          />
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-xs font-bold uppercase text-gray-600 mb-2">
+            E-mail *
+          </label>
+          <input 
+            type="email" 
+            name="email"
+            required
+            class="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-purple-600 focus:outline-none font-semibold"
+            placeholder="ornek@mail.com"
+          />
+        </div>
+
+        <!-- Organization -->
+        <div>
+          <label class="block text-xs font-bold uppercase text-gray-600 mb-2">
+            Üniversite / Kurum (Opsiyonel)
+          </label>
+          <input 
+            type="text" 
+            name="organization"
+            class="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-purple-600 focus:outline-none font-semibold"
+            placeholder="Örn: Boğaziçi Üniversitesi"
+          />
+        </div>
+
+        <!-- Contribution Areas -->
+        <div>
+          <label class="block text-xs font-bold uppercase text-gray-600 mb-3">
+            Katkı Alanları *
+          </label>
+          <div class="space-y-2">
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" name="skills" value="organizing" class="w-4 h-4 rounded border-gray-300" />
+              <span class="text-gray-700">Organizing & Etkinlik Koordinasyonu</span>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" name="skills" value="writing" class="w-4 h-4 rounded border-gray-300" />
+              <span class="text-gray-700">Yazı & Editörlük</span>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" name="skills" value="education" class="w-4 h-4 rounded border-gray-300" />
+              <span class="text-gray-700">Eğitim & Eğitim Materyalleri</span>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" name="skills" value="support" class="w-4 h-4 rounded border-gray-300" />
+              <span class="text-gray-700">Destek & Bakım (Psikolojik, Hukuki vb)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Social Media -->
+        <div>
+          <label class="block text-xs font-bold uppercase text-gray-600 mb-2">
+            Sosyal Medya Handle (Opsiyonel)
+          </label>
+          <input 
+            type="text" 
+            name="social"
+            class="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-purple-600 focus:outline-none font-semibold"
+            placeholder="@kullanıcıad veya profesyonel linkin"
+          />
+        </div>
+
+        <!-- Message -->
+        <div>
+          <label class="block text-xs font-bold uppercase text-gray-600 mb-2">
+            Bize Hakkında Bilgi Ver *
+          </label>
+          <textarea 
+            name="message"
+            required
+            rows="4"
+            class="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-purple-600 focus:outline-none font-semibold resize-none"
+            placeholder="Neden katılmak istiyorsun? İl organizasyonuna nasıl katkı sunabilirsin?"
+          ></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <button 
+          id="submit-btn"
+          type="submit" 
+          disabled
+          class="w-full bg-gray-300 text-gray-600 font-bold py-3 rounded-lg transition cursor-not-allowed disabled:opacity-50"
+        >
+          📋 Başvuruyu Gönder (İl seçiniz)
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    const provinceSelect = document.getElementById('province-select');
+    const provinceDetails = document.getElementById('province-details');
+    const detailsContent = document.getElementById('details-content');
+    const selectProvinceBtn = document.getElementById('select-province-btn');
+    const formProvince = document.getElementById('form-province');
+    const applicationForm = document.getElementById('application-form');
+    const submitBtn = document.getElementById('submit-btn');
+
+    // Province data (from frontmatter)
+    const provincesData = {
+      istanbul: { name: 'İstanbul', region: 'Marmara', status: 'active', members: 145, contacts: ['Zeynep Kaya', 'Ayşe Yılmaz'] },
+      ankara: { name: 'Ankara', region: 'Central Anatolia', status: 'active', members: 89, contacts: ['Fatma Demir', 'Gülsüm Alp'] },
+      izmir: { name: 'İzmir', region: 'Aegean', status: 'growing', members: 67, contacts: ['Müzeyyen Senar'] },
+      bursa: { name: 'Bursa', region: 'Marmara', status: 'active', members: 54, contacts: ['Emine Kara'] },
+      gaziantep: { name: 'Gaziantep', region: 'Southeast Anatolia', status: 'growing', members: 42, contacts: ['Leyla Şahin'] },
+      adana: { name: 'Adana', region: 'Mediterranean', status: 'starting', members: 28, contacts: [] },
+      eskisehir: { name: 'Eskişehir', region: 'Central Anatolia', status: 'active', members: 51, contacts: ['Sevim Aydın'] },
+      mersin: { name: 'Mersin', region: 'Mediterranean', status: 'growing', members: 35, contacts: [] }
+    };
+
+    // Handle province selection
+    provinceSelect.addEventListener('change', (e) => {
+      const selectedCode = e.target.value;
+      
+      if (!selectedCode) {
+        provinceDetails.classList.add('hidden');
+        submitBtn.disabled = true;
+        submitBtn.textContent = '📋 Başvuruyu Gönder (İl seçiniz)';
+        return;
+      }
+
+      const prov = provincesData[selectedCode];
+      
+      // Show details
+      detailsContent.innerHTML = `
+        <div>
+          <p class="text-xs font-bold text-gray-600">İL ADI</p>
+          <p class="text-2xl font-black text-purple-700 mt-1">${prov.name}</p>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-gray-600">BÖLGE</p>
+          <p class="text-lg font-semibold text-gray-900 mt-1">${prov.region}</p>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-gray-600">DURUM</p>
+          <div class="mt-1">
+            <span class="inline-block px-3 py-1 rounded-full font-bold text-sm ${
+              prov.status === 'active' ? 'bg-green-100 text-green-700' :
+              prov.status === 'growing' ? 'bg-blue-100 text-blue-700' :
+              'bg-yellow-100 text-yellow-700'
+            }">
+              ${prov.status === 'active' ? '✓ Aktif' : prov.status === 'growing' ? '📈 Büyüyor' : '🌱 Kuruluş Aşaması'}
+            </span>
+          </div>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-gray-600">AKTIF ÜYE</p>
+          <p class="text-lg font-semibold text-gray-900 mt-1">${prov.members} kişi</p>
+        </div>
+        ${prov.contacts.length > 0 ? `
+          <div>
+            <p class="text-xs font-bold text-gray-600">IL KOORDİNATÖRÜ</p>
+            <p class="text-lg font-semibold text-gray-900 mt-1">${prov.contacts.join(', ')}</p>
+          </div>
+        ` : ''}
+      `;
+      
+      provinceDetails.classList.remove('hidden');
+    });
+
+    // Select province button
+    selectProvinceBtn.addEventListener('click', () => {
+      const selectedCode = provinceSelect.value;
+      const selectedName = provincesData[selectedCode].name;
+      
+      formProvince.value = selectedName;
+      submitBtn.disabled = false;
+      submitBtn.textContent = '✓ Başvuruyu Gönder';
+      submitBtn.classList.remove('bg-gray-300', 'text-gray-600', 'cursor-not-allowed');
+      submitBtn.classList.add('bg-purple-600', 'text-white', 'hover:bg-purple-700');
+      
+      // Scroll to form
+      applicationForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    // Form submission - Send to API
+    applicationForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = {
+        full_name: applicationForm.querySelector('input[name="name"]').value,
+        email: applicationForm.querySelector('input[name="email"]').value,
+        province: formProvince.value,
+        organization: applicationForm.querySelector('input[name="organization"]').value,
+        skills: Array.from(applicationForm.querySelectorAll('input[name="skills"]:checked')).map(cb => cb.value),
+        social_media: applicationForm.querySelector('input[name="social"]').value,
+        message: applicationForm.querySelector('textarea[name="message"]').value,
+      };
+
+      // Disable submit button
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ Gönderiliyor...';
+
+      try {
+        // Send to API
+        const response = await fetch('/api/submit-application', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Bir hata oluştu');
+        }
+
+        // Show success message
+        applicationForm.innerHTML = `
+          <div class="bg-green-50 border-2 border-green-300 rounded-2xl p-6 text-center space-y-3">
+            <p class="text-4xl">✓</p>
+            <p class="text-2xl font-bold text-green-700">Başvurun Alındı!</p>
+            <p class="text-gray-700 mt-4">
+              <strong>${formData.full_name}</strong>, başvurunuz <strong>${formData.province}</strong> il koordinatörlüğü tarafından incelenecek.
+            </p>
+            <div class="bg-green-100 p-4 rounded-lg mt-4">
+              <p class="text-sm text-gray-600">
+                📧 <strong>${formData.email}</strong> adresinize tamamlanma ve değerlendirme hakkında bilgi gönderilecektir.
+              </p>
+              <p class="text-sm text-gray-600 mt-2">
+                ⏱️ Ortalama <strong>3-5 iş günü</strong> içinde dönüş yapılacaktır.
+              </p>
+            </div>
+            <p class="text-xs text-gray-500 mt-4">
+              Başvuru ID: <code class="bg-gray-100 px-2 py-1 rounded">#APP-${result.applicationId}</code>
+            </p>
+            <button onclick="location.reload()" class="mt-6 w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition">
+              Tamam
+            </button>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Submission error:', error);
+        submitBtn.disabled = false;
+        submitBtn.textContent = '✓ Başvuruyu Gönder';
+        
+        // Show error
+        alert(`Hata: ${error.message}\n\nLütfen daha sonra tekrar deneyin.`);
+      }
+    });
+  </script>
+</MainLayout>

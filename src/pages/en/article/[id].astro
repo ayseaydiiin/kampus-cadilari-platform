@@ -1,0 +1,6 @@
+---
+// English article detail: reuse existing article detail renderer
+const id = Astro.params.id ?? '';
+// Redirect to shared article detail route to avoid 404s
+return Astro.redirect(`/article/${id}`);
+---

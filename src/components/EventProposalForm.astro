@@ -1,0 +1,227 @@
+---
+import RegionFilter from './RegionFilter.astro';
+import Toast from './Toast.astro';
+import Modal from './Modal.astro';
+---
+
+<form id="eventProposalForm" class="mx-auto max-w-2xl rounded-lg bg-white p-8 shadow-lg">
+  <h2 class="mb-6 text-2xl font-bold text-gray-900">Etkinlik Onerisi Gonder</h2>
+
+  <div class="mb-6">
+    <label class="mb-2 block text-sm font-semibold text-gray-700">Etkinlik Adi *</label>
+    <div class="relative">
+      <input
+        type="text"
+        id="eventName"
+        name="eventName"
+        placeholder="orn. Feminizm ve Kultur Paneli"
+        required
+        class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+      />
+      <span id="nameStatus" class="absolute right-3 top-3 hidden text-lg">✓</span>
+    </div>
+    <p id="nameError" class="mt-1 hidden text-sm text-red-500"></p>
+  </div>
+
+  <div class="mb-6">
+    <label class="mb-2 block text-sm font-semibold text-gray-700">Kategori *</label>
+    <select
+      id="category"
+      name="category"
+      required
+      class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+    >
+      <option value="">Kategori sec</option>
+      <option value="paneli">Panel</option>
+      <option value="workshop">Workshop</option>
+      <option value="sunum">Sunum</option>
+      <option value="diskusyon">Diskusyon Grubu</option>
+      <option value="sosyal">Sosyal Etkinlik</option>
+      <option value="diger">Diger</option>
+    </select>
+  </div>
+
+  <div class="mb-6">
+    <label class="mb-2 block text-sm font-semibold text-gray-700">Sehir *</label>
+    <RegionFilter id="eventRegion" placeholder="Sehir sec" />
+  </div>
+
+  <div class="mb-6">
+    <label class="mb-2 block text-sm font-semibold text-gray-700">Aciklama *</label>
+    <textarea
+      id="description"
+      name="description"
+      placeholder="Etkinligin amacini, konusunu ve neler yapilacagini aciklayiniz..."
+      required
+      rows="5"
+      class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+    ></textarea>
+    <p class="mt-1 text-sm text-gray-500">Minimum 50 karakter</p>
+  </div>
+
+  <div class="mb-6 rounded-lg border border-purple-200 bg-purple-50 p-3 text-sm font-semibold text-purple-800">
+    Tüm etkinlikler sinirsiz kontenjanla yayinlanir.
+  </div>
+
+  <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div>
+      <label class="mb-2 block text-sm font-semibold text-gray-700">Email *</label>
+      <input
+        type="email"
+        name="email"
+        placeholder="iletisim@example.com"
+        required
+        class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+      />
+    </div>
+
+    <div>
+      <label class="mb-2 block text-sm font-semibold text-gray-700">Telefon</label>
+      <input
+        type="tel"
+        name="phone"
+        placeholder="+90 5XX XXX XXXX"
+        class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+      />
+    </div>
+  </div>
+
+  <div class="mb-6">
+    <label class="mb-2 block text-sm font-semibold text-gray-700">Organizator Adi *</label>
+    <input
+      type="text"
+      name="organizerName"
+      placeholder="Adiniz Soyadiniz"
+      required
+      class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+    />
+  </div>
+
+  <div class="flex gap-4">
+    <button
+      type="submit"
+      id="submitBtn"
+      class="flex-1 rounded-lg bg-purple-600 px-6 py-3 font-semibold text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      Etkinligi Oner
+    </button>
+    <button
+      type="reset"
+      class="rounded-lg bg-gray-300 px-6 py-3 font-semibold text-gray-900 transition hover:bg-gray-400"
+    >
+      Temizle
+    </button>
+  </div>
+</form>
+
+<Toast id="successToast" type="success" message="Etkinlik onerisi basariyla gonderildi!" />
+<Toast id="errorToast" type="error" message="Bir hata olustu" />
+
+<Modal id="confirmModal" title="Etkinligi Onayla" confirmText="Gonder" cancelText="Iptal">
+  <p id="confirmMessage" class="text-gray-700"></p>
+</Modal>
+
+<script>
+  const form = document.getElementById('eventProposalForm');
+  const eventNameInput = document.getElementById('eventName');
+  const nameStatus = document.getElementById('nameStatus');
+  const nameError = document.getElementById('nameError');
+  const submitBtn = document.getElementById('submitBtn');
+
+  let checkTimeout;
+  eventNameInput?.addEventListener('input', async () => {
+    const eventName = eventNameInput.value.trim();
+    nameStatus?.classList.add('hidden');
+    nameError?.classList.add('hidden');
+
+    if (eventName.length < 3) return;
+
+    clearTimeout(checkTimeout);
+    checkTimeout = setTimeout(async () => {
+      try {
+        const response = await fetch('/api/events/check-name', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: eventName }),
+        });
+        const data = await response.json();
+
+        if (data.exists) {
+          if (nameError) {
+            nameError.textContent = 'Bu etkinlik adi daha once kullanilmistir';
+            nameError.classList.remove('hidden');
+          }
+          nameStatus?.classList.add('hidden');
+          if (submitBtn) submitBtn.disabled = true;
+        } else {
+          nameStatus?.classList.remove('hidden');
+          nameError?.classList.add('hidden');
+          if (submitBtn) submitBtn.disabled = false;
+        }
+      } catch (error) {
+        console.error('Name check failed:', error);
+      }
+    }, 500);
+  });
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const regionSelect = document.getElementById('eventRegion');
+    const selectedRegionName =
+      regionSelect && regionSelect.options && regionSelect.selectedIndex >= 0
+        ? regionSelect.options[regionSelect.selectedIndex].text
+        : '';
+
+    const data = {
+      title: formData.get('eventName'),
+      category: formData.get('category'),
+      regionId: parseInt(formData.get('eventRegion') || '0', 10),
+      provinceName: selectedRegionName && selectedRegionName !== 'Sehir sec' ? selectedRegionName : null,
+      description: formData.get('description'),
+      email: formData.get('email'),
+      phone: formData.get('phone'),
+      organizerName: formData.get('organizerName'),
+    };
+
+    const hasRegion = data.regionId && data.regionId > 0;
+    if (!data.title || !data.category || !hasRegion || !data.email || !data.organizerName) {
+      window.showToast('errorToast', 'Lutfen tum zorunlu alanlari doldurunuz (sehir secimi onemli)');
+      return;
+    }
+
+    if (!data.description || String(data.description).trim().length < 50) {
+      window.showToast('errorToast', 'Aciklama en az 50 karakter olmali');
+      return;
+    }
+
+    if (submitBtn) submitBtn.disabled = true;
+
+    try {
+      const response = await fetch('/api/events/propose', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+
+      if (response.ok) {
+        window.showToast('successToast', 'Etkinlik onerisi basariyla gonderildi!');
+        form.reset();
+        nameError?.classList.add('hidden');
+        nameStatus?.classList.add('hidden');
+        setTimeout(() => {
+          window.location.href = '/events';
+        }, 1500);
+      } else {
+        window.showToast('errorToast', result.error || 'Hata olustu');
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      window.showToast('errorToast', 'Baglanti hatasi');
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+</script>

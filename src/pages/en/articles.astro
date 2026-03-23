@@ -1,0 +1,74 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { articles } from '../../data/articles-en';
+
+// Extract categories and calculate article counts
+const categoryMap = new Map<string, { name: string; icon: string }>();
+
+articles.forEach((article) => {
+  if (!categoryMap.has(article.category)) {
+    categoryMap.set(article.category, { name: article.category, icon: article.image });
+  }
+});
+
+const categories = Array.from(categoryMap.values())
+  .map((cat) => ({
+    name: cat.name,
+    icon: cat.icon,
+    count: articles.filter((a) => a.category === cat.name).length,
+    slug: cat.name.toLowerCase().replace(/\s+/g, '-'),
+  }))
+  .sort((a, b) => a.name.localeCompare(b.name, 'en'));
+---
+
+<MainLayout title="Articles - Campus Witches" description="Feminist writings and articles" currentLang="en">
+  <div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="mb-16 pt-4">
+      <h1 class="mb-4 text-4xl font-bold text-slate-900">Articles</h1>
+      <p class="max-w-3xl text-lg text-gray-700">
+        Explore our feminist writings on current social issues. From legal analysis to cultural essays, from interviews to research—we offer comprehensive content across a wide range of topics.
+      </p>
+    </div>
+
+    <!-- Categories Grid Dashboard -->
+    <section>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {categories.map((cat) => (
+          <a
+            href={`/en/articles/${cat.slug}`}
+            class="group relative bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[160px]"
+          >
+            {/* Icon and Badge */}
+            <div class="flex justify-between items-start">
+              <div class="p-3 bg-purple-50 group-hover:bg-purple-600 transition-colors rounded-lg flex items-center justify-center">
+                <span class="text-2xl">{cat.icon}</span>
+              </div>
+              <span class="text-xs font-medium px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full whitespace-nowrap">
+                {cat.count} article{cat.count !== 1 ? 's' : ''}
+              </span>
+            </div>
+
+            {/* Title and Arrow */}
+            <div class="mt-4 flex justify-between items-end gap-2">
+              <div class="flex-1">
+                <h3 class="text-lg font-bold text-gray-800 group-hover:text-purple-700 transition-colors line-clamp-2">
+                  {cat.name}
+                </h3>
+                <p class="text-sm text-gray-400 mt-1">View Content</p>
+              </div>
+              <svg
+                class="w-5 h-5 text-gray-300 group-hover:text-purple-600 transform group-hover:translate-x-1 transition-all flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  </div>
+</MainLayout>

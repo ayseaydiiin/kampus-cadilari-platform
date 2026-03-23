@@ -1,0 +1,143 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { getApprovedArchiveEntries } from '../../utils/db.js';
+
+const allApproved = getApprovedArchiveEntries();
+const decades = [...new Set(allApproved.map((item) => item.decade).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'en'));
+const focusTopics = [...new Set(allApproved.map((item) => item.focus_topic).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'en'));
+---
+
+<MainLayout title="Archive - Campus Witches" description="Admin-verified feminist newspaper archive" currentLang="en">
+  <section class="relative overflow-hidden rounded-[2rem] border border-[#5b2c84]/20 bg-gradient-to-br from-[#4b1f6f] via-[#5b2c84] to-[#2f264d] px-6 py-12 text-white shadow-2xl md:px-10 md:py-14">
+    <div class="relative max-w-4xl">
+      <p class="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs font-bold uppercase tracking-[0.18em]">Archive</p>
+      <h1 class="mt-4 text-4xl font-black leading-tight md:text-5xl">Feminist Newspaper Archive</h1>
+      <p class="mt-4 max-w-3xl text-base leading-8 text-white/90 md:text-lg">
+        Browse admin-verified newspaper records in a structured and research-friendly list.
+        Each card includes publication metadata, verification seal, and citation tools.
+      </p>
+    </div>
+  </section>
+
+  <section class="mt-8 rounded-[1.5rem] border border-[#d7c8b2] bg-[#f6f0e4] p-5 shadow-sm">
+    <div class="grid gap-4 md:grid-cols-3">
+      <label class="flex flex-col gap-2 text-sm font-semibold text-slate-700">
+        Decade
+        <select id="archive-decade" class="rounded-xl border border-[#cdbba0] bg-white px-3 py-2 text-sm text-slate-800 focus:border-[#5b2c84] focus:outline-none">
+          <option value="all">All decades</option>
+          {decades.map((decade) => <option value={decade}>{decade}</option>)}
+        </select>
+      </label>
+
+      <label class="flex flex-col gap-2 text-sm font-semibold text-slate-700">
+        Focus
+        <select id="archive-focus" class="rounded-xl border border-[#cdbba0] bg-white px-3 py-2 text-sm text-slate-800 focus:border-[#5b2c84] focus:outline-none">
+          <option value="all">All topics</option>
+          {focusTopics.map((topic) => <option value={topic}>{topic}</option>)}
+        </select>
+      </label>
+
+      <label class="flex flex-col gap-2 text-sm font-semibold text-slate-700">
+        Search
+        <input id="archive-search" type="search" placeholder="Publication, title, theme..." class="rounded-xl border border-[#cdbba0] bg-white px-3 py-2 text-sm text-slate-800 focus:border-[#5b2c84] focus:outline-none" />
+      </label>
+    </div>
+  </section>
+
+  <section class="mt-8">
+    <div class="mb-4 flex items-center justify-between">
+      <h2 class="text-2xl font-black text-slate-900">Verified Records</h2>
+      <p id="archive-count" class="text-sm font-semibold text-slate-600">{allApproved.length} records</p>
+    </div>
+    <div id="archive-list" class="grid gap-6 md:grid-cols-2 xl:grid-cols-3"></div>
+  </section>
+
+  <script>
+    const decadeSelect = document.getElementById('archive-decade');
+    const focusSelect = document.getElementById('archive-focus');
+    const searchInput = document.getElementById('archive-search');
+    const listEl = document.getElementById('archive-list');
+    const countEl = document.getElementById('archive-count');
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function cardTemplate(item) {
+      const cover = item.cover_image_url || '/archive/placeholder-cover.svg';
+      const pdfClass = item.pdf_url
+        ? 'border-[#5b2c84] text-[#5b2c84] hover:bg-[#efe5f7]'
+        : 'pointer-events-none border-slate-300 text-slate-400';
+      const pdfUrl = item.pdf_url || '#';
+
+      return `
+        <article class="group relative overflow-hidden rounded-[1.4rem] border border-[#d5c6ac] bg-[#fdf8ef] shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl">
+          <div class="relative">
+            <img src="${escapeHtml(cover)}" alt="${escapeHtml(item.publication_name)} cover" class="h-56 w-full object-cover" loading="lazy" />
+            <div class="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full border border-amber-300/70 bg-amber-100/95 px-3 py-1 text-xs font-bold text-amber-900">
+              <span>?</span>
+              <span>Admin Verified</span>
+            </div>
+            <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#2f264d]/80 via-[#2f264d]/10 to-transparent opacity-0 transition group-hover:opacity-100">
+              <p class="absolute bottom-3 left-3 right-3 text-sm leading-6 text-white">${escapeHtml(item.summary || 'Use inspect to open details.')}</p>
+            </div>
+          </div>
+          <div class="p-5">
+            <p class="text-xs font-bold uppercase tracking-wide text-[#5b2c84]">${escapeHtml(item.decade || '')} · ${escapeHtml(item.publication_year || '')}</p>
+            <h3 class="mt-2 line-clamp-2 text-lg font-black leading-snug text-slate-900">${escapeHtml(item.title)}</h3>
+            <p class="mt-2 text-sm font-semibold text-slate-700">${escapeHtml(item.publication_name)}</p>
+            <p class="mt-2 line-clamp-2 text-sm text-slate-600">Focus: ${escapeHtml(item.focus_topic || 'General feminist agenda')}</p>
+            <div class="mt-4 grid grid-cols-2 gap-2 text-xs font-bold">
+              <a href="/archive/${item.id}" class="rounded-lg bg-[#5b2c84] px-2 py-2 text-center text-white transition hover:bg-[#4a236c]">Inspect</a>
+              <a href="${escapeHtml(pdfUrl)}" target="_blank" rel="noreferrer" class="rounded-lg border px-2 py-2 text-center transition ${pdfClass}">Download PDF</a>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    async function loadArchive() {
+      const params = new URLSearchParams();
+      const decade = decadeSelect?.value || 'all';
+      const focus = focusSelect?.value || 'all';
+      const search = searchInput?.value?.trim() || '';
+
+      if (decade !== 'all') params.set('decade', decade);
+      if (focus !== 'all') params.set('focus', focus);
+      if (search) params.set('search', search);
+
+      const response = await fetch(`/api/archive/list?${params.toString()}`);
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        listEl.innerHTML = '<div class="col-span-full rounded-2xl border border-red-200 bg-red-50 p-8 text-center text-sm text-red-700">Archive could not be loaded.</div>';
+        return;
+      }
+
+      if (!data.items.length) {
+        listEl.innerHTML = '<div class="col-span-full rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">No records found for this filter.</div>';
+        countEl.textContent = '0 records';
+        return;
+      }
+
+      listEl.innerHTML = data.items.map(cardTemplate).join('');
+      countEl.textContent = `${data.items.length} records`;
+    }
+
+    let searchTimer;
+    searchInput?.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(loadArchive, 260);
+    });
+    decadeSelect?.addEventListener('change', loadArchive);
+    focusSelect?.addEventListener('change', loadArchive);
+
+    loadArchive();
+  </script>
+</MainLayout>
+

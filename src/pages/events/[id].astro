@@ -1,0 +1,141 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+const { id } = Astro.params;
+export const prerender = false;
+---
+
+<MainLayout title={`Etkinlik #${id}`}>
+  <div class="mx-auto max-w-4xl px-4 py-10">
+    <a href="/events" class="text-sm font-semibold text-purple-700 hover:underline">← Etkinliklere don</a>
+
+    <article id="eventDetail" class="mt-4 rounded-2xl border border-gray-200 bg-white p-6 shadow">
+      <p class="text-gray-500">Etkinlik yukleniyor...</p>
+    </article>
+
+    <section id="joinSection" class="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow">
+      <h2 class="text-2xl font-bold text-gray-900">Etkinlige Katil</h2>
+      <p class="mt-2 text-sm text-gray-600">Formu doldurdugunda katilim admin panelinde gorunur.</p>
+
+      <form id="joinForm" class="mt-6 grid gap-4">
+        <input type="text" name="name" required placeholder="Ad Soyad" class="rounded-lg border border-gray-300 px-4 py-2" />
+        <input type="email" name="email" required placeholder="E-posta" class="rounded-lg border border-gray-300 px-4 py-2" />
+        <textarea name="message" placeholder="Not (opsiyonel)" rows="3" class="rounded-lg border border-gray-300 px-4 py-2"></textarea>
+        <button id="joinButton" type="submit" class="rounded-lg bg-purple-600 px-4 py-2 font-semibold text-white transition hover:bg-purple-700">
+          Katilim Gonder
+        </button>
+      </form>
+      <p id="joinMessage" class="mt-4 text-sm"></p>
+    </section>
+  </div>
+</MainLayout>
+
+<script define:vars={{ id }}>
+  const detailNode = document.getElementById('eventDetail');
+  const joinForm = document.getElementById('joinForm');
+  const joinMessage = document.getElementById('joinMessage');
+  const joinButton = document.getElementById('joinButton');
+  let loadedEvent = null;
+
+  function escapeHtml(value) {
+    return String(value || '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  }
+
+  function renderEvent(event) {
+    const eventUrl = `${window.location.origin}/events/${event.id}`;
+    const capacityText = event.capacity_label || 'Sinirsiz kontenjan';
+
+    detailNode.innerHTML = `
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-purple-700">${escapeHtml(event.category || 'Etkinlik')}</p>
+          <h1 class="mt-2 text-3xl font-black text-gray-900">${escapeHtml(event.title)}</h1>
+          <p class="mt-2 text-sm text-gray-600">Sehir: ${escapeHtml(event.province || '-')}</p>
+        </div>
+        <button id="copyShareBtn" class="rounded-lg border border-purple-200 px-4 py-2 text-sm font-semibold text-purple-700 hover:bg-purple-50">
+          Linki Kopyala
+        </button>
+      </div>
+      <p class="mt-6 whitespace-pre-wrap text-gray-700">${escapeHtml(event.description || '')}</p>
+      <div class="mt-6 grid gap-2 rounded-xl bg-purple-50 p-4 text-sm text-gray-700">
+        <p>Katilim saglayan kisi: ${event.joined_count}</p>
+        <p>${escapeHtml(capacityText)}</p>
+      </div>
+      <input id="shareLinkInput" type="hidden" value="${escapeHtml(eventUrl)}" />
+    `;
+
+    const copyBtn = document.getElementById('copyShareBtn');
+    copyBtn?.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(eventUrl);
+        copyBtn.textContent = 'Kopyalandi';
+        setTimeout(() => { copyBtn.textContent = 'Linki Kopyala'; }, 1500);
+      } catch {
+        copyBtn.textContent = eventUrl;
+      }
+    });
+  }
+
+  async function loadEvent() {
+    try {
+      const response = await fetch(`/api/events/${id}`);
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        detailNode.innerHTML = '<p class="text-red-600">Etkinlik bulunamadi.</p>';
+        joinForm?.classList.add('hidden');
+        return;
+      }
+      loadedEvent = data.event;
+      renderEvent(loadedEvent);
+    } catch (error) {
+      detailNode.innerHTML = '<p class="text-red-600">Etkinlik yuklenemedi.</p>';
+      console.error(error);
+    }
+  }
+
+  joinForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!loadedEvent) return;
+    joinMessage.textContent = '';
+    joinButton.disabled = true;
+
+    const formData = new FormData(joinForm);
+    const payload = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      message: formData.get('message'),
+    };
+
+    try {
+      const response = await fetch(`/api/events/${id}/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        joinMessage.className = 'mt-4 text-sm text-red-600';
+        joinMessage.textContent = data.error || 'Katilim sirasinda hata olustu';
+        joinButton.disabled = false;
+        return;
+      }
+      joinMessage.className = 'mt-4 text-sm text-green-600';
+      joinMessage.textContent = 'Katilim basariyla kaydedildi.';
+      joinForm.reset();
+      await loadEvent();
+      joinButton.disabled = false;
+    } catch (error) {
+      joinMessage.className = 'mt-4 text-sm text-red-600';
+      joinMessage.textContent = 'Baglanti hatasi olustu';
+      joinButton.disabled = false;
+      console.error(error);
+    }
+  });
+
+  loadEvent();
+</script>

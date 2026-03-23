@@ -1,0 +1,171 @@
+---
+// src/pages/en/index.astro
+import MainLayout from '../../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Campus Witches - Strong Women, Strong Future" currentLang="en">
+  <!-- Hero Section -->
+  <section class="min-h-screen flex items-center justify-center py-12 md:py-0">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center w-full">
+      <!-- Left: Text -->
+      <div class="order-2 md:order-1">
+        <h1 class="text-5xl md:text-6xl font-black leading-tight mb-6">
+          <span class="bg-gradient-to-r from-purple-600 via-red-600 to-pink-600 bg-clip-text text-transparent">
+            Strong Women,<br/>Strong Future
+          </span>
+        </h1>
+        <p class="text-lg text-gray-700 mb-8 leading-relaxed max-w-2xl">
+          From campuses to streets, the voice of feminist resistance. Building power through solidarity, one province at a time. Join the revolution.
+        </p>
+        
+        <!-- CTA Buttons -->
+        <div class="flex gap-4 flex-wrap mb-8">
+          <a href="/en/map" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold px-8 py-3 rounded-lg hover:shadow-lg transition transform hover:scale-105">
+            → Join Us
+          </a>
+          <a href="/en/events" class="border-2 border-purple-600 text-purple-600 font-bold px-8 py-3 rounded-lg hover:bg-purple-50 transition">
+            → Discover Events
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-3 gap-4">
+          <div class="bg-purple-50 p-4 rounded-lg">
+            <div class="text-3xl font-black text-purple-600">82</div>
+            <div class="text-sm text-gray-600">Provinces</div>
+          </div>
+          <div class="bg-red-50 p-4 rounded-lg">
+            <div class="text-3xl font-black text-red-600">1.5K+</div>
+            <div class="text-sm text-gray-600">Members</div>
+          </div>
+          <div class="bg-pink-50 p-4 rounded-lg">
+            <div class="text-3xl font-black text-pink-600">∞</div>
+            <div class="text-sm text-gray-600">Solidarity</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Visual -->
+      <div class="order-1 md:order-2 flex items-center justify-center">
+        <div class="relative w-full max-w-md aspect-square">
+          <!-- Animated background circles -->
+          <div class="absolute inset-0 bg-gradient-to-br from-purple-200 to-pink-200 rounded-3xl opacity-20 animate-pulse"></div>
+          <div class="absolute inset-8 bg-gradient-to-br from-red-200 to-purple-200 rounded-2xl opacity-30 animate-pulse" style="animation-delay: 1s;"></div>
+          
+          <!-- Center icon -->
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="text-8xl animate-bounce">🔮</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values Section -->
+  <section class="py-16 md:py-24 bg-gradient-to-br from-slate-50 to-white rounded-2xl px-8 md:px-12">
+    <h2 class="text-4xl md:text-5xl font-black text-center mb-12">
+      Our <span class="text-purple-600">Values</span>
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+      <!-- Value 1 -->
+      <div class="border-4 border-purple-600 rounded-2xl p-8 bg-white hover:shadow-2xl transition hover:scale-105 transform">
+        <div class="text-5xl mb-4">🦅</div>
+        <h3 class="text-3xl font-bold text-purple-600 mb-4">#01 Freedom</h3>
+        <p class="text-gray-700 leading-relaxed">
+          Liberation from patriarchal systems. Every woman deserves bodily autonomy, choice, and dignity.
+        </p>
+      </div>
+
+      <!-- Value 2 -->
+      <div class="border-4 border-red-600 rounded-2xl p-8 bg-white hover:shadow-2xl transition hover:scale-105 transform">
+        <div class="text-5xl mb-4">🤝</div>
+        <h3 class="text-3xl font-bold text-red-600 mb-4">#02 Solidarity</h3>
+        <p class="text-gray-700 leading-relaxed">
+          United in struggle. We stand together across differences, building power through collective action.
+        </p>
+      </div>
+
+      <!-- Value 3 -->
+      <div class="border-4 border-pink-600 rounded-2xl p-8 bg-white hover:shadow-2xl transition hover:scale-105 transform">
+        <div class="text-5xl mb-4">⚡</div>
+        <h3 class="text-3xl font-bold text-pink-600 mb-4">#03 Struggle</h3>
+        <p class="text-gray-700 leading-relaxed">
+          Resistance is our strength. We fight for justice, equality, and a better world for all.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Breaking News Section -->
+  <section class="py-16 md:py-24">
+    <div class="mb-12">
+      <span class="inline-block bg-red-600 text-white px-4 py-2 rounded-full font-bold mb-4">🔴 BREAKING</span>
+      <h2 class="text-4xl md:text-5xl font-black">Latest Press</h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- News 1 -->
+      <div class="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition">
+        <div class="bg-gradient-to-r from-purple-600 to-pink-600 h-32 flex items-center justify-center text-5xl">📢</div>
+        <div class="p-6">
+          <h3 class="font-bold text-lg mb-2">Protest Coverage</h3>
+          <p class="text-gray-600 text-sm mb-4">Join us for the largest feminist gathering of the year across 82 provinces.</p>
+          <a href="#" class="text-purple-600 font-bold hover:underline">Read More →</a>
+        </div>
+      </div>
+
+      <!-- News 2 -->
+      <div class="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition">
+        <div class="bg-gradient-to-r from-red-600 to-purple-600 h-32 flex items-center justify-center text-5xl">🕯️</div>
+        <div class="p-6">
+          <h3 class="font-bold text-lg mb-2">Candle Vigil</h3>
+          <p class="text-gray-600 text-sm mb-4">Honoring our sisters. Lighting candles for those we've lost to patriarchal violence.</p>
+          <a href="#" class="text-purple-600 font-bold hover:underline">Read More →</a>
+        </div>
+      </div>
+
+      <!-- News 3 -->
+      <div class="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition">
+        <div class="bg-gradient-to-r from-pink-600 to-red-600 h-32 flex items-center justify-center text-5xl">📰</div>
+        <div class="p-6">
+          <h3 class="font-bold text-lg mb-2">Press Release</h3>
+          <p class="text-gray-600 text-sm mb-4">Statement on women's rights and international feminist solidarity initiatives.</p>
+          <a href="#" class="text-purple-600 font-bold hover:underline">Read More →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="py-16 md:py-24 bg-gray-50 rounded-2xl px-8 md:px-12">
+    <h2 class="text-4xl font-bold mb-8">Browse by <span class="text-purple-600">Category</span></h2>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {['Activism', 'Analysis', 'Events', 'Resources'].map(category => (
+        <button class="bg-white border-2 border-purple-600 text-purple-600 font-bold py-3 rounded-lg hover:bg-purple-50 transition">
+          {category}
+        </button>
+      ))}
+    </div>
+  </section>
+
+  <!-- Newsletter Section -->
+  <section class="py-16 md:py-24 bg-gradient-to-r from-purple-600 via-red-600 to-pink-600 rounded-2xl px-8 md:px-12 text-white text-center">
+    <h2 class="text-4xl font-black mb-4">Stay Connected</h2>
+    <p class="text-lg mb-8 max-w-2xl mx-auto opacity-90">
+      Get updates on actions, events, and resistance across all 82 provinces. Join thousands of sisters building power.
+    </p>
+    
+    <div class="flex gap-3 max-w-md mx-auto">
+      <input 
+        type="email" 
+        placeholder="Your email address..." 
+        class="flex-1 px-4 py-3 rounded-lg text-gray-900 font-semibold focus:outline-none"
+      />
+      <button class="bg-white text-purple-600 font-black px-6 py-3 rounded-lg hover:shadow-lg transition">
+        Subscribe
+      </button>
+    </div>
+  </section>
+</MainLayout>

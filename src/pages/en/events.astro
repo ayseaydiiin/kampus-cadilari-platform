@@ -1,0 +1,423 @@
+---
+// src/pages/en/events.astro
+import MainLayout from '../../layouts/MainLayout.astro';
+
+// Mock event data
+const events = [
+  {
+    id: 1,
+    title: 'Women Solidarity Gathering',
+    date: '2026-03-25',
+    time: '18:00',
+    location: 'Istanbul - Beyoğlu',
+    description: 'At our monthly solidarity gathering, we will discuss "Labor and Women" this month.',
+    image: '👯',
+    color: 'purple',
+    category: 'solidarity'
+  },
+  {
+    id: 2,
+    title: 'Law Reading Group: Domestic Violence Prevention Law',
+    date: '2026-03-28',
+    time: '19:00',
+    location: 'Online - Zoom',
+    description: 'Together with legal experts, we will examine Law No. 6284 in detail.',
+    image: '⚖️',
+    color: 'red',
+    category: 'online'
+  },
+  {
+    id: 3,
+    title: 'Feminist Film Screening: "Why Men Don\'t Cry"',
+    date: '2026-04-02',
+    time: '20:00',
+    location: 'Izmir - Karşıyaka',
+    description: 'Our goal is to discuss feminist cinema language. We will have dialogue after watching the film.',
+    image: '🎬',
+    color: 'purple',
+    category: 'cultural'
+  },
+  {
+    id: 4,
+    title: 'Academic Workshop: Feminist Research Methodology',
+    date: '2026-04-05',
+    time: '14:00',
+    location: 'Ankara - Çankaya University',
+    description: 'With Res. Asst. Sevim Aydın and Assoc. Prof. Leyla Şahin, you will learn the feminist research process.',
+    image: '🔬',
+    color: 'red',
+    category: 'academic'
+  }
+];
+---
+
+<MainLayout title="Events - Digital Purple Headquarters" description="Feminist activism events and workshops">
+  <div class="mb-8">
+    <h1 class="text-4xl font-bold text-purple-600 mb-4">🎯 Upcoming Events</h1>
+    <p class="text-lg text-gray-700">
+      You can learn about solidarity gatherings, workshops and trainings that we organize nationwide.
+    </p>
+  </div>
+
+  <!-- Event Category Filter -->
+  <section class="bg-white rounded-lg shadow p-6 mb-8">
+    <h3 class="text-xl font-bold text-purple-600 mb-4">Filter by Type</h3>
+    <div class="event-filter flex flex-wrap gap-2">
+      <button data-filter="all" class="event-filter-btn px-4 py-2 rounded-full bg-purple-600 text-white font-medium hover:bg-purple-700 transition">
+        All
+      </button>
+      <button data-filter="online" class="event-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 font-medium hover:bg-purple-100 transition">
+        Online
+      </button>
+      <button data-filter="solidarity" class="event-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 font-medium hover:bg-purple-100 transition">
+        Solidarity Gathering
+      </button>
+      <button data-filter="cultural" class="event-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 font-medium hover:bg-purple-100 transition">
+        Cultural Event
+      </button>
+      <button data-filter="academic" class="event-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 font-medium hover:bg-purple-100 transition">
+        Academic
+      </button>
+    </div>
+  </section>
+
+  <!-- Events List -->
+  <section class="space-y-6 mb-12">
+    {events.map((event) => (
+      <div id={`event-${event.id}`} data-category={event.category} class="event-card bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg shadow hover:shadow-lg transition overflow-hidden">
+        <div class="flex flex-col md:flex-row">
+          <div class="md:w-1/4 flex items-center justify-center p-6 text-6xl bg-white">
+            {event.image}
+          </div>
+          <div class="md:w-3/4 p-6">
+            <div class="flex items-start justify-between mb-3">
+              <h3 class="text-xl md:text-2xl font-bold text-purple-600">
+                {event.title}
+              </h3>
+              <span class={`text-xs font-bold px-3 py-1 rounded-full ${event.color === 'purple' ? 'bg-purple-600 text-white' : 'bg-red-600 text-white'}`}>
+                Upcoming
+              </span>
+            </div>
+            
+            <p class="text-gray-700 mb-4">
+              {event.description}
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">📅</span>
+                <span class="text-gray-800 font-medium">{new Date(event.date).toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'})}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-lg">⏰</span>
+                <span class="text-gray-800 font-medium">{event.time}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-lg">📍</span>
+                <span class="text-gray-800 font-medium">{event.location}</span>
+              </div>
+            </div>
+
+            <div class="flex gap-3 flex-wrap">
+              <button class="event-join-btn px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-bold transition" data-event-id={event.id} data-event-title={event.title}>
+                ✓ Join Event
+              </button>
+              <button class="event-info-btn px-4 py-2 rounded border-2 border-purple-600 text-purple-600 font-bold hover:bg-purple-50 transition" data-event-id={event.id} data-event-title={event.title} data-event-desc={event.description} data-event-date={event.date} data-event-time={event.time} data-event-location={event.location}>
+                ℹ️ More Info
+              </button>
+              <div class="share-button-group flex gap-2">
+                <button class="event-share-whatsapp px-3 py-2 rounded bg-green-500 hover:bg-green-600 text-white font-bold transition" data-event-title={event.title} data-event-id={event.id} title="Share on WhatsApp">
+                  📱 WhatsApp
+                </button>
+                <button class="event-share-twitter px-3 py-2 rounded bg-blue-400 hover:bg-blue-500 text-white font-bold transition" data-event-title={event.title} data-event-id={event.id} title="Share on Twitter">
+                  𝕏
+                </button>
+                <button class="event-share-instagram px-3 py-2 rounded bg-pink-600 hover:bg-pink-700 text-white font-bold transition" data-event-title={event.title} title="Share on Instagram">
+                  📷
+                </button>
+                <button class="event-share-copy px-3 py-2 rounded bg-gray-500 hover:bg-gray-600 text-white font-bold transition" data-event-id={event.id} title="Copy Link">
+                  📋 Copy
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <!-- Call to Action -->
+  <section class="bg-purple-600 text-white rounded-lg p-8 md:p-12 text-center">
+    <h2 class="text-3xl font-bold mb-4">Have an Event Idea?</h2>
+    <p class="text-lg mb-6 max-w-2xl mx-auto">
+      Tell us about your event proposal. We support organizing solidarity actions, workshops, and gatherings in all regions.
+    </p>
+    <button id="event-proposal-btn" class="bg-white text-purple-600 font-bold px-8 py-3 rounded-lg hover:shadow-lg transition">
+      💡 Submit Event Proposal
+    </button>
+  </section>
+
+  <!-- Modal for Event Details -->
+  <div id="eventModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg max-w-2xl w-full max-h-screen overflow-y-auto">
+      <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white">
+        <h2 class="text-2xl font-bold text-purple-600" id="modalTitle"></h2>
+        <button id="closeModal" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <h3 class="text-lg font-bold text-gray-700 mb-2">Description</h3>
+          <p class="text-gray-600" id="modalDescription"></p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h3 class="text-lg font-bold text-gray-700 mb-2">📅 Date & Time</h3>
+            <p class="text-gray-600"><span id="modalDate"></span> at <span id="modalTime"></span></p>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-gray-700 mb-2">📍 Location</h3>
+            <p class="text-gray-600" id="modalLocation"></p>
+          </div>
+        </div>
+        <div class="mt-6 pt-4 border-t border-gray-200">
+          <button id="confirmJoinBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition">
+            ✓ Join This Event
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Event Filter
+    const filterButtons = document.querySelectorAll('.event-filter-btn');
+    const eventCards = document.querySelectorAll('.event-card');
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        filterButtons.forEach(b => {
+          b.classList.remove('bg-purple-600', 'text-white');
+          b.classList.add('bg-gray-100', 'text-gray-700');
+        });
+        
+        button.classList.remove('bg-gray-100', 'text-gray-700');
+        button.classList.add('bg-purple-600', 'text-white');
+
+        const filter = button.dataset.filter;
+        eventCards.forEach(card => {
+          if (filter === 'all' || card.dataset.category === filter) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Modal Elements
+    const modal = document.getElementById('eventModal');
+    const closeModalBtn = document.getElementById('closeModal');
+    const infoButtons = document.querySelectorAll('.event-info-btn');
+    const joinButtons = document.querySelectorAll('.event-join-btn');
+    const confirmJoinBtn = document.getElementById('confirmJoinBtn');
+    let currentEventId = null;
+
+    // Open Modal
+    infoButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        currentEventId = button.dataset.eventId;
+        document.getElementById('modalTitle').textContent = button.dataset.eventTitle;
+        document.getElementById('modalDescription').textContent = button.dataset.eventDesc;
+        document.getElementById('modalDate').textContent = button.dataset.eventDate;
+        document.getElementById('modalTime').textContent = button.dataset.eventTime;
+        document.getElementById('modalLocation').textContent = button.dataset.eventLocation;
+        modal.classList.remove('hidden');
+      });
+    });
+
+    // Close Modal
+    closeModalBtn.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+      }
+    });
+
+    // Join Event from Modal (persist to backend + local marker)
+    confirmJoinBtn.addEventListener('click', async () => {
+      if (!currentEventId) return;
+      const eventTitle = document.getElementById('modalTitle').textContent;
+      confirmJoinBtn.textContent = '⏳ Sending...';
+      confirmJoinBtn.disabled = true;
+
+      try {
+        const response = await fetch('/api/participations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event_id: currentEventId,
+            event_title: eventTitle,
+            participant_name: 'Guest User',
+            email: '',
+            message: 'Joined from modal EN'
+          })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Save failed');
+
+        const joinedEvents = JSON.parse(localStorage.getItem('joined_events') || '[]');
+        joinedEvents.push({ id: currentEventId, title: eventTitle, joinedAt: new Date().toISOString() });
+        localStorage.setItem('joined_events', JSON.stringify(joinedEvents));
+
+        confirmJoinBtn.textContent = '✓ Joined!';
+        confirmJoinBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+        confirmJoinBtn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+        setTimeout(() => {
+          modal.classList.add('hidden');
+          confirmJoinBtn.textContent = '✓ Join This Event';
+          confirmJoinBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+          confirmJoinBtn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+        }, 2000);
+      } catch (err) {
+        console.error('Join error:', err);
+        confirmJoinBtn.textContent = 'Error, try again';
+        confirmJoinBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+      } finally {
+        confirmJoinBtn.disabled = false;
+      }
+    });
+
+    // Join Event from Card
+    joinButtons.forEach(button => {
+      button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const eventId = button.dataset.eventId;
+        const eventTitle = button.dataset.eventTitle;
+        const originalText = button.textContent;
+        const originalClass = button.className;
+
+        button.textContent = '⏳ Sending...';
+        button.disabled = true;
+
+        try {
+          const response = await fetch('/api/participations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              event_id: eventId,
+              event_title: eventTitle,
+              participant_name: 'Guest User',
+              email: '',
+              message: 'Joined from card EN'
+            })
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'Save failed');
+
+          const joinedEvents = JSON.parse(localStorage.getItem('joined_events') || '[]');
+          joinedEvents.push({ id: eventId, title: eventTitle, joinedAt: new Date().toISOString() });
+          localStorage.setItem('joined_events', JSON.stringify(joinedEvents));
+
+          button.textContent = '✓ Joined!';
+          button.className = button.className.replace('bg-purple-600', 'bg-green-600').replace('hover:bg-purple-700', 'hover:bg-green-700');
+        } catch (err) {
+          console.error('Join error:', err);
+          button.textContent = 'Error, try again';
+          button.classList.add('bg-red-600', 'hover:bg-red-700');
+        } finally {
+          setTimeout(() => {
+            button.textContent = originalText;
+            button.className = originalClass;
+            button.disabled = false;
+          }, 2500);
+        }
+      });
+    });
+
+    // Share Buttons
+    document.querySelectorAll('.event-share-whatsapp').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const title = btn.dataset.eventTitle;
+        const eventId = btn.dataset.eventId;
+        const url = `${window.location.origin}/en/events#event-${eventId}`;
+        const text = encodeURIComponent(`Check out this event: ${title} ${url}`);
+        window.open(`https://wa.me/?text=${text}`, '_blank');
+      });
+    });
+
+    document.querySelectorAll('.event-share-twitter').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const title = btn.dataset.eventTitle;
+        const eventId = btn.dataset.eventId;
+        const url = `${window.location.origin}/en/events#event-${eventId}`;
+        const text = encodeURIComponent(`Check out this event: ${title} ${url}`);
+        window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+      });
+    });
+
+    document.querySelectorAll('.event-share-instagram').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('Open Instagram and share this event link manually');
+      });
+    });
+
+    document.querySelectorAll('.event-share-copy').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const eventId = btn.dataset.eventId;
+        const url = `${window.location.origin}/en/events#event-${eventId}`;
+        navigator.clipboard.writeText(url).then(() => {
+          const originalText = btn.textContent;
+          btn.textContent = '✓ Copied!';
+          setTimeout(() => {
+            btn.textContent = originalText;
+          }, 2000);
+        });
+      });
+    });
+
+    // Event Proposal Button
+    document.getElementById('event-proposal-btn').addEventListener('click', () => {
+      const title = prompt('Event title:');
+      const proposer = prompt('Your name:');
+      const email = prompt('Your email:');
+      const description = prompt('Add a short description (optional):');
+
+      if (!title || !proposer || !email) {
+        alert('Please provide a title, name, and email so we can review your proposal.');
+        return;
+      }
+
+      fetch('/api/submit-event-proposal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          proposed_by: proposer,
+          email,
+          description,
+          category: 'user-proposed'
+        })
+      })
+        .then(res => res.json().then(data => ({ ok: res.ok, data })))
+        .then(({ ok, data }) => {
+          if (ok) {
+            alert('✓ Your event proposal has been submitted. Thank you!');
+          } else {
+            alert(data.error || 'Error submitting proposal. Please try again.');
+          }
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          alert('Error submitting proposal. Please try again.');
+        });
+    });
+  </script>
+</MainLayout>

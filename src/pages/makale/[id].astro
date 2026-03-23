@@ -1,0 +1,76 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { articles, getArticleById } from '../../data/articles';
+
+export function getStaticPaths() {
+  const articlePaths = articles.map((article, index) => ([
+    {
+      params: { id: article.id },
+      props: { article },
+    },
+    {
+      params: { id: String(index + 1) },
+      props: { article },
+    },
+  ])).flat();
+
+  return articlePaths;
+}
+
+const article = Astro.props.article ?? getArticleById(Astro.params.id ?? '');
+
+if (!article) {
+  return Astro.redirect('/articles');
+}
+---
+
+<MainLayout title={`${article.title} - Kampus Cadilari`} description={article.excerpt} currentLang="tr">
+  <article class="mx-auto max-w-4xl">
+    <a href="/articles" class="inline-flex items-center gap-2 rounded-full bg-purple-50 px-4 py-2 text-sm font-bold text-purple-700 transition hover:bg-purple-100">
+      Arsive don
+    </a>
+
+    <header class="mt-6 overflow-hidden rounded-[2rem] bg-gradient-to-br from-purple-700 via-fuchsia-700 to-rose-600 text-white shadow-2xl">
+      <div class="grid gap-6 px-6 py-8 md:grid-cols-[0.8fr_1.2fr] md:px-10 md:py-12">
+        <div class="flex items-center justify-center rounded-[1.75rem] bg-white/10 text-7xl ring-1 ring-white/15">
+          {article.image}
+        </div>
+        <div>
+          <p class="text-xs font-bold uppercase tracking-[0.25em] text-pink-100">{article.category}</p>
+          <h1 class="mt-4 text-3xl font-black md:text-5xl">{article.title}</h1>
+          <p class="mt-4 max-w-2xl text-base leading-7 text-white/85">{article.excerpt}</p>
+          <div class="mt-6 flex flex-wrap gap-3 text-sm text-white/80">
+            <span class="rounded-full bg-white/10 px-4 py-2 ring-1 ring-white/15">Yazar: {article.author}</span>
+            <span class="rounded-full bg-white/10 px-4 py-2 ring-1 ring-white/15">{new Date(article.date).toLocaleDateString('tr-TR')}</span>
+            <span class="rounded-full bg-white/10 px-4 py-2 ring-1 ring-white/15">Okuma suresi: {article.readTime}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="mt-8 grid gap-8 lg:grid-cols-[1fr_20rem]">
+      <div class="rounded-[1.75rem] bg-white p-6 shadow-lg ring-1 ring-slate-200 md:p-8">
+        <div class="space-y-6 text-base leading-8 text-slate-700">
+          {article.body.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+      </div>
+
+      <aside class="space-y-6">
+        <div class="rounded-[1.5rem] bg-amber-50 p-6 shadow-lg ring-1 ring-amber-100">
+          <p class="text-xs font-bold uppercase tracking-[0.22em] text-amber-700">Bu yazi neden onemli?</p>
+          <p class="mt-3 text-sm leading-7 text-slate-700">{article.relatedAction}</p>
+        </div>
+
+        <div class="rounded-[1.5rem] bg-slate-950 p-6 text-white shadow-2xl">
+          <p class="text-xs font-bold uppercase tracking-[0.22em] text-fuchsia-300">Sonraki adim</p>
+          <p class="mt-3 text-sm leading-7 text-white/80">
+            Bu basligi ekipte tartismak istersen admin panelindeki gorevler bolumune not dusup ilgili kategori editorune atayabilirsin.
+          </p>
+          <a href="/admin/" class="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm font-bold text-slate-950 transition hover:bg-fuchsia-100">
+            Admin paneline git
+          </a>
+        </div>
+      </aside>
+    </section>
+  </article>
+</MainLayout>

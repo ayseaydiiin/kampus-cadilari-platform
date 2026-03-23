@@ -1,0 +1,545 @@
+---
+// src/pages/events.astro
+import MainLayout from '../layouts/MainLayout.astro';
+
+// Mock event data
+const events = [
+  {
+    id: 1,
+    title: 'Kadın Dayanışması Buluşması',
+    date: '2026-03-25',
+    time: '18:00',
+    location: 'İstanbul - Beyoğlu',
+    description: 'Aylık dayanışma buluşmamızda bu ay "Emek ve Kadın" konusu etrafında sohbet edeceğiz.',
+    image: '👯',
+    color: 'purple',
+    category: 'dayanisma'
+  },
+  {
+    id: 2,
+    title: 'Yasa Okur Grubu: Ev İçi Şiddetle Mücadele Kanunu',
+    date: '2026-03-28',
+    time: '19:00',
+    location: 'Online - Zoom',
+    description: 'Hukuk uzmanları eşliğinde, 6284 sayılı kanunu detaylı şekilde inceleyeceğiz.',
+    image: '⚖️',
+    color: 'red',
+    category: 'cevirimi'
+  },
+  {
+    id: 3,
+    title: 'Feminist Film Gösterimi: "Erkeklerin Ağlayamadığı"',
+    date: '2026-04-02',
+    time: '20:00',
+    location: 'İzmir - Karşıyaka',
+    description: 'Hedefimiz feminist sinema dilini tartışmak. Filmi izledikten sonra diyalog yapacağız.',
+    image: '🎬',
+    color: 'purple',
+    category: 'kulturel'
+  },
+  {
+    id: 4,
+    title: 'Akademik Atölye: Feminist Araştırma Metodolojisi',
+    date: '2026-04-05',
+    time: '14:00',
+    location: 'Ankara - Çankaya Üniversitesi',
+    description: 'Arş.Gör. Sevim Aydın ve Doç.Dr. Leyla Şahin ile feminist araştırma sürecini öğreneceksiniz.',
+    image: '🔬',
+    color: 'red',
+    category: 'akademik'
+  }
+];
+---
+
+<MainLayout title="Etkinlikler - Dijital Mor Karargah" description="Feminist aktivizm etkinlikleri ve çalışmaları">
+  <div class="mb-8">
+    <h1 class="text-4xl font-bold text-purple-600 mb-4">🎯 Yaklaşan Etkinlikler</h1>
+    <p class="text-lg text-gray-700">
+      Ülke genelinde organize ettigimiz dayanışma buluşmalarını, atölyeleri ve eğitimlerini buradan öğrenebilirsiniz.
+    </p>
+  </div>
+
+  <!-- Event Category Filter -->
+  <section class="bg-white rounded-lg shadow p-6 mb-8">
+    <h3 class="text-xl font-bold text-purple-600 mb-4">Türüne Göre Filtrele</h3>
+    <div class="event-filter flex flex-wrap gap-2">
+      <button data-filter="all" class="event-filter-btn px-4 py-2 rounded-full bg-purple-600 text-white font-medium hover:bg-purple-700 transition">
+        Tümü
+      </button>
+      <button data-filter="cevirimi" class="event-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 font-medium hover:bg-purple-100 transition">
+        Çevrimiçi
+      </button>
+      <button data-filter="dayanisma" class="event-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 font-medium hover:bg-purple-100 transition">
+        Dayanışma Buluşması
+      </button>
+      <button data-filter="kulturel" class="event-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 font-medium hover:bg-purple-100 transition">
+        Kültürel Etkinlik
+      </button>
+      <button data-filter="akademik" class="event-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 font-medium hover:bg-purple-100 transition">
+        Akademik
+      </button>
+    </div>
+  </section>
+
+  <!-- Events List -->
+  <section class="space-y-6 mb-12">
+    {events.map((event) => (
+      <div id={`event-${event.id}`} data-category={event.category} class="event-card bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg shadow hover:shadow-lg transition overflow-hidden">
+        <div class="flex flex-col md:flex-row">
+          <div class="md:w-1/4 flex items-center justify-center p-6 text-6xl bg-white">
+            {event.image}
+          </div>
+          <div class="md:w-3/4 p-6">
+            <div class="flex items-start justify-between mb-3">
+              <h3 class="text-xl md:text-2xl font-bold text-purple-600">
+                {event.title}
+              </h3>
+              <span class={`text-xs font-bold px-3 py-1 rounded-full ${event.color === 'purple' ? 'bg-purple-600 text-white' : 'bg-red-600 text-white'}`}>
+                Yaklaşan
+              </span>
+            </div>
+            
+            <p class="text-gray-700 mb-4">
+              {event.description}
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">📅</span>
+                <span class="text-gray-800 font-medium">{new Date(event.date).toLocaleDateString('tr-TR')}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-lg">⏰</span>
+                <span class="text-gray-800 font-medium">{event.time}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-lg">📍</span>
+                <span class="text-gray-800 font-medium">{event.location}</span>
+              </div>
+            </div>
+
+            <div class="flex gap-3 flex-wrap">
+              <button class="event-join-btn px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-bold transition" data-event-id={event.id} data-event-title={event.title}>
+                ✓ Etkinliğe Katıl
+              </button>
+              <button class="event-info-btn px-4 py-2 rounded border-2 border-purple-600 text-purple-600 font-bold hover:bg-purple-50 transition" data-event-id={event.id} data-event-title={event.title} data-event-desc={event.description} data-event-date={event.date} data-event-time={event.time} data-event-location={event.location}>
+                ℹ️ Daha Fazla Bilgi
+              </button>
+              <div class="share-button-group flex gap-2">
+                <button class="event-share-whatsapp px-3 py-2 rounded bg-green-500 hover:bg-green-600 text-white font-bold transition" data-event-title={event.title} data-event-id={event.id} title="WhatsApp'ta Paylaş">
+                  📱 WhatsApp
+                </button>
+                <button class="event-share-twitter px-3 py-2 rounded bg-blue-400 hover:bg-blue-500 text-white font-bold transition" data-event-title={event.title} data-event-id={event.id} title="Twitter'da Paylaş">
+                  𝕏
+                </button>
+                <button class="event-share-instagram px-3 py-2 rounded bg-pink-600 hover:bg-pink-700 text-white font-bold transition" data-event-title={event.title} title="Instagram'da Paylaş">
+                  📷
+                </button>
+                <button class="event-share-copy px-3 py-2 rounded bg-gray-500 hover:bg-gray-600 text-white font-bold transition" data-event-id={event.id} title="Bağlantı Kopyala">
+                  📋 Kopyala
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <!-- Call to Action -->
+  <section class="bg-purple-600 text-white rounded-lg p-8 md:p-12 text-center">
+    <h2 class="text-2xl md:text-3xl font-bold mb-4">🎪 Etkinlik Önerisi Gönder</h2>
+    <p class="text-lg mb-6 opacity-90">
+      Ülkenin herhangi bir yerinde bir etkinlik planlıyorsan, bize ulaş. Birlikte organize edelim!
+    </p>
+    <button id="event-proposal-btn" class="inline-block bg-red-600 px-8 py-3 rounded font-bold hover:bg-red-700 transition">
+      Etkinlik Öner
+    </button>
+  </section>
+
+  <!-- Event Detail Modal -->
+  <div id="event-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div class="p-8">
+        <div class="flex items-start justify-between mb-6">
+          <h2 id="modal-title" class="text-3xl font-bold text-purple-600"></h2>
+          <button id="modal-close" class="text-3xl font-bold text-gray-400 hover:text-gray-600">×</button>
+        </div>
+        
+        <div id="modal-content" class="space-y-4">
+          <!-- Content will be populated -->
+        </div>
+
+        <div class="mt-8 flex gap-3">
+          <button class="flex-1 event-modal-join bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-3 rounded transition">
+            ✓ Etkinliğe Katıl
+          </button>
+          <button id="modal-close-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-6 py-3 rounded transition">
+            Kapat
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Event Category Filter
+    const filterButtons = document.querySelectorAll('.event-filter-btn');
+    const eventCards = document.querySelectorAll('.event-card');
+
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        filterButtons.forEach(b => {
+          b.classList.remove('bg-purple-600', 'text-white');
+          b.classList.add('bg-gray-100', 'text-gray-700');
+        });
+        
+        button.classList.remove('bg-gray-100', 'text-gray-700');
+        button.classList.add('bg-purple-600', 'text-white');
+
+        const filter = button.dataset.filter;
+        eventCards.forEach(card => {
+          if (filter === 'all' || card.dataset.category === filter) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Event Join Button Handler
+    const joinButtons = document.querySelectorAll('.event-join-btn');
+    joinButtons.forEach(button => {
+      button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const eventId = button.dataset.eventId;
+        const eventTitle = button.dataset.eventTitle;
+        const originalText = button.textContent;
+
+        button.textContent = '⏳ Gönderiliyor...';
+        button.disabled = true;
+
+        // Persist participation to backend as an event proposal with type=participation
+        try {
+        const response = await fetch('/api/participations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event_id: eventId,
+            event_title: eventTitle,
+            participant_name: 'Anonim Kullanıcı',
+            email: '',
+            message: 'Kart üzerinden katılım'
+          })
+        });
+
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || 'Kaydedilemedi');
+
+          // Save lightweight marker to localStorage for quick feedback
+          const joinedEvents = JSON.parse(localStorage.getItem('joined_events') || '[]');
+          joinedEvents.push({ id: eventId, title: eventTitle, joinedAt: new Date().toISOString() });
+          localStorage.setItem('joined_events', JSON.stringify(joinedEvents));
+
+          button.textContent = '✓ Katılım Kaydedildi!';
+          button.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+          button.classList.add('bg-green-600', 'hover:bg-green-700');
+        } catch (err) {
+          console.error('Join error:', err);
+          button.textContent = 'Hata! Tekrar dene';
+          button.classList.add('bg-red-600', 'hover:bg-red-700');
+        } finally {
+          setTimeout(() => {
+            button.textContent = originalText;
+            button.classList.remove('bg-green-600', 'hover:bg-green-700', 'bg-red-600', 'hover:bg-red-700');
+            button.classList.add('bg-purple-600', 'hover:bg-purple-700');
+            button.disabled = false;
+          }, 2500);
+        }
+      });
+    });
+
+    // More Info Button - Open Modal
+    const infoButtons = document.querySelectorAll('.event-info-btn');
+    infoButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const title = button.dataset.eventTitle;
+        const desc = button.dataset.eventDesc;
+        const date = button.dataset.eventDate;
+        const time = button.dataset.eventTime;
+        const location = button.dataset.eventLocation;
+
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-content').innerHTML = `
+          <div class="space-y-4 text-gray-700">
+            <div>
+              <label class="text-sm font-bold text-gray-600">📝 Açıklama</label>
+              <p class="mt-2">${desc}</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm font-bold text-gray-600">📅 Tarih</label>
+                <p class="mt-1 text-lg font-semibold">${new Date(date).toLocaleDateString('tr-TR')}</p>
+              </div>
+              <div>
+                <label class="text-sm font-bold text-gray-600">⏰ Saat</label>
+                <p class="mt-1 text-lg font-semibold">${time}</p>
+              </div>
+            </div>
+            <div>
+              <label class="text-sm font-bold text-gray-600">📍 Yer</label>
+              <p class="mt-1 text-lg font-semibold">${location}</p>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('event-modal').classList.remove('hidden');
+      });
+    });
+
+    // Modal Close
+    document.getElementById('modal-close').addEventListener('click', () => {
+      document.getElementById('event-modal').classList.add('hidden');
+    });
+    document.getElementById('modal-close-btn').addEventListener('click', () => {
+      document.getElementById('event-modal').classList.add('hidden');
+    });
+
+    // Modal Join Button
+    document.querySelector('.event-modal-join').addEventListener('click', async (e) => {
+      const btn = e.target;
+      const title = document.getElementById('modal-title').textContent;
+      btn.textContent = '⏳ Gönderiliyor...';
+      btn.disabled = true;
+      try {
+        const response = await fetch('/api/participations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event_title: title,
+            participant_name: 'Anonim Kullanıcı',
+            email: '',
+            message: 'Modal üzerinden katılım'
+          })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Kaydedilemedi');
+        btn.textContent = '✓ Katılım Kaydedildi!';
+        btn.classList.add('bg-green-600');
+        setTimeout(() => {
+          document.getElementById('event-modal').classList.add('hidden');
+          btn.disabled = false;
+          btn.textContent = '✓ Etkinliğe Katıl';
+          btn.classList.remove('bg-green-600');
+        }, 1500);
+      } catch (err) {
+        btn.textContent = 'Hata, tekrar dene';
+        btn.classList.add('bg-red-600');
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = '✓ Etkinliğe Katıl';
+          btn.classList.remove('bg-red-600');
+        }, 1500);
+      }
+    });
+
+    // Share Buttons
+    const baseUrl = window.location.origin;
+
+    // WhatsApp Share
+    document.querySelectorAll('.event-share-whatsapp').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const title = btn.dataset.eventTitle;
+        const eventId = btn.dataset.eventId;
+        const url = `${baseUrl}/events#event-${eventId}`;
+        const message = encodeURIComponent(`🎯 Etkinliğe katılmak ister misin?\n\n📌 ${title}\n🔗 ${url}`);
+        window.open(`https://wa.me/?text=${message}`, '_blank');
+      });
+    });
+
+    // Twitter Share
+    document.querySelectorAll('.event-share-twitter').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const title = btn.dataset.eventTitle;
+        const eventId = btn.dataset.eventId;
+        const url = `${baseUrl}/events#event-${eventId}`;
+        const text = encodeURIComponent(`🎯 ${title} - Etkinliğe katılmak için: ${url}\n\n#KampusCadilari #Feminizm`);
+        window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+      });
+    });
+
+    // Instagram Share (Copy link + info)
+    document.querySelectorAll('.event-share-instagram').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const title = btn.dataset.eventTitle;
+        alert(`📱 Instagram Paylaşımı\n\nTakip et: @kampuscadilari\n\n${title}\n\nEtkinlikler sayfasını ziyaret et!`);
+      });
+    });
+
+    // Copy Link
+    document.querySelectorAll('.event-share-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const eventId = btn.dataset.eventId;
+        const url = `${baseUrl}/events#event-${eventId}`;
+        
+        navigator.clipboard.writeText(url).then(() => {
+          const originalText = btn.textContent;
+          btn.textContent = '✓ Kopyalandı!';
+          btn.classList.add('bg-green-600');
+          
+          setTimeout(() => {
+            btn.textContent = originalText;
+            btn.classList.remove('bg-green-600');
+            btn.classList.add('bg-gray-500');
+          }, 2000);
+        });
+      });
+    });
+
+    // Event Proposal Button - Show Modal
+    document.getElementById('event-proposal-btn').addEventListener('click', () => {
+      const proposalHTML = `
+        <div class="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
+          <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl p-8">
+            <h2 class="text-2xl font-bold text-purple-600 mb-2">🎪 Etkinlik Öneriniz</h2>
+            <p class="text-gray-600 mb-6">Ülkenin herhangi bir il koordinasyonunda etkinlik önerisinde bulunabilirsiniz.</p>
+            
+            <form id="proposal-form" class="space-y-4">
+              <div>
+                <label class="block text-sm font-bold text-gray-600 mb-2">Etkinlik Adı *</label>
+                <input type="text" name="title" required class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-600 focus:outline-none" placeholder="Örn: Feminist Film Gösterimi" />
+              </div>
+              
+              <div>
+                <label class="block text-sm font-bold text-gray-600 mb-2">Ad Soyadınız *</label>
+                <input type="text" name="proposed_by" required class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-600 focus:outline-none" placeholder="Adınız ve soyadınız" />
+              </div>
+              
+              <div>
+                <label class="block text-sm font-bold text-gray-600 mb-2">Email *</label>
+                <input type="email" name="email" required class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-600 focus:outline-none" placeholder="ornek@mail.com" />
+              </div>
+              
+              <div>
+                <label class="block text-sm font-bold text-gray-600 mb-2">Önceden Bilgilendirmek İstediğiniz İl (Opsiyonel)</label>
+                <input type="text" name="province" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-600 focus:outline-none" placeholder="Örn: İstanbul, Ankara" />
+              </div>
+              
+              <div>
+                <label class="block text-sm font-bold text-gray-600 mb-2">Açıklama *</label>
+                <textarea name="description" required rows="4" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-600 focus:outline-none resize-none" placeholder="Etkinlik hakkında detaylı bilgi verin..."></textarea>
+              </div>
+              
+              <div class="flex gap-3 pt-4">
+                <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded transition">
+                  ✓ Gönder
+                </button>
+                <button type="button" onclick="this.closest('[id^=proposal]')?.remove()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 rounded transition">
+                  İptal
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+      
+      // Inject modal
+      const modalContainer = document.createElement('div');
+      modalContainer.id = 'proposal-modal-container';
+      modalContainer.innerHTML = proposalHTML;
+      document.body.appendChild(modalContainer);
+      
+      // Handle form submission
+      document.getElementById('proposal-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = {
+          title: document.querySelector('input[name="title"]').value,
+          proposed_by: document.querySelector('input[name="proposed_by"]').value,
+          email: document.querySelector('input[name="email"]').value,
+          province: document.querySelector('input[name="province"]').value,
+          description: document.querySelector('textarea[name="description"]').value,
+          category: 'user-proposed'
+        };
+        
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = '⏳ Gönderiliyor...';
+        
+        try {
+          const response = await fetch('/api/submit-event-proposal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData),
+          });
+          
+          const result = await response.json();
+          
+          if (!response.ok) throw new Error(result.error || 'Bir hata oluştu');
+          
+          // Success
+          modalContainer.innerHTML = `
+            <div class="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
+              <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl p-8 text-center">
+                <p class="text-4xl mb-4">✓</p>
+                <h2 class="text-2xl font-bold text-green-700 mb-2">Etkinlik Öneriniz Alındı!</h2>
+                <p class="text-gray-700 mb-4">
+                  ${formData.proposed_by}, öneriniz inceleme için kabul edildi.
+                </p>
+                <div class="bg-green-50 p-4 rounded-lg mb-6">
+                  <p class="text-sm text-gray-600">
+                    📧 ${formData.email} adresinize değerlendirme sonucu gönderilecektir.
+                  </p>
+                </div>
+                <button onclick="location.reload()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded transition">
+                  Tamam
+                </button>
+              </div>
+            </div>
+          `;
+        } catch (error) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = '✓ Gönder';
+          alert(`Hata: ${error.message}`);
+        }
+      });
+    });
+
+    // Approved proposals -> append to list (onaylananlar takvimde görünsün)
+    async function loadApprovedEvents() {
+      const container = document.getElementById('events-list');
+      if (!container) return;
+      try {
+        const res = await fetch('/api/admin/event-proposals?status=approved');
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) return;
+        const html = data.map(event => `
+          <div class="event-card bg-gradient-to-r from-green-50 to-green-100 rounded-lg shadow hover:shadow-lg transition overflow-hidden">
+            <div class="flex flex-col md:flex-row">
+              <div class="md:w-1/4 flex items-center justify-center p-6 text-6xl bg-white">📅</div>
+              <div class="md:w-3/4 p-6">
+                <div class="flex items-start justify-between mb-3">
+                  <h3 class="text-xl md:text-2xl font-bold text-green-700">${event.title}</h3>
+                  <span class="text-xs font-bold px-3 py-1 rounded-full bg-green-600 text-white">Onaylandı</span>
+                </div>
+                <p class="text-gray-700 mb-4">${event.description || ''}</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
+                  <div class="flex items-center gap-2"><span class="text-lg">📍</span><span class="text-gray-800 font-medium">${event.province || 'Genel'}</span></div>
+                  <div class="flex items-center gap-2"><span class="text-lg">👤</span><span class="text-gray-800 font-medium">${event.proposed_by || ''}</span></div>
+                  <div class="flex items-center gap-2"><span class="text-lg">⏱️</span><span class="text-gray-800 font-medium">${new Date(event.created_at).toLocaleDateString('tr-TR')}</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+        container.insertAdjacentHTML('beforeend', html);
+      } catch (err) {
+        console.error('Approved events load failed', err);
+      }
+    }
+
+    // initial loads
+    loadApprovedEvents();
+  </script>
+</MainLayout>

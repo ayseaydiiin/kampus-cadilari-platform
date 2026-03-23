@@ -1,0 +1,130 @@
+---
+/**
+ * Region Filter Dropdown Component
+ * Shows all 81 Turkish provinces
+ * 
+ * Usage:
+ *   <RegionFilter id="regionSelect" placeholder="Şehir seç" />
+ *   
+ * Then access selected value with JavaScript:
+ *   document.getElementById('regionSelect').value
+ */
+interface Props {
+  id?: string;
+  placeholder?: string;
+  selectedId?: number;
+  lang?: 'tr' | 'en';
+}
+
+const {
+  id = 'regionFilter',
+  placeholder = 'Şehir seç',
+  selectedId,
+  lang = 'tr',
+} = Astro.props as Props;
+
+// Turkish provinces
+const regions = [
+  { id: 34, code: '34', name: 'İstanbul' },
+  { id: 6, code: '06', name: 'Ankara' },
+  { id: 35, code: '35', name: 'İzmir' },
+  { id: 16, code: '16', name: 'Bursa' },
+  { id: 55, code: '55', name: 'Samsun' },
+  { id: 41, code: '41', name: 'Kocaeli' },
+  { id: 7, code: '07', name: 'Antalya' },
+  { id: 17, code: '17', name: 'Çanakkale' },
+  { id: 37, code: '37', name: 'Aydın' },
+  { id: 9, code: '09', name: 'Balıkesir' },
+  { id: 74, code: '74', name: 'Rize' },
+  { id: 22, code: '22', name: 'Edirne' },
+  { id: 32, code: '32', name: 'Hatay' },
+  { id: 42, code: '42', name: 'Konya' },
+  { id: 33, code: '33', name: 'Mersin' },
+  { id: 5, code: '05', name: 'Amasya' },
+  { id: 11, code: '11', name: 'Bilecik' },
+  { id: 12, code: '12', name: 'Bingöl' },
+  { id: 13, code: '13', name: 'Bitlis' },
+  { id: 14, code: '14', name: 'Bolu' },
+  { id: 15, code: '15', name: 'Çorum' },
+  { id: 18, code: '18', name: 'Çankırı' },
+  { id: 19, code: '19', name: 'Çorum (2)' },
+  { id: 20, code: '20', name: 'Denizli' },
+  { id: 21, code: '21', name: 'Diyarbakır' },
+  { id: 23, code: '23', name: 'Elazığ' },
+  { id: 24, code: '24', name: 'Erzincan' },
+  { id: 25, code: '25', name: 'Erzurum' },
+  { id: 26, code: '26', name: 'Eskişehir' },
+  { id: 27, code: '27', name: 'Gaziantep' },
+  { id: 28, code: '28', name: 'Giresun' },
+  { id: 29, code: '29', name: 'Gümüşhane' },
+  { id: 30, code: '30', name: 'Hakkari' },
+  { id: 36, code: '36', name: 'Kastamonu' },
+  { id: 38, code: '38', name: 'Kayseri' },
+  { id: 40, code: '40', name: 'Kırşehir' },
+  { id: 43, code: '43', name: 'Kütahya' },
+  { id: 44, code: '44', name: 'Malatya' },
+  { id: 45, code: '45', name: 'Manisa' },
+  { id: 46, code: '46', name: 'Mardin' },
+  { id: 47, code: '47', name: 'Muğla' },
+  { id: 48, code: '48', name: 'Muş' },
+  { id: 49, code: '49', name: 'Nevşehir' },
+  { id: 50, code: '50', name: 'Niğde' },
+  { id: 51, code: '51', name: 'Ordu' },
+  { id: 52, code: '52', name: 'Rize' },
+  { id: 53, code: '53', name: 'Sakarya' },
+  { id: 54, code: '54', name: 'Samsun (2)' },
+  { id: 56, code: '56', name: 'Siirt' },
+  { id: 57, code: '57', name: 'Sinop' },
+  { id: 58, code: '58', name: 'Sivas' },
+  { id: 59, code: '59', name: 'Şanlıurfa' },
+  { id: 60, code: '60', name: 'Şırnak' },
+  { id: 61, code: '61', name: 'Tekirdağ' },
+  { id: 62, code: '62', name: 'Tokat' },
+  { id: 63, code: '63', name: 'Trabzon' },
+  { id: 64, code: '64', name: 'Tunceli' },
+  { id: 65, code: '65', name: 'Uşak' },
+  { id: 66, code: '66', name: 'Van' },
+  { id: 67, code: '67', name: 'Yalova' },
+  { id: 68, code: '68', name: 'Yozgat' },
+  { id: 69, code: '69', name: 'Zonguldak' },
+  { id: 70, code: '70', name: 'Aksaray' },
+  { id: 71, code: '71', name: 'Artvın' },
+  { id: 72, code: '72', name: 'Bartın' },
+  { id: 73, code: '73', name: 'Batman' },
+  { id: 75, code: '75', name: 'Bayburt' },
+  { id: 76, code: '76', name: 'Karaman' },
+  { id: 77, code: '77', name: 'Karabük' },
+  { id: 78, code: '78', name: 'Kilis' },
+  { id: 79, code: '79', name: 'Kırıkkale' },
+  { id: 80, code: '80', name: 'Kırklareli' },
+  { id: 81, code: '81', name: 'Kırşehir' },
+  { id: 83, code: '83', name: 'Iğdır' },
+];
+
+// Sort by name
+const sortedRegions = [...regions].sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+---
+
+<select
+  id={id}
+  name={id}
+  class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 bg-white hover:border-gray-400 transition"
+>
+  <option value="">{placeholder}</option>
+  {sortedRegions.map((region) => (
+    <option value={region.id} selected={region.id === selectedId}>
+      {region.name}
+    </option>
+  ))}
+</select>
+
+<script>
+  // Optional: Add filtering functionality
+  window.getSelectedRegion = (selectId: string) => {
+    const select = document.getElementById(selectId) as HTMLSelectElement;
+    return {
+      id: parseInt(select.value),
+      name: select.options[select.selectedIndex].text,
+    };
+  };
+</script>

@@ -1,0 +1,91 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { getArchiveById } from '../../utils/db.js';
+
+export const prerender = false;
+
+const archiveId = Number(Astro.params.id);
+const item = Number.isFinite(archiveId) ? getArchiveById(archiveId) : null;
+
+if (!item || item.status !== 'approved') {
+  Astro.response.status = 404;
+  Astro.response.statusText = 'Not Found';
+}
+
+const currentUrl = `${Astro.url.origin}/archive/${Astro.params.id}`;
+---
+
+<MainLayout title={item?.title ? `${item.title} - Gazete Arsivi` : 'Gazete Arsivi'} description="Admin onayli gazete arsiv detayi">
+  {(!item || item.status !== 'approved') ? (
+    <section class="mx-auto max-w-3xl rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+      <h1 class="text-3xl font-black text-red-800">Kayit bulunamadi</h1>
+      <p class="mt-3 text-sm text-red-700">Talep ettiginiz arsiv girdisi yayinda degil.</p>
+      <a href="/archive" class="mt-6 inline-flex rounded-lg bg-red-700 px-4 py-2 text-sm font-bold text-white hover:bg-red-800">Arsive don</a>
+    </section>
+  ) : (
+    <section class="mx-auto max-w-6xl">
+      <a href="/archive" class="text-sm font-bold text-purple-700 hover:text-purple-900"><- Arsive geri don</a>
+
+      <div class="mt-4 grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+        <article class="overflow-hidden rounded-[1.5rem] border border-[#d5c6ac] bg-[#fdf8ef] shadow-lg">
+          <img src={item.cover_image_url || '/archive/placeholder-cover.svg'} alt={`${item.publication_name} kapak`} class="w-full object-cover" />
+        </article>
+
+        <article class="rounded-[1.5rem] border border-[#d5c6ac] bg-[#fdf8ef] p-6 shadow-lg md:p-8">
+          <div class="inline-flex items-center gap-2 rounded-full border border-amber-300 bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900">
+            <span>✓</span>
+            <span>Admin Onayli Arsiv Kaydi</span>
+          </div>
+
+          <h1 class="mt-4 text-3xl font-black leading-tight text-slate-900 md:text-4xl">{item.title}</h1>
+          <p class="mt-2 text-base font-semibold text-slate-700">{item.publication_name}</p>
+
+          <dl class="mt-6 grid gap-3 text-sm md:grid-cols-2">
+            <div class="rounded-xl bg-white/70 p-3">
+              <dt class="text-xs font-bold uppercase tracking-wide text-slate-500">Yayin yili</dt>
+              <dd class="mt-1 font-semibold text-slate-900">{item.publication_year}</dd>
+            </div>
+            <div class="rounded-xl bg-white/70 p-3">
+              <dt class="text-xs font-bold uppercase tracking-wide text-slate-500">Donem</dt>
+              <dd class="mt-1 font-semibold text-slate-900">{item.decade}</dd>
+            </div>
+            <div class="rounded-xl bg-white/70 p-3 md:col-span-2">
+              <dt class="text-xs font-bold uppercase tracking-wide text-slate-500">Odak noktasi</dt>
+              <dd class="mt-1 font-semibold text-slate-900">{item.focus_topic || 'Genel feminist gundem'}</dd>
+            </div>
+          </dl>
+
+          <p class="mt-6 text-sm leading-7 text-slate-700">{item.summary || 'Bu arsiv kaydi icin ozet metin henuz eklenmemis.'}</p>
+
+          <div class="mt-6 flex flex-wrap gap-3 text-sm font-bold">
+            <a href={item.pdf_url || '#'} download class={`rounded-lg px-4 py-2 transition ${item.pdf_url ? 'bg-[#5b2c84] text-white hover:bg-[#4a236c]' : 'pointer-events-none bg-slate-300 text-slate-500'}`}>
+              PDF Indir
+            </a>
+            <button id="copy-link-btn" class="rounded-lg border border-[#5b2c84] px-4 py-2 text-[#5b2c84] transition hover:bg-[#efe5f7]">
+              Baglantiyi Kopyala
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+  )}
+
+  <script define:vars={{ currentUrl }}>
+    const copyButton = document.getElementById('copy-link-btn');
+    copyButton?.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(currentUrl);
+        const old = copyButton.textContent;
+        copyButton.textContent = 'Kopyalandi';
+        setTimeout(() => {
+          copyButton.textContent = old;
+        }, 1200);
+      } catch {
+        copyButton.textContent = 'Basarisiz';
+        setTimeout(() => {
+          copyButton.textContent = 'Baglantiyi Kopyala';
+        }, 1200);
+      }
+    });
+  </script>
+</MainLayout>

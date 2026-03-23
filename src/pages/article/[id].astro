@@ -1,0 +1,13 @@
+---
+import { articles } from '../../data/articles';
+
+export function getStaticPaths() {
+  return articles.map((article, index) => ([
+    { params: { id: article.id } },
+    { params: { id: String(index + 1) } },
+  ])).flat();
+}
+
+const id = Astro.params.id ?? '';
+return Astro.redirect(`/makale/${id}`);
+---

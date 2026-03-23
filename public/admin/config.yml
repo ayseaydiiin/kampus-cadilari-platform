@@ -1,0 +1,50 @@
+backend:
+  name: git-gateway
+  branch: main
+
+local_backend: true
+site_url: /
+display_url: /
+
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "articles"
+    label: "Yazilar"
+    folder: "content/articles"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Baslik", name: "title", widget: "string" }
+      - { label: "Aciklama", name: "description", widget: "text" }
+      - { label: "Yazi Icerigi", name: "body", widget: "markdown" }
+      - { label: "Tarih", name: "date", widget: "datetime" }
+      - { label: "Kategori", name: "category", widget: "select", options: ["Hukuk", "Roportaj", "Gorunmeyen Kadinlar", "Kultur Sanat", "Psikoloji", "Cadi Medya Kolektifi", "Egitim"] }
+      - { label: "Etiketler", name: "tags", widget: "list" }
+      - { label: "Kapak Resmi", name: "image", widget: "image", required: false }
+      - { label: "Yayinda", name: "published", widget: "boolean", default: false }
+
+  - name: "events"
+    label: "Etkinlikler"
+    folder: "content/events"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Baslik", name: "title", widget: "string" }
+      - { label: "Tarih", name: "date", widget: "datetime" }
+      - { label: "Konum", name: "location", widget: "string" }
+      - { label: "Aciklama", name: "description", widget: "text" }
+      - { label: "Poster", name: "poster", widget: "image", required: false }
+      - { label: "Twitter Link", name: "twitter_link", widget: "string", required: false }
+
+  - name: "pages"
+    label: "Sayfalar"
+    folder: "content/pages"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Baslik", name: "title", widget: "string" }
+      - { label: "URL Slug", name: "slug", widget: "string" }
+      - { label: "Icerik", name: "body", widget: "markdown" }
+      - { label: "Aciklama", name: "description", widget: "text", required: false }

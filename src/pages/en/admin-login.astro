@@ -1,0 +1,132 @@
+---
+// src/pages/en/admin-login.astro
+import MainLayout from '../../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Admin Login - Campus Witches" currentLang="en">
+  <div class="min-h-screen flex items-center justify-center py-12">
+    <div class="max-w-md w-full">
+      <!-- Logo & Title -->
+      <div class="text-center mb-8">
+        <div class="text-6xl mb-4 inline-block">🔮</div>
+        <h1 class="text-3xl font-black text-purple-600 mb-2">Campus Witches</h1>
+        <p class="text-gray-600">Admin Portal</p>
+      </div>
+
+      <!-- Login Card -->
+      <div class="bg-white p-8 rounded-2xl border-2 border-gray-200 shadow-lg">
+        <!-- Email/Password Login -->
+        <form class="space-y-4 mb-6">
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
+            <input 
+              type="email" 
+              class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 transition" 
+              placeholder="your@email.com" 
+              required 
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Password</label>
+            <input 
+              type="password" 
+              class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 transition" 
+              placeholder="••••••••" 
+              required 
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-lg hover:shadow-lg transition text-lg"
+          >
+            Sign In
+          </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="relative mb-6">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white text-gray-600">Or continue with</span>
+          </div>
+        </div>
+
+        <!-- OAuth Options -->
+        <div class="space-y-3 mb-6">
+          <button 
+            type="button"
+            class="w-full border-2 border-gray-300 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2"
+          >
+            <span>🐙</span> GitHub
+          </button>
+
+          <button 
+            type="button"
+            class="w-full border-2 border-gray-300 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2"
+          >
+            <span>🔴</span> Google
+          </button>
+
+          <button 
+            type="button"
+            class="w-full border-2 border-gray-300 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2"
+          >
+            <span>📧</span> Microsoft
+          </button>
+        </div>
+
+        <!-- Links -->
+        <div class="text-center text-sm space-y-2">
+          <p>
+            <a href="#" class="text-purple-600 hover:underline font-semibold">Forgot password?</a>
+          </p>
+          <p class="text-gray-600">
+            Don't have access? <a href="/en/" class="text-purple-600 hover:underline font-semibold">Contact us</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Info Box -->
+      <div class="mt-8 bg-gradient-to-r from-purple-100 to-pink-100 p-6 rounded-xl border-2 border-purple-200">
+        <h3 class="font-bold text-purple-700 mb-2">🔐 Secure Portal</h3>
+        <p class="text-sm text-gray-700 mb-3">
+          This is the admin portal for Campus Witches coordinators and contributors.
+        </p>
+        <ul class="text-xs text-gray-700 space-y-1">
+          <li>✓ Manage articles and content</li>
+          <li>✓ Organize events across provinces</li>
+          <li>✓ View network statistics</li>
+          <li>✓ Manage user permissions</li>
+          <li>✓ Access our CMS</li>
+        </ul>
+      </div>
+
+      <!-- CMS Link -->
+      <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600 mb-3">Using Decap CMS?</p>
+        <a 
+          href="/admin/" 
+          class="inline-block bg-white border-2 border-purple-600 text-purple-600 font-bold px-6 py-2 rounded-lg hover:bg-purple-50 transition"
+        >
+          → Go to CMS Editor
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Background Animation -->
+  <style>
+    @keyframes wave {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .wave-animation {
+      animation: wave 4s ease-in-out infinite;
+    }
+  </style>
+</MainLayout>
