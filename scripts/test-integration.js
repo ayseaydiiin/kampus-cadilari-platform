@@ -2,199 +2,244 @@
 
 /**
  * Integration Test Script
- * Tests the entire user journey from form submission to admin review
+ * Tests the key user journey from form submission to admin review.
  */
 
-const BASE_URL = 'http://localhost:4321';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:4321';
+const DEFAULT_LOGIN_EMAIL = 'admin@kampuscadilari.org';
 
-async function log(title, message, status = 'info') {
-  const emoji = {
-    info: 'ℹ️ ',
-    success: '✅ ',
-    error: '❌ ',
-    test: '🧪'
+function log(title, message, status = 'info') {
+  const icon = {
+    info: '[INFO]',
+    success: '[OK]',
+    error: '[ERR]',
+    test: '[TEST]',
   };
-  console.log(`\n${emoji[status]} ${title}`);
+
+  console.log(`\n${icon[status]} ${title}`);
   if (message) console.log(`   ${message}`);
 }
 
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function resolveLoginPassword(email) {
+  if (email === 'test@kampuscadilari.org') {
+    return process.env.TEST_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD_TEST || process.env.ADMIN_DEFAULT_PASSWORD || null;
+  }
+
+  if (email === 'admin@kampuscadilari.org') {
+    return process.env.ADMIN_PASSWORD_ADMIN || process.env.ADMIN_DEFAULT_PASSWORD || null;
+  }
+
+  return process.env.ADMIN_DEFAULT_PASSWORD || null;
+}
+
+function expectedPasswordEnvHint(email) {
+  if (email === 'test@kampuscadilari.org') {
+    return 'TEST_ADMIN_PASSWORD or ADMIN_PASSWORD_TEST or ADMIN_DEFAULT_PASSWORD';
+  }
+
+  if (email === 'admin@kampuscadilari.org') {
+    return 'ADMIN_PASSWORD_ADMIN or ADMIN_DEFAULT_PASSWORD';
+  }
+
+  return 'ADMIN_DEFAULT_PASSWORD';
+}
+
 async function testFormSubmission() {
-  log('TEST 1', 'Başvuru Formu Gönderme', 'test');
+  log('TEST 1', 'Submit application form', 'test');
 
   const applicationData = {
-    full_name: 'Test Kullanıcı',
-    email: 'test.user@example.com',
+    full_name: 'Test Kullanici',
+    email: `test.user.${Date.now()}@example.com`,
     phone: '+90 555 123 4567',
-    province: 'İstanbul',
-    organization: 'Boğaziçi Üniversitesi',
+    province: 'Istanbul',
+    organization: 'Bogazici Universitesi',
     skills: ['organizing', 'writing'],
     social_media: '@testuser',
-    message: 'Feminist aktivizmde yer almak istiyorum ve Kampüs Cadıları hareketi ile kadın hakları mücadelesinde rol oynamak isterim.'
+    message: 'Feminist aktivizmde yer almak istiyorum ve Kampus Cadilari hareketi ile kadin haklari mucadelesinde rol almak isterim.',
   };
 
   try {
-    log('POST', '/api/submit-application gönderiliyor...');
+    log('POST', '/api/submit-application');
     const response = await fetch(`${BASE_URL}/api/submit-application`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(applicationData)
+      body: JSON.stringify(applicationData),
     });
 
     const data = await response.json();
 
     if (response.ok && data.success) {
       log('Response', `Status: ${response.status} - ${data.message}`, 'success');
-      log('Application ID', data.applicationId, 'success');
+      log('Application ID', String(data.applicationId), 'success');
       return { success: true, applicationId: data.applicationId };
-    } else {
-      log('API Hatası', `${data.error || 'Bilinmeyen hata'}`, 'error');
-      return { success: false };
     }
+
+    log('API Error', data.error || 'Unknown error', 'error');
+    return { success: false };
   } catch (error) {
-    log('Network Hatası', error.message, 'error');
+    log('Network Error', error.message, 'error');
     return { success: false };
   }
 }
 
 async function testEventProposal() {
-  log('TEST 2', 'Etkinlik Önerisi Gönderme', 'test');
+  log('TEST 2', 'Submit event proposal', 'test');
 
   const proposalData = {
-    title: 'Feminist Film Gösterimi: Erkeklerin Ağlayamadığı',
-    proposed_by: 'Ayşe Yılmaz',
-    email: 'ayse@example.com',
-    province: 'İzmir',
-    description: 'Feminist sinema dilini tartışmak için üniversite kampüsünde film gösterimi ve diyalog oturumu.',
-    category: 'kulturel'
+    title: `Feminist Film Gosterimi ${Date.now()}`,
+    email: `ayse.${Date.now()}@example.com`,
+    description: 'Feminist sinema dili uzerine kampuste film gosterimi ve diyalog oturumu. Bu etkinlikte tartisma cemberi, paylasim ve kolektif ogrenme akisi olacak.',
+    category: 'paneli',
+    regionId: 35,
+    provinceName: 'Izmir',
+    eventDate: '2026-04-22',
+    organizerName: 'Ayse Yilmaz',
+    phone: '+90 555 222 3344',
   };
 
   try {
-    log('POST', '/api/submit-event-proposal gönderiliyor...');
-    const response = await fetch(`${BASE_URL}/api/submit-event-proposal`, {
+    log('POST', '/api/events/propose');
+    const response = await fetch(`${BASE_URL}/api/events/propose`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(proposalData)
+      body: JSON.stringify(proposalData),
     });
 
     const data = await response.json();
 
     if (response.ok && data.success) {
       log('Response', `Status: ${response.status} - ${data.message}`, 'success');
-      log('Proposal ID', data.proposalId, 'success');
+      log('Proposal ID', String(data.proposalId), 'success');
       return { success: true, proposalId: data.proposalId };
-    } else {
-      log('API Hatası', `${data.error || 'Bilinmeyen hata'}`, 'error');
-      return { success: false };
     }
+
+    log('API Error', data.error || 'Unknown error', 'error');
+    return { success: false };
   } catch (error) {
-    log('Network Hatası', error.message, 'error');
+    log('Network Error', error.message, 'error');
     return { success: false };
   }
 }
 
 async function testAdminLogin() {
-  log('TEST 3', 'Admin Giriş', 'test');
+  log('TEST 3', 'Admin login', 'test');
 
-  if (!(process.env.TEST_ADMIN_PASSWORD || process.env.ADMIN_DEFAULT_PASSWORD)) {
-    log('Eksik ortam degiskeni', 'TEST_ADMIN_PASSWORD veya ADMIN_DEFAULT_PASSWORD tanimlanmali', 'error');
+  const loginEmail = process.env.TEST_LOGIN_EMAIL || DEFAULT_LOGIN_EMAIL;
+  const loginPassword = resolveLoginPassword(loginEmail);
+
+  if (!loginPassword) {
+    log('Missing env var', `No password found for ${loginEmail}`, 'error');
+    log('Expected env', expectedPasswordEnvHint(loginEmail), 'error');
     return { success: false };
   }
 
   const loginData = {
-    email: 'admin@kampuscadilari.org',
-    password: (process.env.TEST_ADMIN_PASSWORD || process.env.ADMIN_DEFAULT_PASSWORD || '')
+    email: loginEmail,
+    password: loginPassword,
   };
 
   try {
-    log('POST', '/api/auth/login gönderiliyor...');
+    log('POST', '/api/auth/login');
     const response = await fetch(`${BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(loginData)
+      body: JSON.stringify(loginData),
     });
 
-    console.log(`   Response Status: ${response.status}`);
     const text = await response.text();
+    console.log(`   Response Status: ${response.status}`);
     console.log(`   Response Text: ${text.substring(0, 200)}`);
 
+    let data;
     try {
-      const data = JSON.parse(text);
-      if (response.ok && data.success) {
-        log('Admin Giriş', 'Başarılı!', 'success');
-        log('Token', data.token?.substring(0, 30) + '...', 'success');
-        return { success: true, token: data.token };
-      } else {
-        log('Login Hatası', data.error || 'Bilinmeyen hata', 'error');
-        return { success: false };
-      }
+      data = JSON.parse(text);
     } catch (parseError) {
-      log('JSON Parse Hatası', parseError.message, 'error');
+      log('JSON Parse Error', parseError.message, 'error');
       return { success: false };
     }
+
+    if (response.ok && data.success) {
+      log('Admin Login', 'Successful', 'success');
+      log('Token', `${String(data.token || '').substring(0, 30)}...`, 'success');
+      return { success: true, token: data.token };
+    }
+
+    log('Login Error', data.error || 'Unknown error', 'error');
+    return { success: false };
   } catch (error) {
-    log('Network Hatası', error.message, 'error');
+    log('Network Error', error.message, 'error');
     return { success: false };
   }
 }
 
 async function testAdminFetch(token) {
-  log('TEST 4', 'Admin Panel - Başvuruları Getirme', 'test');
+  log('TEST 4', 'Fetch admin applications', 'test');
 
   try {
-    log('GET', '/api/admin/applications gönderiliyor...');
+    log('GET', '/api/admin/applications');
     const response = await fetch(`${BASE_URL}/api/admin/applications`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     console.log(`   Response Status: ${response.status}`);
     const data = await response.json();
 
     if (Array.isArray(data)) {
-      log('Başvurular Başarıyla Getirildi', `Toplam: ${data.length} başvuru`, 'success');
+      log('Applications fetched', `Total: ${data.length}`, 'success');
       if (data.length > 0) {
-        log('Son Başvuru', `${data[0].full_name} - ${data[0].email}`, 'info');
+        log('Latest application', `${data[0].full_name} - ${data[0].email}`, 'info');
       }
       return { success: true, applications: data };
-    } else {
-      log('Beklenmeyen Response', JSON.stringify(data).substring(0, 100), 'error');
-      return { success: false };
     }
+
+    log('Unexpected response', JSON.stringify(data).substring(0, 200), 'error');
+    return { success: false };
   } catch (error) {
-    log('Hata', error.message, 'error');
+    log('Error', error.message, 'error');
     return { success: false };
   }
 }
 
 async function runAllTests() {
-  console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('🧪 DİJİTAL MOR KARARGAH - İNTEGRASYON TESTİ');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+  console.log('\n==================================================');
+  console.log('DIGITAL MOR KARARGAH - INTEGRATION TEST');
+  console.log('==================================================\n');
 
-  // Wait for server to be ready
-  log('Sistem', 'Dev server hazırlanıyor (3 saniye bekleme)...', 'info');
-  await new Promise(r => setTimeout(r, 3000));
+  log('System', 'Waiting 3 seconds for dev server...', 'info');
+  await wait(3000);
 
-  // Run tests
   const test1 = await testFormSubmission();
   const test2 = await testEventProposal();
   const test3 = await testAdminLogin();
+  let test4 = { success: false };
 
   if (test3.success) {
-    const test4 = await testAdminFetch(test3.token);
+    test4 = await testAdminFetch(test3.token);
   }
 
-  // Summary
-  console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('📊 TEST ÖZETI');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log(`✅ Başvuru Submission: ${test1.success ? 'PASSED' : 'FAILED'}`);
-  console.log(`✅ Event Proposal: ${test2.success ? 'PASSED' : 'FAILED'}`);
-  console.log(`✅ Admin Login: ${test3.success ? 'PASSED' : 'FAILED'}`);
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+  console.log('\n==================================================');
+  console.log('TEST SUMMARY');
+  console.log('==================================================');
+  console.log(`[OK] Form Submission: ${test1.success ? 'PASSED' : 'FAILED'}`);
+  console.log(`[OK] Event Proposal: ${test2.success ? 'PASSED' : 'FAILED'}`);
+  console.log(`[OK] Admin Login: ${test3.success ? 'PASSED' : 'FAILED'}`);
+  console.log(`[OK] Admin Applications: ${test3.success ? (test4.success ? 'PASSED' : 'FAILED') : 'SKIPPED'}`);
+  console.log('==================================================\n');
+
+  if (!test1.success || !test2.success || !test3.success || (test3.success && !test4.success)) {
+    process.exitCode = 1;
+  }
 }
 
-runAllTests().catch(console.error);
+runAllTests().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

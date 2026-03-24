@@ -1,4 +1,5 @@
 import { getApprovedArchiveEntries } from '../../../utils/db.js';
+import { toEnglishArchiveItem } from '../../../utils/contentI18n.js';
 
 export const prerender = false;
 
@@ -12,6 +13,7 @@ export async function GET({ url }) {
     const decade = url.searchParams.get('decade');
     const search = url.searchParams.get('search');
     const focus = url.searchParams.get('focus');
+    const lang = url.searchParams.get('lang') === 'en' ? 'en' : 'tr';
     const limit = Number(url.searchParams.get('limit') || 0);
 
     const filters = {};
@@ -20,13 +22,15 @@ export async function GET({ url }) {
     if (focus && focus !== 'all') filters.focus = focus;
     if (limit > 0) filters.limit = limit;
 
-    const items = getApprovedArchiveEntries(filters);
-    const allApproved = getApprovedArchiveEntries();
+    const itemsRaw = getApprovedArchiveEntries(filters);
+    const allApprovedRaw = getApprovedArchiveEntries();
+    const items = lang === 'en' ? itemsRaw.map((item) => toEnglishArchiveItem(item)) : itemsRaw;
+    const allApproved = lang === 'en' ? allApprovedRaw.map((item) => toEnglishArchiveItem(item)) : allApprovedRaw;
 
     const decades = [...new Set(allApproved.map((item) => item.decade).filter(Boolean))]
-      .sort((a, b) => a.localeCompare(b, 'tr'));
+      .sort((a, b) => a.localeCompare(b, lang === 'en' ? 'en' : 'tr'));
     const focusTopics = [...new Set(allApproved.map((item) => item.focus_topic).filter(Boolean))]
-      .sort((a, b) => a.localeCompare(b, 'tr'));
+      .sort((a, b) => a.localeCompare(b, lang === 'en' ? 'en' : 'tr'));
 
     return new Response(
       JSON.stringify({

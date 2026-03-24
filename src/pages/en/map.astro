@@ -1,220 +1,320 @@
 ---
-// src/pages/en/map.astro
 import MainLayout from '../../layouts/MainLayout.astro';
-import TurkeyMap from '../../components/TurkeyMap.astro';
+
+const provinces = [
+  { code: 'istanbul', name: 'Istanbul', region: 'Marmara', status: 'active', members: 145, contacts: ['Zeynep Kaya', 'Ayse Yilmaz'] },
+  { code: 'ankara', name: 'Ankara', region: 'Central Anatolia', status: 'active', members: 89, contacts: ['Fatma Demir', 'Gulsum Alp'] },
+  { code: 'izmir', name: 'Izmir', region: 'Aegean', status: 'growing', members: 67, contacts: ['Muzeyyen Senar'] },
+  { code: 'bursa', name: 'Bursa', region: 'Marmara', status: 'active', members: 54, contacts: ['Emine Kara'] },
+  { code: 'gaziantep', name: 'Gaziantep', region: 'Southeast Anatolia', status: 'growing', members: 42, contacts: ['Leyla Sahin'] },
+  { code: 'adana', name: 'Adana', region: 'Mediterranean', status: 'starting', members: 28, contacts: [] },
+  { code: 'eskisehir', name: 'Eskisehir', region: 'Central Anatolia', status: 'active', members: 51, contacts: ['Sevim Aydin'] },
+  { code: 'mersin', name: 'Mersin', region: 'Mediterranean', status: 'growing', members: 35, contacts: [] },
+];
 ---
 
 <MainLayout title="Join Us - Campus Witches" currentLang="en">
-  <!-- Header -->
-  <div class="py-12 text-center mb-8">
-    <h1 class="text-5xl md:text-6xl font-black mb-4">
-      <span class="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-        Join the Movement
-      </span>
-    </h1>
-    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-      Campus Witches organize in 82 provinces across Turkey. Find your local chapter and join us.
+  <section class="mb-12 rounded-2xl bg-gradient-to-r from-purple-700 to-pink-600 p-8 text-white md:p-12">
+    <h1 class="app-h1 mb-4 text-4xl font-black md:text-5xl">Join Us</h1>
+    <p class="max-w-2xl text-lg text-white/90">
+      Join our feminist network organized across 82 provinces. Select your province, tell us about yourself, and join the team.
     </p>
-  </div>
-
-  <!-- Interactive Map -->
-  <section class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 md:p-12 mb-12 border-2 border-purple-200">
-    <h2 class="text-3xl font-bold mb-6 text-center">Find Your Province</h2>
-    <TurkeyMap />
   </section>
 
-  <!-- Join Form -->
-  <section class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
-    <!-- Form -->
-    <div>
-      <h2 class="text-3xl font-bold mb-6">
-        <span class="text-purple-600">Sign Up</span> for Our Network
-      </h2>
-      
-      <form id="en-join-form" class="bg-white p-8 rounded-xl border-2 border-gray-200 space-y-4">
+  <section class="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1.2fr]">
+    <div class="space-y-6">
+      <div class="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-200">
+        <label class="mb-3 block text-sm font-bold uppercase text-gray-600">
+          1. Select Province
+        </label>
+        <select id="province-select" class="w-full rounded-lg border-2 border-purple-300 px-4 py-3 font-semibold focus:border-purple-600 focus:outline-none">
+          <option value="">-- Select Your Province --</option>
+          {provinces.map((p) => (
+            <option value={p.code}>{p.name}</option>
+          ))}
+        </select>
+      </div>
+
+      <div id="province-details" class="hidden space-y-4 rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-200">
+        <label class="text-sm font-bold uppercase text-gray-600">
+          2. Province Details
+        </label>
+
+        <div id="details-content" class="space-y-4"></div>
+
+        <button id="select-province-btn" class="w-full rounded-lg bg-purple-600 py-3 font-bold text-white transition hover:bg-purple-700">
+          Select This Province
+        </button>
+      </div>
+
+      <div class="rounded-2xl border-2 border-purple-200 bg-purple-50 p-6">
+        <p class="mb-3 text-sm font-bold uppercase text-purple-700">Info</p>
+        <p class="text-sm leading-6 text-gray-700">
+          After your application is received, the contact person or team in your selected province will get in touch with you.
+          For active provinces, you will be directed to the local team. For provinces in setup phase, you will be directed to the founding volunteer pool.
+        </p>
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-200">
+      <label class="mb-6 block text-sm font-bold uppercase text-gray-600">
+        3. Application Form
+      </label>
+
+      <form id="application-form" class="space-y-4">
         <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">Full Name *</label>
-          <input type="text" name="name" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600" placeholder="Your name" required />
+          <label class="mb-2 block text-xs font-bold uppercase text-gray-600">
+            Province (Auto)
+          </label>
+          <input
+            id="form-province"
+            type="text"
+            disabled
+            class="w-full rounded-lg border-2 border-gray-300 bg-gray-100 px-4 py-3 font-semibold text-gray-700"
+            placeholder="Waiting for province selection..."
+          />
         </div>
 
         <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">Email Address *</label>
-          <input type="email" name="email" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600" placeholder="your@email.com" required />
+          <label class="mb-2 block text-xs font-bold uppercase text-gray-600">
+            Full Name *
+          </label>
+          <input
+            type="text"
+            name="name"
+            required
+            class="w-full rounded-lg border-2 border-gray-300 px-4 py-3 font-semibold focus:border-purple-600 focus:outline-none"
+            placeholder="Enter your full name"
+          />
         </div>
 
         <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">Province *</label>
-          <select name="province" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600" required>
-            <option value="">-- Select Province --</option>
-            <option value="istanbul">Istanbul</option>
-            <option value="ankara">Ankara</option>
-            <option value="izmir">Izmir</option>
-            <option value="other">Other...</option>
-          </select>
+          <label class="mb-2 block text-xs font-bold uppercase text-gray-600">
+            E-mail *
+          </label>
+          <input
+            type="email"
+            name="email"
+            required
+            class="w-full rounded-lg border-2 border-gray-300 px-4 py-3 font-semibold focus:border-purple-600 focus:outline-none"
+            placeholder="example@mail.com"
+          />
         </div>
 
         <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">University / Organization</label>
-          <input type="text" name="organization" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600" placeholder="Your institution" />
+          <label class="mb-2 block text-xs font-bold uppercase text-gray-600">
+            University / Organization (Optional)
+          </label>
+          <input
+            type="text"
+            name="organization"
+            class="w-full rounded-lg border-2 border-gray-300 px-4 py-3 font-semibold focus:border-purple-600 focus:outline-none"
+            placeholder="e.g. Bogazici University"
+          />
         </div>
 
         <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">How can you contribute? *</label>
+          <label class="mb-3 block text-xs font-bold uppercase text-gray-600">
+            Contribution Areas *
+          </label>
           <div class="space-y-2">
-            <label class="flex items-center">
-              <input type="checkbox" name="skills" value="organizing" class="mr-2" /> Organizing & Events
+            <label class="flex cursor-pointer items-center gap-3">
+              <input type="checkbox" name="skills" value="organizing" class="h-4 w-4 rounded border-gray-300" />
+              <span class="text-gray-700">Organizing and Event Coordination</span>
             </label>
-            <label class="flex items-center">
-              <input type="checkbox" name="skills" value="writing" class="mr-2" /> Writing & Media
+            <label class="flex cursor-pointer items-center gap-3">
+              <input type="checkbox" name="skills" value="writing" class="h-4 w-4 rounded border-gray-300" />
+              <span class="text-gray-700">Writing and Editorial</span>
             </label>
-            <label class="flex items-center">
-              <input type="checkbox" name="skills" value="education" class="mr-2" /> Education & Training
+            <label class="flex cursor-pointer items-center gap-3">
+              <input type="checkbox" name="skills" value="education" class="h-4 w-4 rounded border-gray-300" />
+              <span class="text-gray-700">Education and Learning Materials</span>
             </label>
-            <label class="flex items-center">
-              <input type="checkbox" name="skills" value="support" class="mr-2" /> Support & Care
+            <label class="flex cursor-pointer items-center gap-3">
+              <input type="checkbox" name="skills" value="support" class="h-4 w-4 rounded border-gray-300" />
+              <span class="text-gray-700">Support and Care (Psychological, Legal, etc.)</span>
             </label>
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">Social Media Handle</label>
-          <input type="text" name="social" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600" placeholder="@yourhandle" />
+          <label class="mb-2 block text-xs font-bold uppercase text-gray-600">
+            Social Media Handle (Optional)
+          </label>
+          <input
+            type="text"
+            name="social"
+            class="w-full rounded-lg border-2 border-gray-300 px-4 py-3 font-semibold focus:border-purple-600 focus:outline-none"
+            placeholder="@username or your profile link"
+          />
         </div>
 
         <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">Why do you want to join us?</label>
-          <textarea name="message" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 h-24" placeholder="Tell us your motivation..." required></textarea>
+          <label class="mb-2 block text-xs font-bold uppercase text-gray-600">
+            Tell Us About Yourself *
+          </label>
+          <textarea
+            name="message"
+            required
+            rows="4"
+            class="w-full resize-none rounded-lg border-2 border-gray-300 px-4 py-3 font-semibold focus:border-purple-600 focus:outline-none"
+            placeholder="Why do you want to join? How can you contribute to local organizing?"
+          ></textarea>
         </div>
 
-        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-lg hover:shadow-lg transition text-lg">
-          Join the Movement
+        <button
+          id="submit-btn"
+          type="submit"
+          disabled
+          class="w-full cursor-not-allowed rounded-lg bg-gray-300 py-3 font-bold text-gray-600 transition disabled:opacity-50"
+        >
+          Submit Application (select province first)
         </button>
       </form>
-    </div>
-
-    <!-- Why Join -->
-    <div>
-      <h2 class="text-3xl font-bold mb-6">
-        Why <span class="text-purple-600">Join Us</span>?
-      </h2>
-
-      <div class="space-y-6">
-        <div class="flex gap-4">
-          <div class="text-4xl">👭</div>
-          <div>
-            <h3 class="font-bold text-lg mb-2">Community & Sisterhood</h3>
-            <p class="text-gray-600">Connect with like-minded women organizing for change in your province.</p>
-          </div>
-        </div>
-
-        <div class="flex gap-4">
-          <div class="text-4xl">🎓</div>
-          <div>
-            <h3 class="font-bold text-lg mb-2">Knowledge & Skills</h3>
-            <p class="text-gray-600">Learn about feminist theory, organizing, media, and activism from experts.</p>
-          </div>
-        </div>
-
-        <div class="flex gap-4">
-          <div class="text-4xl">✊</div>
-          <div>
-            <h3 class="font-bold text-lg mb-2">Direct Action</h3>
-            <p class="text-gray-600">Participate in marches, protests, workshops, and cultural events nationwide.</p>
-          </div>
-        </div>
-
-        <div class="flex gap-4">
-          <div class="text-4xl">📢</div>
-          <div>
-            <h3 class="font-bold text-lg mb-2">Amplify Your Voice</h3>
-            <p class="text-gray-600">Platform to publish articles, organize campaigns, and build solidarity networks.</p>
-          </div>
-        </div>
-
-        <div class="flex gap-4">
-          <div class="text-4xl">🛡️</div>
-          <div>
-            <h3 class="font-bold text-lg mb-2">Mutual Support</h3>
-            <p class="text-gray-600">Care networks for legal support, mental health, and community protection.</p>
-          </div>
-        </div>
-
-        <div class="flex gap-4">
-          <div class="text-4xl">🌍</div>
-          <div>
-            <h3 class="font-bold text-lg mb-2">International Solidarity</h3>
-            <p class="text-gray-600">Connect with feminist movements across the globe and build transnational power.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Stats Box -->
-      <div class="mt-8 bg-gradient-to-br from-purple-100 to-pink-100 p-6 rounded-xl">
-        <h3 class="font-bold text-lg mb-4">Current Network</h3>
-        <div class="space-y-2">
-          <p class="flex justify-between"><span>Active Provinces:</span> <strong>82</strong></p>
-          <p class="flex justify-between"><span>Active Members:</span> <strong>1,500+</strong></p>
-          <p class="flex justify-between"><span>Events This Year:</span> <strong>250+</strong></p>
-          <p class="flex justify-between"><span>Articles Published:</span> <strong>480+</strong></p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Values Section -->
-  <section class="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl p-8 md:p-12 text-center">
-    <h2 class="text-4xl font-bold mb-6">Our Three Core Values</h2>
-    
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white bg-opacity-10 p-6 rounded-xl backdrop-blur">
-        <div class="text-4xl mb-3">🦅</div>
-        <h3 class="font-bold text-xl mb-2">Freedom</h3>
-        <p>Liberation from patriarchal oppression. Bodily autonomy for all women.</p>
-      </div>
-      
-      <div class="bg-white bg-opacity-10 p-6 rounded-xl backdrop-blur">
-        <div class="text-4xl mb-3">🤝</div>
-        <h3 class="font-bold text-xl mb-2">Solidarity</h3>
-        <p>United across differences. Our strength comes from collective action.</p>
-      </div>
-      
-      <div class="bg-white bg-opacity-10 p-6 rounded-xl backdrop-blur">
-        <div class="text-4xl mb-3">⚡</div>
-        <h3 class="font-bold text-xl mb-2">Struggle</h3>
-        <p>Resistance as our path. Fighting for justice and equality for all.</p>
-      </div>
     </div>
   </section>
 
   <script>
-    // English Join Form Handler
-    const enJoinForm = document.getElementById('en-join-form');
-    enJoinForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const formData = new FormData(enJoinForm);
-      const name = formData.get('name');
-      const email = formData.get('email');
-      const province = formData.get('province');
-      
-      // Basic validation
-      if (!name || !email || !province) {
-        alert('❌ Please fill in all required fields!');
+    const provinceSelect = document.getElementById('province-select');
+    const provinceDetails = document.getElementById('province-details');
+    const detailsContent = document.getElementById('details-content');
+    const selectProvinceBtn = document.getElementById('select-province-btn');
+    const formProvince = document.getElementById('form-province');
+    const applicationForm = document.getElementById('application-form');
+    const submitBtn = document.getElementById('submit-btn');
+
+    const provincesData = {
+      istanbul: { name: 'Istanbul', region: 'Marmara', status: 'active', members: 145, contacts: ['Zeynep Kaya', 'Ayse Yilmaz'] },
+      ankara: { name: 'Ankara', region: 'Central Anatolia', status: 'active', members: 89, contacts: ['Fatma Demir', 'Gulsum Alp'] },
+      izmir: { name: 'Izmir', region: 'Aegean', status: 'growing', members: 67, contacts: ['Muzeyyen Senar'] },
+      bursa: { name: 'Bursa', region: 'Marmara', status: 'active', members: 54, contacts: ['Emine Kara'] },
+      gaziantep: { name: 'Gaziantep', region: 'Southeast Anatolia', status: 'growing', members: 42, contacts: ['Leyla Sahin'] },
+      adana: { name: 'Adana', region: 'Mediterranean', status: 'starting', members: 28, contacts: [] },
+      eskisehir: { name: 'Eskisehir', region: 'Central Anatolia', status: 'active', members: 51, contacts: ['Sevim Aydin'] },
+      mersin: { name: 'Mersin', region: 'Mediterranean', status: 'growing', members: 35, contacts: [] },
+    };
+
+    provinceSelect.addEventListener('change', (e) => {
+      const selectedCode = e.target.value;
+
+      if (!selectedCode) {
+        provinceDetails.classList.add('hidden');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submit Application (select province first)';
         return;
       }
-      
-      // Update form with success message
-      enJoinForm.innerHTML = `
-        <div class="bg-green-100 border-2 border-green-500 text-green-800 rounded-lg p-6 text-center">
-          <p class="text-2xl font-bold mb-2">✓ Welcome to the Movement!</p>
-          <p class="text-lg mb-4">Thank you for joining! We'll be in touch soon with more information about your local chapter.</p>
-          <p class="text-sm opacity-75">Page will reload in 3 seconds...</p>
+
+      const prov = provincesData[selectedCode];
+
+      detailsContent.innerHTML = `
+        <div>
+          <p class="text-xs font-bold text-gray-600">PROVINCE</p>
+          <p class="mt-1 text-2xl font-black text-purple-700">${prov.name}</p>
         </div>
+        <div>
+          <p class="text-xs font-bold text-gray-600">REGION</p>
+          <p class="mt-1 text-lg font-semibold text-gray-900">${prov.region}</p>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-gray-600">STATUS</p>
+          <div class="mt-1">
+            <span class="inline-block rounded-full px-3 py-1 text-sm font-bold ${
+              prov.status === 'active' ? 'bg-green-100 text-green-700' :
+              prov.status === 'growing' ? 'bg-blue-100 text-blue-700' :
+              'bg-yellow-100 text-yellow-700'
+            }">
+              ${prov.status === 'active' ? 'Active' : prov.status === 'growing' ? 'Growing' : 'Setup Phase'}
+            </span>
+          </div>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-gray-600">ACTIVE MEMBERS</p>
+          <p class="mt-1 text-lg font-semibold text-gray-900">${prov.members} people</p>
+        </div>
+        ${prov.contacts.length > 0 ? `
+          <div>
+            <p class="text-xs font-bold text-gray-600">PROVINCE COORDINATOR</p>
+            <p class="mt-1 text-lg font-semibold text-gray-900">${prov.contacts.join(', ')}</p>
+          </div>
+        ` : ''}
       `;
-      
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
+
+      provinceDetails.classList.remove('hidden');
+    });
+
+    selectProvinceBtn.addEventListener('click', () => {
+      const selectedCode = provinceSelect.value;
+      const selectedName = provincesData[selectedCode].name;
+
+      formProvince.value = selectedName;
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Application';
+      submitBtn.classList.remove('bg-gray-300', 'text-gray-600', 'cursor-not-allowed');
+      submitBtn.classList.add('bg-purple-600', 'text-white', 'hover:bg-purple-700');
+
+      applicationForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    applicationForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = {
+        full_name: applicationForm.querySelector('input[name="name"]').value,
+        email: applicationForm.querySelector('input[name="email"]').value,
+        province: formProvince.value,
+        organization: applicationForm.querySelector('input[name="organization"]').value,
+        skills: Array.from(applicationForm.querySelectorAll('input[name="skills"]:checked')).map((cb) => cb.value),
+        social_media: applicationForm.querySelector('input[name="social"]').value,
+        message: applicationForm.querySelector('textarea[name="message"]').value,
+      };
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+
+      try {
+        const response = await fetch('/api/submit-application', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'An error occurred');
+        }
+
+        applicationForm.innerHTML = `
+          <div class="space-y-3 rounded-2xl border-2 border-green-300 bg-green-50 p-6 text-center">
+            <p class="text-4xl">OK</p>
+            <p class="text-2xl font-bold text-green-700">Application Received!</p>
+            <p class="mt-4 text-gray-700">
+              <strong>${formData.full_name}</strong>, your application will be reviewed by the <strong>${formData.province}</strong> coordination team.
+            </p>
+            <div class="mt-4 rounded-lg bg-green-100 p-4">
+              <p class="text-sm text-gray-600">
+                <strong>${formData.email}</strong> will receive updates about review progress.
+              </p>
+              <p class="mt-2 text-sm text-gray-600">
+                Average response time: <strong>3-5 business days</strong>.
+              </p>
+            </div>
+            <p class="mt-4 text-xs text-gray-500">
+              Application ID: <code class="rounded bg-gray-100 px-2 py-1">#APP-${result.applicationId}</code>
+            </p>
+            <button onclick="location.reload()" class="mt-6 w-full rounded-lg bg-purple-600 py-3 font-bold text-white transition hover:bg-purple-700">
+              Done
+            </button>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Submission error:', error);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Application';
+        alert(`Error: ${error.message}\n\nPlease try again later.`);
+      }
     });
   </script>
 </MainLayout>

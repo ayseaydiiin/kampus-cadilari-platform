@@ -75,11 +75,13 @@ Guvenlik nedeniyle sifreler repoda tutulmaz.
 ### Public
 - `POST /api/submit-application`
 - `POST /api/events/propose`
+- `POST /api/events/check-name`
 - `GET /api/events/list`
 - `GET /api/events/:id`
 - `POST /api/events/:id/join`
-- `GET /api/articles/list`
+- `POST /api/articles/view`
 - `GET /api/archive/list`
+- `GET /api/archive/:id/export-pdf`
 
 ### Admin
 - `GET /api/admin/applications`

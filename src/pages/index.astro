@@ -2,8 +2,7 @@
 import MainLayout from '../layouts/MainLayout.astro';
 import SelectedWordPanel from '../components/SelectedWordPanel.astro';
 import { feministWords } from '../data/feministWords';
-import { articles as staticArticles } from '../data/articles';
-import { slugify } from '../utils/slugify';
+import { getCategoryLabel, getCategorySlug } from '../utils/articleCategories';
 import { getApprovedArchiveEntries, getPublishedArticles } from '../utils/db.js';
 
 const today = new Date();
@@ -11,25 +10,24 @@ const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0,
 const todaysWord = feministWords[(dayOfYear - 1) % feministWords.length];
 
 const publishedArticles = getPublishedArticles();
-const homeArticles = publishedArticles.length
-  ? publishedArticles.map((article) => ({
-      id: article.slug,
-      slug: article.slug,
-      title: article.title,
-      category: article.category || 'Genel',
-      excerpt: article.excerpt || String(article.body || '').slice(0, 180),
-      date: article.created_at,
-      image: '*',
-    }))
-  : staticArticles;
+const homeArticles = publishedArticles.map((article) => ({
+  id: article.slug,
+  slug: article.slug,
+  title: article.title,
+  category: article.category || 'Gundem ve Politika',
+  excerpt: article.excerpt || String(article.body || '').slice(0, 180),
+  date: article.created_at,
+  image: '*',
+}));
 
-const categoryMap = new Map<string, { name: string; count: number; icon: string }>();
+const categoryMap = new Map();
 for (const article of homeArticles) {
-  const current = categoryMap.get(article.category);
+  const displayCategory = getCategoryLabel(article.category || 'Gundem ve Politika', 'tr');
+  const current = categoryMap.get(displayCategory);
   if (current) current.count += 1;
   else {
-    categoryMap.set(article.category, {
-      name: article.category,
+    categoryMap.set(displayCategory, {
+      name: displayCategory,
       count: 1,
       icon: article.image || '*',
     });
@@ -37,7 +35,7 @@ for (const article of homeArticles) {
 }
 
 const categories = Array.from(categoryMap.values())
-  .map((category) => ({ ...category, slug: slugify(category.name) }))
+  .map((category) => ({ ...category, slug: getCategorySlug(category.name) }))
   .sort((a, b) => a.name.localeCompare(b.name, 'tr'));
 
 const latestArticles = [...homeArticles]
@@ -134,7 +132,7 @@ const featuredArchiveItems = getApprovedArchiveEntries({ limit: 3 });
           </p>
           <h4 class="mt-2 text-xl font-bold leading-tight text-slate-900">{article.title}</h4>
           <p class="mt-3 line-clamp-3 text-sm leading-6 text-slate-600">{article.excerpt}</p>
-          <a href={article.slug ? `/articles/${slugify(article.category || 'genel') || 'genel'}/${article.slug}` : `/makale/${article.id}`} class="mt-4 inline-flex text-sm font-bold text-purple-700 hover:text-purple-900">
+          <a href={`/articles/${getCategorySlug(article.category || 'Gundem ve Politika')}/${article.slug}`} class="mt-4 inline-flex text-sm font-bold text-purple-700 hover:text-purple-900">
             Yaziyi oku ->
           </a>
         </article>

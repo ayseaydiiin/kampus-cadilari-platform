@@ -14,7 +14,7 @@ const focusTopics = [...new Set(allApproved.map((item) => item.focus_topic).filt
     <div class="absolute -bottom-10 right-0 h-56 w-56 rounded-full bg-fuchsia-100/10 blur-3xl"></div>
     <div class="relative max-w-4xl">
       <p class="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs font-bold uppercase tracking-[0.18em]">Arsiv bolumu</p>
-      <h1 class="mt-4 text-4xl font-black leading-tight md:text-5xl">Gazete Arsiv Bolumu</h1>
+      <h1 class="app-h1 mt-4 text-4xl font-black leading-tight md:text-5xl">Gazete Arsiv Bolumu</h1>
       <p class="mt-4 max-w-3xl text-base leading-8 text-white/95 md:text-lg">
         Feminist gazetelerin admin onayindan gecmis surumlerini kurumsal bir akisla listeliyoruz.
       </p>
@@ -58,7 +58,7 @@ const focusTopics = [...new Set(allApproved.map((item) => item.focus_topic).filt
           <div class="relative">
             <img src={item.cover_image_url || '/archive/placeholder-cover.svg'} alt={`${item.publication_name} kapak`} class="h-56 w-full object-cover" loading="lazy" />
             <div class="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full border border-amber-300/70 bg-amber-100/95 px-3 py-1 text-xs font-bold text-amber-900">
-              <span>✓</span>
+              <span>OK</span>
               <span>Admin Onayli</span>
             </div>
           </div>
@@ -167,7 +167,7 @@ const focusTopics = [...new Set(allApproved.map((item) => item.focus_topic).filt
           <div class="relative">
             <img src="${escapeHtml(cover)}" alt="${escapeHtml(item.publication_name)} kapak" class="h-56 w-full object-cover" loading="lazy" />
             <div class="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full border border-amber-300/70 bg-amber-100/95 px-3 py-1 text-xs font-bold text-amber-900">
-              <span>✓</span>
+              <span>OK</span>
               <span>Admin Onayli</span>
             </div>
           </div>

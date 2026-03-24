@@ -1,142 +1,62 @@
 ---
 import MainLayout from '../../layouts/MainLayout.astro';
-import { adminAnnouncements, adminHelpItems, adminQuotes, adminRoster } from '../../data/adminExperience';
-import fs from 'node:fs';
-import path from 'node:path';
 
-const articlesDir = path.join(process.cwd(), 'content', 'articles');
-const articleCount = fs.existsSync(articlesDir) ? fs.readdirSync(articlesDir).filter((item) => item.endsWith('.md') || item.endsWith('.mdx')).length : 0;
-const firstQuote = adminQuotes[(new Date().getDate() + 2) % adminQuotes.length];
+const SESSION_MAX_HOURS = 8;
 ---
 
 <MainLayout title="Admin Giris - Kampus Cadilari" currentLang="tr">
-  <section class="admin-shell relative overflow-hidden rounded-[2rem] px-4 py-8 md:px-8 md:py-10">
-    <div class="admin-aurora"></div>
-    <div class="admin-stars"></div>
-
-    <div class="relative z-10 grid gap-6 xl:grid-cols-[0.9fr_1.05fr_0.85fr]">
-      <aside class="glass-panel p-6 text-white">
-        <p class="text-xs font-bold uppercase tracking-[0.25em] text-pink-100">Duyuru sutunu</p>
-        <h2 class="mt-3 text-3xl font-black text-white">Ekip ici notlar</h2>
-        <div class="mt-6 space-y-3">
-          {adminAnnouncements.map((item, index) => (
-            <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/15">
-              <p class="text-xs font-bold uppercase tracking-[0.18em] text-pink-100">Not {index + 1}</p>
-              <p class="mt-2 text-sm leading-6 text-white/85">{item}</p>
-            </div>
-          ))}
-        </div>
-      </aside>
-
-      <div class="glass-panel p-6 md:p-8">
-        <div class="text-center text-white">
-          <div class="mx-auto grid h-20 w-20 place-items-center rounded-[1.5rem] bg-white/15 text-lg font-black shadow-2xl ring-1 ring-white/20">KM</div>
-          <p class="mt-5 text-xs font-bold uppercase tracking-[0.35em] text-pink-100">Dijital Karargah</p>
-          <h1 class="mt-3 text-4xl font-black text-white md:text-5xl">Yetkili Cadilar Icin Guvenli Giris</h1>
-          <p class="mx-auto mt-4 max-w-2xl text-sm leading-7 text-white/80 md:text-base">
-            Giris sonrasi panel seni dashboard, gorevler, notlar ve hizli yayin akisiyla karsilar.
-          </p>
-        </div>
-
-        <div id="message" class="hidden mb-4 mt-6 rounded-xl p-4 text-sm font-semibold"></div>
-        <div id="loading" class="mb-4 mt-6 hidden rounded-xl bg-blue-100 p-4 text-sm font-semibold text-blue-800">
-          Giris kontrol ediliyor...
-        </div>
-
-        <div class="mt-6 grid gap-4 md:grid-cols-2">
-          <button type="button" class="hero-login-btn hero-login-btn-red cursor-not-allowed opacity-85" title="Yakinda aktiflestirilecek">
-            <span class="text-lg font-black">GitHub ile Giris</span>
-            <span class="text-xs uppercase tracking-[0.2em]">Yakinda</span>
-          </button>
-          <button type="button" class="hero-login-btn cursor-not-allowed opacity-85" title="Yakinda aktiflestirilecek">
-            <span class="text-lg font-black">Google ile Giris</span>
-            <span class="text-xs uppercase tracking-[0.2em]">Yakinda</span>
-          </button>
-        </div>
-
-        <form id="login-form" class="mt-4 space-y-4">
-          <label class="block">
-            <span class="mb-2 block text-sm font-bold text-white/90">E-posta</span>
-            <input id="email" type="email" required class="w-full rounded-xl border border-white/20 bg-white/95 px-4 py-3 text-slate-900 focus:border-purple-600 focus:outline-none" placeholder="admin@kampuscadilari.org" />
-          </label>
-
-          <label class="block">
-            <span class="mb-2 block text-sm font-bold text-white/90">Parola</span>
-            <input id="password" type="password" required class="w-full rounded-xl border border-white/20 bg-white/95 px-4 py-3 text-slate-900 focus:border-purple-600 focus:outline-none" placeholder="••••••••" />
-          </label>
-
-          <button id="submit-btn" type="submit" class="w-full rounded-xl bg-white py-3 text-lg font-black text-purple-700 shadow-xl transition hover:-translate-y-1 hover:bg-amber-50 disabled:opacity-50">
-            E-posta ile giris yap
-          </button>
-        </form>
-
-        <div class="mt-5 rounded-[1.25rem] bg-white/10 px-5 py-4 text-center italic text-pink-50 ring-1 ring-white/15">
-          <p id="daily-quote" data-quotes={JSON.stringify(adminQuotes)}>{firstQuote}</p>
-        </div>
-
-        <div class="mt-4 rounded-[1.25rem] bg-black/20 px-5 py-4 text-sm text-white/85 ring-1 ring-white/10">
-          Bu alan sadece yetkili Cadilar icindir. Dijital guvenligin icin cikis yapmayi unutma.
-        </div>
+  <section class="mx-auto flex min-h-[70vh] max-w-3xl items-center justify-center">
+    <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-xl">
+      <div class="text-center">
+        <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-purple-700 to-pink-600 text-sm font-black text-white">KM</div>
+        <h1 class="app-h1 mt-4 text-3xl font-black text-slate-900">Admin Giris</h1>
+        <p class="mt-2 text-sm text-slate-600">Yetkili paneline erismek icin e-posta ve parolanizi girin.</p>
       </div>
 
-      <aside class="glass-panel p-6 text-white">
-        <p class="text-xs font-bold uppercase tracking-[0.25em] text-pink-100">Hizli bakis</p>
-        <div class="mt-4 grid gap-3">
-          <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/15">
-            <p class="text-xs uppercase tracking-[0.18em] text-white/60">Yayindaki yazi</p>
-            <p class="mt-2 text-3xl font-black">{articleCount}</p>
-          </div>
-          <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/15">
-            <p class="text-xs uppercase tracking-[0.18em] text-white/60">Baslangic notu</p>
-            <p class="mt-2 text-sm leading-6 text-white/85">Giris yaptiktan sonra dashboard uzerindeki hizli notlardan baslayabilirsin.</p>
-          </div>
-          <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/15">
-            <p class="text-xs uppercase tracking-[0.18em] text-white/60">Yetkili roller</p>
-            <div class="mt-2 space-y-2 text-sm leading-6 text-white/85">
-              {adminRoster.slice(0, 3).map((member) => (
-                <p><span class="font-bold">{member.role}:</span> {member.email}</p>
-              ))}
-            </div>
-          </div>
-        </div>
-      </aside>
-    </div>
+      <div id="message" class="hidden mt-5 rounded-xl p-4 text-sm font-semibold"></div>
+      <div id="loading" class="mt-5 hidden rounded-xl bg-blue-100 p-4 text-sm font-semibold text-blue-800">Giris kontrol ediliyor...</div>
 
-    <button id="help-toggle" class="help-fab" type="button" aria-expanded="false" aria-controls="help-panel">?</button>
-    <div id="help-panel" class="help-panel hidden">
-      <p class="text-xs font-bold uppercase tracking-[0.2em] text-purple-700">Yardim</p>
-      <div class="mt-3 space-y-3 text-sm text-slate-700">
-        {adminHelpItems.map((item) => <p>{item}</p>)}
-      </div>
-      <p class="mt-4 text-xs text-slate-500">Teknik destek: admin@kampuscadilari.org</p>
+      <form id="login-form" class="mt-5 space-y-4">
+        <label class="block">
+          <span class="mb-2 block text-sm font-bold text-slate-700">E-posta</span>
+          <input id="email" type="email" required class="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-purple-600 focus:outline-none" placeholder="admin@kampuscadilari.org" />
+        </label>
+
+        <label class="block">
+          <span class="mb-2 block text-sm font-bold text-slate-700">Parola</span>
+          <input id="password" type="password" required class="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-purple-600 focus:outline-none" placeholder="********" />
+        </label>
+
+        <button id="submit-btn" type="submit" class="w-full rounded-xl bg-gradient-to-r from-purple-700 to-pink-600 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50">
+          Giris Yap
+        </button>
+      </form>
     </div>
   </section>
 
-  <script>
+  <script define:vars={{ SESSION_MAX_HOURS }}>
     const form = document.getElementById('login-form');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const submitBtn = document.getElementById('submit-btn');
     const messageDiv = document.getElementById('message');
     const loadingDiv = document.getElementById('loading');
-    const helpToggle = document.getElementById('help-toggle');
-    const helpPanel = document.getElementById('help-panel');
-    const quoteNode = document.getElementById('daily-quote');
-    const quotes = JSON.parse(quoteNode?.dataset.quotes || '[]');
+    const SESSION_MAX_MS = Number(SESSION_MAX_HOURS || 8) * 60 * 60 * 1000;
 
-    if (quoteNode && quotes.length > 0) {
-      quoteNode.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+    localStorage.removeItem('admin_auth_token');
+    localStorage.removeItem('admin_auth_user');
+
+    function getTokenExpiryMs(token) {
+      try {
+        const payload = JSON.parse(atob(String(token).split('.')[1] || ''));
+        if (payload?.exp) return Number(payload.exp) * 1000;
+      } catch {}
+      return null;
     }
 
-    helpToggle?.addEventListener('click', () => {
-      helpPanel?.classList.toggle('hidden');
-      helpToggle.setAttribute('aria-expanded', String(!helpPanel?.classList.contains('hidden')));
-    });
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      messageDiv.className = 'hidden mb-4 mt-6 rounded-xl p-4 text-sm font-semibold';
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      messageDiv.className = 'hidden mt-5 rounded-xl p-4 text-sm font-semibold';
       loadingDiv.classList.remove('hidden');
       submitBtn.disabled = true;
 
@@ -155,32 +75,31 @@ const firstQuote = adminQuotes[(new Date().getDate() + 2) % adminQuotes.length];
 
         try {
           data = raw ? JSON.parse(raw) : null;
-        } catch (parseError) {
-          data = {
-            success: false,
-            error: raw || `Beklenmeyen yanit alindi (HTTP ${response.status})`,
-          };
+        } catch {
+          data = { success: false, error: raw || `Beklenmeyen yanit (HTTP ${response.status})` };
         }
 
         if (response.ok && data?.success) {
-          localStorage.setItem('admin_auth_token', data.token);
-          localStorage.setItem('admin_auth_user', JSON.stringify(data.user));
+          const tokenExpiry = getTokenExpiryMs(data.token);
+          const clientExpiry = Date.now() + SESSION_MAX_MS;
+          const expiryMs = tokenExpiry ? Math.min(tokenExpiry, clientExpiry) : clientExpiry;
 
-          messageDiv.className = 'mb-4 mt-6 rounded-xl border border-green-400 bg-green-100 p-4 text-sm font-semibold text-green-800';
-          messageDiv.textContent = 'Giris basarili. Dijital Karargah aciliyor...';
+          sessionStorage.setItem('admin_auth_token', data.token);
+          sessionStorage.setItem('admin_auth_user', JSON.stringify(data.user));
+          sessionStorage.setItem('admin_auth_expires_at', String(expiryMs));
 
-          setTimeout(() => {
-            window.location.replace('/admin/');
-          }, 500);
+          messageDiv.className = 'mt-5 rounded-xl border border-green-300 bg-green-50 p-4 text-sm font-semibold text-green-700';
+          messageDiv.textContent = 'Giris basarili. Panel aciliyor...';
+          setTimeout(() => window.location.replace('/admin/'), 400);
           return;
         }
 
-        messageDiv.className = 'mb-4 mt-6 rounded-xl border border-red-400 bg-red-100 p-4 text-sm font-semibold text-red-800';
-        messageDiv.textContent = `Hata: ${data?.error || `Giris basarisiz (HTTP ${response.status})`}`;
+        messageDiv.className = 'mt-5 rounded-xl border border-red-300 bg-red-50 p-4 text-sm font-semibold text-red-700';
+        messageDiv.textContent = data?.error || `Giris basarisiz (HTTP ${response.status})`;
         passwordInput.value = '';
         passwordInput.focus();
-      } catch (error) {
-        messageDiv.className = 'mb-4 mt-6 rounded-xl border border-red-400 bg-red-100 p-4 text-sm font-semibold text-red-800';
+      } catch {
+        messageDiv.className = 'mt-5 rounded-xl border border-red-300 bg-red-50 p-4 text-sm font-semibold text-red-700';
         messageDiv.textContent = 'Baglanti hatasi. Lutfen tekrar deneyin.';
       } finally {
         loadingDiv.classList.add('hidden');
@@ -188,100 +107,4 @@ const firstQuote = adminQuotes[(new Date().getDate() + 2) % adminQuotes.length];
       }
     });
   </script>
-
-  <style>
-    .admin-shell {
-      min-height: calc(100vh - 8rem);
-      background:
-        radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 28%),
-        linear-gradient(135deg, #35114f 0%, #5e1c6d 42%, #a31e53 100%);
-      box-shadow: 0 40px 120px rgba(53, 17, 79, 0.35);
-    }
-    .admin-aurora,
-    .admin-stars {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-    }
-    .admin-aurora {
-      background:
-        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.12), transparent 22%),
-        radial-gradient(circle at 75% 30%, rgba(218, 41, 28, 0.2), transparent 24%),
-        radial-gradient(circle at 50% 75%, rgba(255, 182, 193, 0.12), transparent 20%);
-      animation: floatAurora 14s ease-in-out infinite alternate;
-    }
-    .admin-stars {
-      background-image:
-        radial-gradient(circle at 15% 30%, rgba(255, 255, 255, 0.7) 0 1px, transparent 1.5px),
-        radial-gradient(circle at 82% 18%, rgba(255, 255, 255, 0.65) 0 1px, transparent 1.5px),
-        radial-gradient(circle at 60% 78%, rgba(255, 255, 255, 0.45) 0 1px, transparent 1.5px),
-        radial-gradient(circle at 32% 70%, rgba(255, 255, 255, 0.4) 0 1px, transparent 1.5px);
-      animation: twinkle 8s ease-in-out infinite;
-    }
-    .glass-panel {
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 1.75rem;
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(18px);
-      box-shadow: 0 24px 60px rgba(20, 5, 34, 0.22);
-    }
-    .hero-login-btn {
-      display: flex;
-      min-height: 92px;
-      flex-direction: column;
-      justify-content: center;
-      border-radius: 1.25rem;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      background: rgba(255, 255, 255, 0.12);
-      color: white;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      box-shadow: 0 16px 32px rgba(30, 5, 45, 0.18);
-    }
-    .hero-login-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 18px 38px rgba(30, 5, 45, 0.28);
-    }
-    .hero-login-btn-red {
-      background: linear-gradient(135deg, rgba(218, 41, 28, 0.95), rgba(160, 23, 22, 0.95));
-    }
-    .hero-login-btn-red:hover {
-      box-shadow: 0 0 24px rgba(218, 41, 28, 0.5);
-    }
-    .help-fab {
-      position: absolute;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      z-index: 20;
-      display: grid;
-      height: 52px;
-      width: 52px;
-      place-items: center;
-      border: 0;
-      border-radius: 999px;
-      background: #ffffff;
-      color: #632f86;
-      font-size: 1.4rem;
-      font-weight: 900;
-      box-shadow: 0 18px 30px rgba(0, 0, 0, 0.2);
-    }
-    .help-panel {
-      position: absolute;
-      right: 1.5rem;
-      bottom: 5.5rem;
-      z-index: 20;
-      width: min(320px, calc(100% - 2rem));
-      border-radius: 1.25rem;
-      background: white;
-      padding: 1rem;
-      box-shadow: 0 22px 40px rgba(0, 0, 0, 0.22);
-    }
-    @keyframes floatAurora {
-      from { transform: translate3d(-1%, 0, 0) scale(1); }
-      to { transform: translate3d(2%, -2%, 0) scale(1.03); }
-    }
-    @keyframes twinkle {
-      0%, 100% { opacity: 0.55; }
-      50% { opacity: 0.95; }
-    }
-  </style>
 </MainLayout>

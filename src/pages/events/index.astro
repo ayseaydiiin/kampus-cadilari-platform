@@ -6,18 +6,44 @@ import EventProposalForm from '../../components/EventProposalForm.astro';
 <MainLayout title="Etkinlikler">
   <div class="bg-gradient-to-r from-purple-600 to-purple-700 py-12 text-white">
     <div class="mx-auto max-w-6xl px-4 text-center">
-      <h1 class="mb-4 text-4xl font-bold">Kampus Cadilari Etkinlikleri</h1>
-      <p class="text-lg text-purple-100">Onayli etkinlikleri incele, katil veya yeni bir etkinlik oner.</p>
+      <h1 class="app-h1 mb-4 text-4xl font-bold">Kampus Cadilari Etkinlik Takvimi</h1>
+      <p class="text-lg text-purple-100">Onayli etkinlikleri takvimden takip et ve gun secerek sadece ad + il bilgisine hizla ulas.</p>
     </div>
   </div>
 
   <div class="mx-auto max-w-6xl px-4 py-12">
     <section class="mb-12">
-      <h2 class="mb-6 text-2xl font-bold text-gray-900">Yayindaki Etkinlikler</h2>
-      <div id="eventsList" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <div class="col-span-full py-12 text-center text-gray-500">
-          <p>Etkinlikler yukleniyor...</p>
-        </div>
+      <h2 class="mb-6 text-2xl font-bold text-gray-900">Yayindaki Etkinlikler - Takvim Gorunumu</h2>
+
+      <div class="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+        <article class="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm">
+          <div class="mb-4 flex items-center justify-between">
+            <button id="prevMonthBtn" class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">&larr; Onceki Ay</button>
+            <h3 id="calendarMonthLabel" class="text-lg font-bold text-gray-900"></h3>
+            <button id="nextMonthBtn" class="rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">Sonraki Ay &rarr;</button>
+          </div>
+
+          <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold uppercase tracking-wide text-gray-500">
+            <span>Pzt</span>
+            <span>Sal</span>
+            <span>Car</span>
+            <span>Per</span>
+            <span>Cum</span>
+            <span>Cmt</span>
+            <span>Paz</span>
+          </div>
+
+          <div id="calendarGrid" class="mt-2 grid grid-cols-7 gap-1"></div>
+          <p class="mt-4 text-xs text-gray-500">Dolu gunlerde mor nokta ve sayi gorulur. Gune tiklayinca sagda sadece etkinlik adi ve il bilgisi listelenir.</p>
+        </article>
+
+        <article class="rounded-2xl border border-purple-100 bg-white p-5 shadow-sm">
+          <p class="text-xs font-bold uppercase tracking-wide text-purple-700">Secili Gun</p>
+          <h3 id="selectedDateTitle" class="mt-2 text-xl font-bold text-gray-900">Bir gun secin</h3>
+          <div id="selectedDateEvents" class="mt-4 space-y-3 text-sm text-gray-700">
+            <p class="rounded-lg bg-gray-50 p-3 text-gray-500">Takvimden bir gun secerek etkinlikleri goruntuleyin.</p>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -34,49 +60,182 @@ import EventProposalForm from '../../components/EventProposalForm.astro';
 </MainLayout>
 
 <script>
-  async function loadEvents() {
-    const list = document.getElementById('eventsList');
-    if (!list) return;
+  const monthLabelNode = document.getElementById('calendarMonthLabel');
+  const calendarGridNode = document.getElementById('calendarGrid');
+  const selectedDateTitleNode = document.getElementById('selectedDateTitle');
+  const selectedDateEventsNode = document.getElementById('selectedDateEvents');
+  const prevMonthBtn = document.getElementById('prevMonthBtn');
+  const nextMonthBtn = document.getElementById('nextMonthBtn');
 
+  let activeMonth = new Date();
+  activeMonth.setDate(1);
+
+  let eventsByDate = new Map();
+  let selectedDateKey = null;
+
+  function pad(value) {
+    return String(value).padStart(2, '0');
+  }
+
+  function formatDateKey(date) {
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  }
+
+  function parseEventDateKey(event) {
+    const candidate = String(event?.date_suggested || event?.created_at || '').trim();
+    if (!candidate) return null;
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(candidate)) {
+      return candidate;
+    }
+
+    const parsed = new Date(candidate);
+    if (Number.isNaN(parsed.getTime())) return null;
+    return formatDateKey(parsed);
+  }
+
+  function formatMonthLabel(date) {
+    return new Intl.DateTimeFormat('tr-TR', { month: 'long', year: 'numeric' }).format(date);
+  }
+
+  function formatReadableDate(dateKey) {
+    const [year, month, day] = String(dateKey).split('-').map((part) => Number(part));
+    if (!year || !month || !day) return 'Secili gun';
+    return new Intl.DateTimeFormat('tr-TR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      weekday: 'long',
+    }).format(new Date(year, month - 1, day));
+  }
+
+  function renderSelectedDay() {
+    if (!selectedDateKey) {
+      selectedDateTitleNode.textContent = 'Bir gun secin';
+      selectedDateEventsNode.innerHTML = '<p class="rounded-lg bg-gray-50 p-3 text-gray-500">Takvimden bir gun secerek etkinlikleri goruntuleyin.</p>';
+      return;
+    }
+
+    const events = eventsByDate.get(selectedDateKey) || [];
+    selectedDateTitleNode.textContent = formatReadableDate(selectedDateKey);
+
+    if (!events.length) {
+      selectedDateEventsNode.innerHTML = '<p class="rounded-lg bg-gray-50 p-3 text-gray-500">Bu gun icin etkinlik bulunmuyor.</p>';
+      return;
+    }
+
+    selectedDateEventsNode.innerHTML = events
+      .map((event) => `
+        <article class="rounded-lg border border-purple-100 bg-purple-50 p-3">
+          <p class="font-semibold text-gray-900">${event.title || 'Etkinlik'}</p>
+          <p class="mt-1 text-xs font-medium uppercase tracking-wide text-purple-700">Il: ${event.province || '-'}</p>
+        </article>
+      `)
+      .join('');
+  }
+
+  function renderCalendar() {
+    monthLabelNode.textContent = formatMonthLabel(activeMonth);
+
+    const year = activeMonth.getFullYear();
+    const month = activeMonth.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const mondayOffset = (firstDay.getDay() + 6) % 7;
+
+    const cells = [];
+
+    for (let i = 0; i < mondayOffset; i += 1) {
+      cells.push('<div class="h-16 rounded-lg border border-transparent bg-gray-50"></div>');
+    }
+
+    for (let day = 1; day <= daysInMonth; day += 1) {
+      const key = `${year}-${pad(month + 1)}-${pad(day)}`;
+      const dayEvents = eventsByDate.get(key) || [];
+      const hasEvents = dayEvents.length > 0;
+      const isSelected = key === selectedDateKey;
+
+      const baseClass = isSelected
+        ? 'border-purple-600 bg-purple-100 text-purple-900'
+        : hasEvents
+          ? 'border-purple-200 bg-white text-gray-900 hover:bg-purple-50'
+          : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50';
+
+      const marker = hasEvents
+        ? `<span class="inline-flex items-center gap-1 rounded-full bg-purple-600 px-2 py-0.5 text-[10px] font-bold text-white"><span class="h-1.5 w-1.5 rounded-full bg-white"></span>${dayEvents.length}</span>`
+        : '';
+
+      cells.push(`
+        <button data-date-key="${key}" class="calendar-day flex h-16 flex-col items-start justify-between rounded-lg border p-2 text-left transition ${baseClass}">
+          <span class="text-sm font-bold">${day}</span>
+          ${marker}
+        </button>
+      `);
+    }
+
+    while (cells.length % 7 !== 0) {
+      cells.push('<div class="h-16 rounded-lg border border-transparent bg-gray-50"></div>');
+    }
+
+    calendarGridNode.innerHTML = cells.join('');
+
+    calendarGridNode.querySelectorAll('.calendar-day').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        selectedDateKey = btn.dataset.dateKey;
+        renderCalendar();
+        renderSelectedDay();
+      });
+    });
+  }
+
+  async function loadEventsCalendar() {
     try {
       const response = await fetch('/api/events/list');
       const data = await response.json();
+      const events = Array.isArray(data?.events) ? data.events : [];
 
-      if (!data?.events?.length) {
-        list.innerHTML = `
-          <div class="col-span-full py-12 text-center text-gray-500">
-            <p>Onayli etkinlik henuz yok.</p>
-            <p class="text-sm">Yeni oneriler formdan gonderildiginde burada listelenecek.</p>
-          </div>
-        `;
-        return;
+      eventsByDate = new Map();
+      events.forEach((event) => {
+        const key = parseEventDateKey(event);
+        if (!key) return;
+
+        if (!eventsByDate.has(key)) {
+          eventsByDate.set(key, []);
+        }
+        eventsByDate.get(key).push(event);
+      });
+
+      const todayKey = formatDateKey(new Date());
+      const availableKeys = Array.from(eventsByDate.keys()).sort();
+
+      selectedDateKey = null;
+      if (eventsByDate.has(todayKey)) {
+        selectedDateKey = todayKey;
+      } else if (availableKeys.length > 0) {
+        selectedDateKey = availableKeys[0];
+        const [year, month] = selectedDateKey.split('-').map(Number);
+        activeMonth = new Date(year, month - 1, 1);
       }
 
-      list.innerHTML = data.events.map((event) => `
-        <article class="overflow-hidden rounded-lg border border-gray-200 bg-white transition hover:shadow-lg">
-          <div class="bg-purple-100 p-4">
-            <h3 class="text-lg font-bold text-gray-900">${event.title}</h3>
-            <p class="mt-1 text-sm text-gray-600">${event.category || 'Etkinlik'}</p>
-          </div>
-          <div class="space-y-3 p-4">
-            <p class="text-sm text-gray-700">${(event.description || '').slice(0, 120)}...</p>
-            <p class="text-sm text-gray-600">Sehir: ${event.province || '-'}</p>
-            <p class="text-sm text-gray-600">Katilim: ${event.joined_count || 0} (${event.capacity_label || 'Sinirsiz kontenjan'})</p>
-            <a href="/events/${event.id}" class="block rounded bg-purple-600 px-4 py-2 text-center text-white transition hover:bg-purple-700">
-              Detaylari Gor
-            </a>
-          </div>
-        </article>
-      `).join('');
+      renderCalendar();
+      renderSelectedDay();
     } catch (error) {
-      list.innerHTML = `
-        <div class="col-span-full py-12 text-center text-red-500">
-          <p>Etkinlikler yuklenirken hata olustu.</p>
-        </div>
-      `;
-      console.error('Events load failed:', error);
+      monthLabelNode.textContent = 'Takvim yuklenemedi';
+      calendarGridNode.innerHTML = '<p class="col-span-7 rounded-lg bg-red-50 p-4 text-center text-sm text-red-700">Etkinlik takvimi yuklenirken hata olustu.</p>';
+      selectedDateEventsNode.innerHTML = '<p class="rounded-lg bg-red-50 p-3 text-red-700">Etkinlik listesi yuklenemedi.</p>';
+      console.error('Events calendar load failed:', error);
     }
   }
 
-  document.addEventListener('DOMContentLoaded', loadEvents);
+  prevMonthBtn?.addEventListener('click', () => {
+    activeMonth = new Date(activeMonth.getFullYear(), activeMonth.getMonth() - 1, 1);
+    renderCalendar();
+  });
+
+  nextMonthBtn?.addEventListener('click', () => {
+    activeMonth = new Date(activeMonth.getFullYear(), activeMonth.getMonth() + 1, 1);
+    renderCalendar();
+  });
+
+  document.addEventListener('DOMContentLoaded', loadEventsCalendar);
 </script>

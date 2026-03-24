@@ -1,43 +1,44 @@
 ---
-import MainLayout from '../../layouts/MainLayout.astro';
-import { getArchiveById } from '../../utils/db.js';
+import MainLayout from '../../../layouts/MainLayout.astro';
+import { getArchiveById } from '../../../utils/db.js';
+import { toEnglishArchiveItem } from '../../../utils/contentI18n.js';
 
 export const prerender = false;
 
 const archiveId = Number(Astro.params.id);
-const item = Number.isFinite(archiveId) ? getArchiveById(archiveId) : null;
+const item = Number.isFinite(archiveId) ? toEnglishArchiveItem(getArchiveById(archiveId)) : null;
 
 if (!item || item.status !== 'approved') {
   Astro.response.status = 404;
   Astro.response.statusText = 'Not Found';
 }
 
-const currentUrl = `${Astro.url.origin}/archive/${Astro.params.id}`;
-const exportFileName = `${String(item?.publication_name || 'arsiv').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}-${String(item?.title || archiveId).replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}.pdf`;
-const exportFallbackUrl = `/api/archive/${archiveId}/export-pdf?lang=tr`;
+const currentUrl = `${Astro.url.origin}/en/archive/${Astro.params.id}`;
+const exportFileName = `${String(item?.publication_name || 'archive').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}-${String(item?.title || archiveId).replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}.pdf`;
+const exportFallbackUrl = `/api/archive/${archiveId}/export-pdf?lang=en`;
 ---
 
-<MainLayout title={item?.title ? `${item.title} - Gazete Arsivi` : 'Gazete Arsivi'} description="Admin onayli gazete arsiv detayi" currentLang="tr">
+<MainLayout title={item?.title ? `${item.title} - Newspaper Archive` : 'Newspaper Archive'} description="Admin-approved newspaper archive detail" currentLang="en">
   {(!item || item.status !== 'approved') ? (
     <section class="mx-auto max-w-3xl rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
-      <h1 class="app-h1 text-3xl font-black text-red-800">Kayit bulunamadi</h1>
-      <p class="mt-3 text-sm text-red-700">Talep ettiginiz arsiv girdisi yayinda degil.</p>
-      <a href="/archive" class="mt-6 inline-flex rounded-lg bg-red-700 px-4 py-2 text-sm font-bold text-white hover:bg-red-800">Arsive don</a>
+      <h1 class="app-h1 text-3xl font-black text-red-800">Record not found</h1>
+      <p class="mt-3 text-sm text-red-700">The requested archive entry is not published.</p>
+      <a href="/en/archive" class="mt-6 inline-flex rounded-lg bg-red-700 px-4 py-2 text-sm font-bold text-white hover:bg-red-800">Back to archive</a>
     </section>
   ) : (
     <section class="mx-auto max-w-6xl">
-      <a href="/archive" class="inline-flex items-center gap-2 text-sm font-bold text-purple-700 hover:text-purple-900">Arsive geri don</a>
+      <a href="/en/archive" class="inline-flex items-center gap-2 text-sm font-bold text-purple-700 hover:text-purple-900">Back to archive</a>
 
       <article id="archive-export-content" class="mt-4 rounded-[1.75rem] border border-[#d5c6ac] bg-[#fdf8ef] p-5 shadow-lg md:p-8">
         <div class="grid gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
           <figure class="overflow-hidden rounded-[1.25rem] border border-[#e0d3bd] bg-white shadow-sm">
-            <img src={item.cover_image_url || '/archive/placeholder-cover.svg'} alt={`${item.publication_name} kapak`} class="h-full w-full object-cover" />
+            <img src={item.cover_image_url || '/archive/placeholder-cover.svg'} alt={`${item.publication_name} cover`} class="h-full w-full object-cover" />
           </figure>
 
           <div>
             <div class="inline-flex items-center gap-2 rounded-full border border-amber-300 bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900">
-              <span>Onayli</span>
-              <span>Arsiv Kaydi</span>
+              <span>Approved</span>
+              <span>Archive Record</span>
             </div>
 
             <h1 class="app-h1 mt-4 text-3xl font-black leading-tight text-slate-900 md:text-4xl">{item.title}</h1>
@@ -45,30 +46,30 @@ const exportFallbackUrl = `/api/archive/${archiveId}/export-pdf?lang=tr`;
 
             <div class="mt-6 grid gap-3 text-sm md:grid-cols-2">
               <div class="rounded-xl bg-white/80 p-3">
-                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Yayin yili</p>
+                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Publication year</p>
                 <p class="mt-1 font-semibold text-slate-900">{item.publication_year}</p>
               </div>
               <div class="rounded-xl bg-white/80 p-3">
-                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Donem</p>
+                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Period</p>
                 <p class="mt-1 font-semibold text-slate-900">{item.decade}</p>
               </div>
               <div class="rounded-xl bg-white/80 p-3 md:col-span-2">
-                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Odak noktasi</p>
-                <p class="mt-1 font-semibold text-slate-900">{item.focus_topic || 'Genel feminist gundem'}</p>
+                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Focus topic</p>
+                <p class="mt-1 font-semibold text-slate-900">{item.focus_topic || 'General feminist agenda'}</p>
               </div>
             </div>
 
             <section class="mt-6 max-w-[900px]">
-              <h2 class="text-lg font-black text-slate-900">Kisa Ozet</h2>
-              <p class="mt-3 text-sm leading-7 text-slate-700">{item.summary || 'Bu arsiv kaydi icin ozet metin henuz eklenmemis.'}</p>
+              <h2 class="text-lg font-black text-slate-900">Summary</h2>
+              <p class="mt-3 text-sm leading-7 text-slate-700">{item.summary || 'Summary text has not been added for this archive record yet.'}</p>
             </section>
 
             <section class="mt-6 max-w-[900px]">
-              <h3 class="text-sm font-black uppercase tracking-wide text-slate-700">Hizli Bilgiler</h3>
+              <h3 class="text-sm font-black uppercase tracking-wide text-slate-700">Quick Notes</h3>
               <ul class="mt-2 list-disc space-y-1 pl-5 text-sm leading-7 text-slate-700">
-                <li>Kaynak: {item.source_url ? <a href={item.source_url} target="_blank" rel="noreferrer" class="font-semibold text-purple-700 underline">Baglantiyi ac</a> : 'Belirtilmedi'}</li>
-                <li>Giris durumu: Admin onayi tamamlandi ve arsivde yayinlandi.</li>
-                <li>Paylasim: Link kopyala veya PDF olarak kaydet aksiyonlarini kullanabilirsiniz.</li>
+                <li>Source: {item.source_url ? <a href={item.source_url} target="_blank" rel="noreferrer" class="font-semibold text-purple-700 underline">Open source link</a> : 'Not provided'}</li>
+                <li>Status: All active admin approvals are complete and the record is published.</li>
+                <li>Sharing: Use copy link or save page as PDF actions below.</li>
               </ul>
             </section>
           </div>
@@ -76,13 +77,13 @@ const exportFallbackUrl = `/api/archive/${archiveId}/export-pdf?lang=tr`;
       </article>
 
       <section class="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 class="text-base font-black text-slate-900">Paylasim ve Cikti</h2>
+        <h2 class="text-base font-black text-slate-900">Share and Export</h2>
         <div class="mt-3 flex flex-wrap gap-3 text-sm font-bold">
           <a id="export-pdf-btn" href={exportFallbackUrl} data-file-name={exportFileName} class="rounded-lg border border-slate-700 px-4 py-2 text-slate-800 transition hover:bg-slate-100">
-            Arsiv Kaydini PDF Olarak Indir
+            Download Archive PDF
           </a>
           <button id="copy-link-btn" class="rounded-lg border border-[#5b2c84] px-4 py-2 text-[#5b2c84] transition hover:bg-[#efe5f7]">
-            Baglantiyi Kopyala
+            Copy Link
           </button>
         </div>
       </section>
@@ -109,9 +110,9 @@ const exportFallbackUrl = `/api/archive/${archiveId}/export-pdf?lang=tr`;
     copyButton?.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(currentUrl);
-        updateButtonText(copyButton, 'Kopyalandi', 'Baglantiyi Kopyala');
+        updateButtonText(copyButton, 'Copied', 'Copy Link');
       } catch {
-        updateButtonText(copyButton, 'Basarisiz', 'Baglantiyi Kopyala');
+        updateButtonText(copyButton, 'Failed', 'Copy Link');
       }
     });
 
@@ -119,7 +120,7 @@ const exportFallbackUrl = `/api/archive/${archiveId}/export-pdf?lang=tr`;
       event.preventDefault();
       if (!exportTarget) return;
       try {
-        updateButtonText(exportPdfButton, 'PDF Hazirlaniyor...', 'Arsiv Kaydini PDF Olarak Indir');
+        updateButtonText(exportPdfButton, 'Preparing PDF...', 'Download Archive PDF');
 
         const canvas = await html2canvas(exportTarget, {
           scale: 2,
@@ -149,12 +150,12 @@ const exportFallbackUrl = `/api/archive/${archiveId}/export-pdf?lang=tr`;
           heightLeft -= pageHeight - margin * 2;
         }
 
-        const fileName = exportPdfButton?.dataset.fileName || 'arsiv-kaydi.pdf';
+        const fileName = exportPdfButton?.dataset.fileName || 'archive-record.pdf';
         pdf.save(fileName);
-        updateButtonText(exportPdfButton, 'Indirildi', 'Arsiv Kaydini PDF Olarak Indir');
+        updateButtonText(exportPdfButton, 'Downloaded', 'Download Archive PDF');
       } catch (error) {
         console.error(error);
-        updateButtonText(exportPdfButton, 'PDF Hatasi', 'Arsiv Kaydini PDF Olarak Indir');
+        updateButtonText(exportPdfButton, 'PDF Error', 'Download Archive PDF');
         if (exportPdfButton?.href) {
           window.location.href = exportPdfButton.href;
         }

@@ -2,96 +2,192 @@
 import RegionFilter from './RegionFilter.astro';
 import Toast from './Toast.astro';
 import Modal from './Modal.astro';
+
+interface Props {
+  lang?: 'tr' | 'en';
+}
+
+const { lang = 'tr' } = Astro.props as Props;
+
+const copy = {
+  tr: {
+    heading: 'Etkinlik Onerisi Gonder',
+    eventName: 'Etkinlik Adi *',
+    eventNamePlaceholder: 'orn. Feminizm ve Kultur Paneli',
+    category: 'Kategori *',
+    categoryPlaceholder: 'Kategori sec',
+    categoryPanel: 'Panel',
+    categoryWorkshop: 'Workshop',
+    categoryPresentation: 'Sunum',
+    categoryDiscussion: 'Diskusyon Grubu',
+    categorySocial: 'Sosyal Etkinlik',
+    categoryOther: 'Diger',
+    city: 'Sehir *',
+    cityPlaceholder: 'Sehir sec',
+    date: 'Etkinlik Tarihi *',
+    description: 'Aciklama *',
+    descriptionPlaceholder: 'Etkinligin amacini, konusunu ve neler yapilacagini aciklayiniz...',
+    minDescription: 'Minimum 50 karakter',
+    note: 'Tum etkinlikler sinirsiz kontenjanla yayinlanir.',
+    email: 'Email *',
+    emailPlaceholder: 'iletisim@example.com',
+    phone: 'Telefon',
+    phonePlaceholder: '+90 5XX XXX XXXX',
+    organizer: 'Organizator Adi *',
+    organizerPlaceholder: 'Adiniz Soyadiniz',
+    submit: 'Etkinligi Oner',
+    reset: 'Temizle',
+    successToast: 'Etkinlik onerisi basariyla gonderildi!',
+    errorToast: 'Bir hata olustu',
+    modalTitle: 'Etkinligi Onayla',
+    modalConfirm: 'Gonder',
+    modalCancel: 'Iptal',
+    duplicateName: 'Bu etkinlik adi daha once kullanilmistir',
+    requiredError: 'Lutfen tum zorunlu alanlari doldurunuz (sehir ve tarih secimi onemli)',
+    shortDescriptionError: 'Aciklama en az 50 karakter olmali',
+    networkError: 'Baglanti hatasi',
+    redirectPath: '/events',
+  },
+  en: {
+    heading: 'Submit Event Proposal',
+    eventName: 'Event Name *',
+    eventNamePlaceholder: 'e.g. Feminism and Culture Panel',
+    category: 'Category *',
+    categoryPlaceholder: 'Select category',
+    categoryPanel: 'Panel',
+    categoryWorkshop: 'Workshop',
+    categoryPresentation: 'Presentation',
+    categoryDiscussion: 'Discussion Group',
+    categorySocial: 'Social Event',
+    categoryOther: 'Other',
+    city: 'City *',
+    cityPlaceholder: 'Select city',
+    date: 'Event Date *',
+    description: 'Description *',
+    descriptionPlaceholder: 'Please describe the event goal, topic, and planned flow...',
+    minDescription: 'Minimum 50 characters',
+    note: 'All published events are listed without a participant cap.',
+    email: 'Email *',
+    emailPlaceholder: 'contact@example.com',
+    phone: 'Phone',
+    phonePlaceholder: '+90 5XX XXX XXXX',
+    organizer: 'Organizer Name *',
+    organizerPlaceholder: 'Your full name',
+    submit: 'Submit Proposal',
+    reset: 'Clear',
+    successToast: 'Event proposal submitted successfully!',
+    errorToast: 'Something went wrong',
+    modalTitle: 'Confirm Event',
+    modalConfirm: 'Send',
+    modalCancel: 'Cancel',
+    duplicateName: 'This event name has already been used',
+    requiredError: 'Please fill all required fields (city and date are required)',
+    shortDescriptionError: 'Description must be at least 50 characters',
+    networkError: 'Connection error',
+    redirectPath: '/en/events',
+  },
+}[lang];
 ---
 
 <form id="eventProposalForm" class="mx-auto max-w-2xl rounded-lg bg-white p-8 shadow-lg">
-  <h2 class="mb-6 text-2xl font-bold text-gray-900">Etkinlik Onerisi Gonder</h2>
+  <h2 class="mb-6 text-2xl font-bold text-gray-900">{copy.heading}</h2>
 
   <div class="mb-6">
-    <label class="mb-2 block text-sm font-semibold text-gray-700">Etkinlik Adi *</label>
+    <label class="mb-2 block text-sm font-semibold text-gray-700">{copy.eventName}</label>
     <div class="relative">
       <input
         type="text"
         id="eventName"
         name="eventName"
-        placeholder="orn. Feminizm ve Kultur Paneli"
+        placeholder={copy.eventNamePlaceholder}
         required
         class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
       />
-      <span id="nameStatus" class="absolute right-3 top-3 hidden text-lg">✓</span>
+      <span id="nameStatus" class="absolute right-3 top-3 hidden text-lg">OK</span>
     </div>
     <p id="nameError" class="mt-1 hidden text-sm text-red-500"></p>
   </div>
 
   <div class="mb-6">
-    <label class="mb-2 block text-sm font-semibold text-gray-700">Kategori *</label>
+    <label class="mb-2 block text-sm font-semibold text-gray-700">{copy.category}</label>
     <select
       id="category"
       name="category"
       required
       class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
     >
-      <option value="">Kategori sec</option>
-      <option value="paneli">Panel</option>
-      <option value="workshop">Workshop</option>
-      <option value="sunum">Sunum</option>
-      <option value="diskusyon">Diskusyon Grubu</option>
-      <option value="sosyal">Sosyal Etkinlik</option>
-      <option value="diger">Diger</option>
+      <option value="">{copy.categoryPlaceholder}</option>
+      <option value="paneli">{copy.categoryPanel}</option>
+      <option value="workshop">{copy.categoryWorkshop}</option>
+      <option value="sunum">{copy.categoryPresentation}</option>
+      <option value="diskusyon">{copy.categoryDiscussion}</option>
+      <option value="sosyal">{copy.categorySocial}</option>
+      <option value="diger">{copy.categoryOther}</option>
     </select>
   </div>
 
   <div class="mb-6">
-    <label class="mb-2 block text-sm font-semibold text-gray-700">Sehir *</label>
-    <RegionFilter id="eventRegion" placeholder="Sehir sec" />
+    <label class="mb-2 block text-sm font-semibold text-gray-700">{copy.city}</label>
+    <RegionFilter id="eventRegion" placeholder={copy.cityPlaceholder} lang={lang} />
   </div>
 
   <div class="mb-6">
-    <label class="mb-2 block text-sm font-semibold text-gray-700">Aciklama *</label>
+    <label class="mb-2 block text-sm font-semibold text-gray-700">{copy.date}</label>
+    <input
+      type="date"
+      id="eventDate"
+      name="eventDate"
+      required
+      class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+    />
+  </div>
+
+  <div class="mb-6">
+    <label class="mb-2 block text-sm font-semibold text-gray-700">{copy.description}</label>
     <textarea
       id="description"
       name="description"
-      placeholder="Etkinligin amacini, konusunu ve neler yapilacagini aciklayiniz..."
+      placeholder={copy.descriptionPlaceholder}
       required
       rows="5"
       class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
     ></textarea>
-    <p class="mt-1 text-sm text-gray-500">Minimum 50 karakter</p>
+    <p class="mt-1 text-sm text-gray-500">{copy.minDescription}</p>
   </div>
 
   <div class="mb-6 rounded-lg border border-purple-200 bg-purple-50 p-3 text-sm font-semibold text-purple-800">
-    Tüm etkinlikler sinirsiz kontenjanla yayinlanir.
+    {copy.note}
   </div>
 
   <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
     <div>
-      <label class="mb-2 block text-sm font-semibold text-gray-700">Email *</label>
+      <label class="mb-2 block text-sm font-semibold text-gray-700">{copy.email}</label>
       <input
         type="email"
         name="email"
-        placeholder="iletisim@example.com"
+        placeholder={copy.emailPlaceholder}
         required
         class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
       />
     </div>
 
     <div>
-      <label class="mb-2 block text-sm font-semibold text-gray-700">Telefon</label>
+      <label class="mb-2 block text-sm font-semibold text-gray-700">{copy.phone}</label>
       <input
         type="tel"
         name="phone"
-        placeholder="+90 5XX XXX XXXX"
+        placeholder={copy.phonePlaceholder}
         class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
       />
     </div>
   </div>
 
   <div class="mb-6">
-    <label class="mb-2 block text-sm font-semibold text-gray-700">Organizator Adi *</label>
+    <label class="mb-2 block text-sm font-semibold text-gray-700">{copy.organizer}</label>
     <input
       type="text"
       name="organizerName"
-      placeholder="Adiniz Soyadiniz"
+      placeholder={copy.organizerPlaceholder}
       required
       class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
     />
@@ -103,25 +199,25 @@ import Modal from './Modal.astro';
       id="submitBtn"
       class="flex-1 rounded-lg bg-purple-600 px-6 py-3 font-semibold text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
     >
-      Etkinligi Oner
+      {copy.submit}
     </button>
     <button
       type="reset"
       class="rounded-lg bg-gray-300 px-6 py-3 font-semibold text-gray-900 transition hover:bg-gray-400"
     >
-      Temizle
+      {copy.reset}
     </button>
   </div>
 </form>
 
-<Toast id="successToast" type="success" message="Etkinlik onerisi basariyla gonderildi!" />
-<Toast id="errorToast" type="error" message="Bir hata olustu" />
+<Toast id="successToast" type="success" message={copy.successToast} />
+<Toast id="errorToast" type="error" message={copy.errorToast} />
 
-<Modal id="confirmModal" title="Etkinligi Onayla" confirmText="Gonder" cancelText="Iptal">
+<Modal id="confirmModal" title={copy.modalTitle} confirmText={copy.modalConfirm} cancelText={copy.modalCancel}>
   <p id="confirmMessage" class="text-gray-700"></p>
 </Modal>
 
-<script>
+<script define:vars={{ copy }}>
   const form = document.getElementById('eventProposalForm');
   const eventNameInput = document.getElementById('eventName');
   const nameStatus = document.getElementById('nameStatus');
@@ -148,7 +244,7 @@ import Modal from './Modal.astro';
 
         if (data.exists) {
           if (nameError) {
-            nameError.textContent = 'Bu etkinlik adi daha once kullanilmistir';
+            nameError.textContent = copy.duplicateName;
             nameError.classList.remove('hidden');
           }
           nameStatus?.classList.add('hidden');
@@ -178,7 +274,8 @@ import Modal from './Modal.astro';
       title: formData.get('eventName'),
       category: formData.get('category'),
       regionId: parseInt(formData.get('eventRegion') || '0', 10),
-      provinceName: selectedRegionName && selectedRegionName !== 'Sehir sec' ? selectedRegionName : null,
+      provinceName: selectedRegionName && selectedRegionName !== copy.cityPlaceholder ? selectedRegionName : null,
+      eventDate: formData.get('eventDate'),
       description: formData.get('description'),
       email: formData.get('email'),
       phone: formData.get('phone'),
@@ -186,13 +283,13 @@ import Modal from './Modal.astro';
     };
 
     const hasRegion = data.regionId && data.regionId > 0;
-    if (!data.title || !data.category || !hasRegion || !data.email || !data.organizerName) {
-      window.showToast('errorToast', 'Lutfen tum zorunlu alanlari doldurunuz (sehir secimi onemli)');
+    if (!data.title || !data.category || !hasRegion || !data.eventDate || !data.email || !data.organizerName) {
+      window.showToast('errorToast', copy.requiredError);
       return;
     }
 
     if (!data.description || String(data.description).trim().length < 50) {
-      window.showToast('errorToast', 'Aciklama en az 50 karakter olmali');
+      window.showToast('errorToast', copy.shortDescriptionError);
       return;
     }
 
@@ -207,19 +304,19 @@ import Modal from './Modal.astro';
       const result = await response.json();
 
       if (response.ok) {
-        window.showToast('successToast', 'Etkinlik onerisi basariyla gonderildi!');
+        window.showToast('successToast', copy.successToast);
         form.reset();
         nameError?.classList.add('hidden');
         nameStatus?.classList.add('hidden');
         setTimeout(() => {
-          window.location.href = '/events';
+          window.location.href = copy.redirectPath;
         }, 1500);
       } else {
-        window.showToast('errorToast', result.error || 'Hata olustu');
+        window.showToast('errorToast', result.error || copy.errorToast);
       }
     } catch (error) {
       console.error('Submission error:', error);
-      window.showToast('errorToast', 'Baglanti hatasi');
+      window.showToast('errorToast', copy.networkError);
     } finally {
       if (submitBtn) submitBtn.disabled = false;
     }

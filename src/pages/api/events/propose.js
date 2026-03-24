@@ -10,6 +10,7 @@ export async function POST({ request }) {
       category,
       regionId,
       provinceName,
+      eventDate,
       description,
       email,
       phone,
@@ -17,9 +18,10 @@ export async function POST({ request }) {
     } = await request.json();
 
     const hasRegion = Number(regionId) > 0;
-    if (!title || !category || !hasRegion || !description || !email || !organizerName) {
+    const hasDate = typeof eventDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(eventDate);
+    if (!title || !category || !hasRegion || !hasDate || !description || !email || !organizerName) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Zorunlu alanlar eksik (title, category, city, description, email, organizerName)' }),
+        JSON.stringify({ success: false, error: 'Zorunlu alanlar eksik (title, category, city, eventDate, description, email, organizerName)' }),
         { status: 400, headers }
       );
     }
@@ -45,6 +47,7 @@ export async function POST({ request }) {
       email: String(email).trim(),
       province: provinceName ? String(provinceName).trim() : String(regionId),
       category: String(category).trim(),
+      date_suggested: String(eventDate),
       organizer_phone: phone ? String(phone).trim() : null,
     });
 

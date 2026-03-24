@@ -52,9 +52,13 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
-h1 {
-  font-size: 3rem;
-  color: var(--color-purple-primary);
+.app-h1 {
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.16;
+  letter-spacing: -0.015em;
+  color: #2b1643;
+  text-wrap: balance;
 }
 
 h2 {
@@ -95,6 +99,10 @@ body.dark-mode h4,
 body.dark-mode h5,
 body.dark-mode h6 {
   color: #c084fc;
+}
+
+body.dark-mode .app-h1 {
+  color: #e9d5ff;
 }
 
 /* Button Styles */

@@ -1,155 +1,106 @@
 ---
-// src/pages/en/admin/login-email.astro
 import MainLayout from '../../../layouts/MainLayout.astro';
+
+const SESSION_MAX_HOURS = 8;
 ---
 
 <MainLayout title="Admin Login - Campus Witches" currentLang="en">
-  <div class="min-h-screen bg-gradient-to-br from-purple-600 via-red-500 to-pink-600 flex items-center justify-center py-12 px-4">
-    <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
-      <!-- Logo -->
-      <div class="text-center mb-8">
-        <div class="text-6xl mb-4">🔮</div>
-        <h1 class="text-3xl font-bold text-purple-600">Campus Witches</h1>
-        <p class="text-gray-600 mt-2">Admin Portal</p>
+  <section class="mx-auto flex min-h-[70vh] max-w-3xl items-center justify-center">
+    <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-xl">
+      <div class="text-center">
+        <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-purple-700 to-pink-600 text-sm font-black text-white">KM</div>
+        <h1 class="app-h1 mt-4 text-3xl font-black text-slate-900">Admin Login</h1>
+        <p class="mt-2 text-sm text-slate-600">Sign in with your admin email and password.</p>
       </div>
 
-      <!-- Messages -->
-      <div id="message" class="hidden p-4 mb-4 rounded-lg text-sm font-semibold"></div>
-      <div id="loading" class="hidden p-4 mb-4 rounded-lg bg-blue-100 text-blue-800">
-        🔄 Processing...
-      </div>
+      <div id="message" class="hidden mt-5 rounded-xl p-4 text-sm font-semibold"></div>
+      <div id="loading" class="mt-5 hidden rounded-xl bg-blue-100 p-4 text-sm font-semibold text-blue-800">Checking credentials...</div>
 
-      <!-- Email/Password Form -->
-      <form id="login-form" class="space-y-4">
-        <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">
-            📧 Email Address
-          </label>
-          <input 
-            type="email" 
-            id="email"
-            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 transition" 
-            placeholder="admin@kampuscadilari.org" 
-            required 
-          />
-        </div>
+      <form id="login-form" class="mt-5 space-y-4">
+        <label class="block">
+          <span class="mb-2 block text-sm font-bold text-slate-700">Email</span>
+          <input id="email" type="email" required class="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-purple-600 focus:outline-none" placeholder="admin@kampuscadilari.org" />
+        </label>
 
-        <div>
-          <label class="block text-sm font-bold text-gray-700 mb-2">
-            🔐 Password
-          </label>
-          <input 
-            type="password" 
-            id="password"
-            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 transition" 
-            placeholder="••••••••" 
-            required 
-          />
-        </div>
+        <label class="block">
+          <span class="mb-2 block text-sm font-bold text-slate-700">Password</span>
+          <input id="password" type="password" required class="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-purple-600 focus:outline-none" placeholder="********" />
+        </label>
 
-        <button 
-          type="submit" 
-          id="submit-btn"
-          class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-lg hover:shadow-lg transition text-lg disabled:opacity-50"
-        >
-          ✊ Sign In
+        <button id="submit-btn" type="submit" class="w-full rounded-xl bg-gradient-to-r from-purple-700 to-pink-600 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50">
+          Sign In
         </button>
       </form>
-
-      <!-- Divider -->
-      <div class="relative my-6">
-        <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t border-gray-300"></div>
-        </div>
-        <div class="relative flex justify-center text-xs">
-          <span class="px-2 bg-white text-gray-600">or</span>
-        </div>
-      </div>
-
-      <!-- OAuth -->
-      <div class="space-y-3 mb-6">
-        <button type="button" class="w-full border-2 border-gray-300 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2">
-          <span>🐙</span> Sign in with GitHub
-        </button>
-        <button type="button" class="w-full border-2 border-gray-300 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-2">
-          <span>🔴</span> Sign in with Google
-        </button>
-      </div>
-
-      <!-- Decap CMS Link -->
-      <div class="text-center border-t border-gray-200 pt-6">
-        <p class="text-sm text-gray-600 mb-3">Want to use Decap CMS?</p>
-        <a href="/admin/" class="inline-block bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 font-bold px-6 py-2 rounded-lg hover:from-purple-200 hover:to-pink-200 transition border-2 border-purple-200">
-          → Go to CMS
-        </a>
-      </div>
-
-      <!-- Back Link -->
-      <div class="text-center mt-6">
-        <a href="/en/admin-login" class="text-purple-600 hover:underline text-sm font-semibold">
-          ← Back to login methods
-        </a>
-      </div>
     </div>
-  </div>
+  </section>
 
-  <script>
+  <script define:vars={{ SESSION_MAX_HOURS }}>
     const form = document.getElementById('login-form');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const submitBtn = document.getElementById('submit-btn');
     const messageDiv = document.getElementById('message');
     const loadingDiv = document.getElementById('loading');
+    const SESSION_MAX_MS = Number(SESSION_MAX_HOURS || 8) * 60 * 60 * 1000;
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const email = emailInput.value;
-      const password = passwordInput.value;
+    localStorage.removeItem('admin_auth_token');
+    localStorage.removeItem('admin_auth_user');
 
-      // Clear previous messages
-      messageDiv.classList.add('hidden');
-      messageDiv.innerHTML = '';
+    function getTokenExpiryMs(token) {
+      try {
+        const payload = JSON.parse(atob(String(token).split('.')[1] || ''));
+        if (payload?.exp) return Number(payload.exp) * 1000;
+      } catch {}
+      return null;
+    }
 
-      // Show loading
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      messageDiv.className = 'hidden mt-5 rounded-xl p-4 text-sm font-semibold';
       loadingDiv.classList.remove('hidden');
       submitBtn.disabled = true;
 
       try {
         const response = await fetch('/api/auth/login', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: emailInput.value,
+            password: passwordInput.value,
+          }),
         });
 
-        const data = await response.json();
+        const raw = await response.text();
+        let data = null;
 
-        if (data.success) {
-          // Show success message
-          messageDiv.classList.remove('hidden');
-          messageDiv.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-400');
-          messageDiv.textContent = '✓ Login successful! Redirecting to admin panel...';
-          
-          // Redirect after 2 seconds
-          setTimeout(() => {
-            window.location.href = '/admin/';
-          }, 2000);
-        } else {
-          // Show error message
-          messageDiv.classList.remove('hidden');
-          messageDiv.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-400');
-          messageDiv.textContent = `✗ Error: ${data.error}`;
-          
-          // Clear password field
-          passwordInput.value = '';
-          passwordInput.focus();
+        try {
+          data = raw ? JSON.parse(raw) : null;
+        } catch {
+          data = { success: false, error: raw || `Unexpected response (HTTP ${response.status})` };
         }
-      } catch (error) {
-        messageDiv.classList.remove('hidden');
-        messageDiv.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-400');
-        messageDiv.textContent = '✗ Connection error. Please try again.';
+
+        if (response.ok && data?.success) {
+          const tokenExpiry = getTokenExpiryMs(data.token);
+          const clientExpiry = Date.now() + SESSION_MAX_MS;
+          const expiryMs = tokenExpiry ? Math.min(tokenExpiry, clientExpiry) : clientExpiry;
+
+          sessionStorage.setItem('admin_auth_token', data.token);
+          sessionStorage.setItem('admin_auth_user', JSON.stringify(data.user));
+          sessionStorage.setItem('admin_auth_expires_at', String(expiryMs));
+
+          messageDiv.className = 'mt-5 rounded-xl border border-green-300 bg-green-50 p-4 text-sm font-semibold text-green-700';
+          messageDiv.textContent = 'Login successful. Opening dashboard...';
+          setTimeout(() => window.location.replace('/en/admin/'), 400);
+          return;
+        }
+
+        messageDiv.className = 'mt-5 rounded-xl border border-red-300 bg-red-50 p-4 text-sm font-semibold text-red-700';
+        messageDiv.textContent = data?.error || `Login failed (HTTP ${response.status})`;
+        passwordInput.value = '';
+        passwordInput.focus();
+      } catch {
+        messageDiv.className = 'mt-5 rounded-xl border border-red-300 bg-red-50 p-4 text-sm font-semibold text-red-700';
+        messageDiv.textContent = 'Connection error. Please try again.';
       } finally {
         loadingDiv.classList.add('hidden');
         submitBtn.disabled = false;

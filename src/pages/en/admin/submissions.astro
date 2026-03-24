@@ -1,35 +1,35 @@
 ---
-import MainLayout from '../../layouts/MainLayout.astro';
-import AdminNotificationPanel from '../../components/AdminNotificationPanel.astro';
+import MainLayout from '../../../layouts/MainLayout.astro';
+import AdminNotificationPanel from '../../../components/AdminNotificationPanel.astro';
 ---
 
-<MainLayout title="Admin Submissions - Kampus Cadilari" currentLang="tr">
+<MainLayout title="Admin Submissions - Campus Witches" currentLang="en">
   <section class="mx-auto max-w-6xl px-4 py-8">
     <header class="rounded-2xl bg-gradient-to-r from-purple-700 to-pink-600 p-8 text-white shadow-xl">
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p class="text-xs font-bold uppercase tracking-[0.2em] text-purple-100">Admin workflow</p>
-          <h1 class="app-h1 mt-2 text-3xl font-black">Basvurular ve Etkinlik Onerileri</h1>
-          <p class="mt-3 text-sm text-white/90">Tum admin onayina dayali karar akisini buradan yonet.</p>
+          <h1 class="app-h1 mt-2 text-3xl font-black">Applications and Event Proposals</h1>
+          <p class="mt-3 text-sm text-white/90">Manage the full approval workflow that requires admin decisions.</p>
         </div>
         <button id="notifToggleBtn" class="relative rounded-full bg-white px-5 py-2 font-bold text-purple-700 hover:bg-purple-50">
-          Bildirimler
+          Notifications
           <span id="notifBadge" class="ml-2 hidden rounded-full bg-rose-600 px-2 py-0.5 text-xs text-white">0</span>
         </button>
       </div>
     </header>
 
     <div id="authBox" class="mt-6 rounded-xl border border-gray-200 bg-white p-5 text-sm text-gray-600 shadow-sm">
-      Oturum kontrol ediliyor...
+      Checking session...
     </div>
 
     <div id="mainContent" class="mt-6 hidden space-y-6">
       <div class="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
         <div class="flex flex-wrap gap-2">
-          <button data-tab="applications" class="tab-btn rounded-lg bg-purple-600 px-4 py-2 text-sm font-bold text-white">Bize Katil Basvurulari</button>
-          <button data-tab="events" class="tab-btn rounded-lg bg-gray-100 px-4 py-2 text-sm font-bold text-gray-700">Etkinlik Onerileri</button>
-          <button data-tab="articles" class="tab-btn rounded-lg bg-gray-100 px-4 py-2 text-sm font-bold text-gray-700">Yazi Onaylari</button>
-          <button data-tab="archive" class="tab-btn rounded-lg bg-gray-100 px-4 py-2 text-sm font-bold text-gray-700">Gazete Arsivi</button>
+          <button data-tab="applications" class="tab-btn rounded-lg bg-purple-600 px-4 py-2 text-sm font-bold text-white">Join Us Applications</button>
+          <button data-tab="events" class="tab-btn rounded-lg bg-gray-100 px-4 py-2 text-sm font-bold text-gray-700">Event Proposals</button>
+          <button data-tab="articles" class="tab-btn rounded-lg bg-gray-100 px-4 py-2 text-sm font-bold text-gray-700">Article Approvals</button>
+          <button data-tab="archive" class="tab-btn rounded-lg bg-gray-100 px-4 py-2 text-sm font-bold text-gray-700">Newspaper Archive</button>
         </div>
       </div>
 
@@ -41,7 +41,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
   </section>
 
   <AdminNotificationPanel
-    locale="tr"
+    locale="en"
     panelId="notifPanel"
     listId="notifList"
     closeButtonId="notifCloseBtn"
@@ -52,8 +52,8 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
   <div id="detailModal" class="fixed inset-0 z-40 hidden items-end justify-center bg-black/60 p-3 sm:items-center sm:p-4">
     <div class="flex max-h-[88vh] w-[min(94vw,40rem)] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
       <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3 sm:px-5 sm:py-4">
-        <h3 id="detailTitle" class="text-xl font-black text-gray-900 sm:text-2xl">Detay</h3>
-        <button id="detailCloseBtn" class="rounded-full bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600 transition hover:bg-gray-200">Kapat</button>
+        <h3 id="detailTitle" class="text-xl font-black text-gray-900 sm:text-2xl">Details</h3>
+        <button id="detailCloseBtn" class="rounded-full bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600 transition hover:bg-gray-200">Close</button>
       </div>
       <div id="detailBody" class="min-h-0 flex-1 space-y-3 overflow-y-auto break-words px-4 py-4 text-sm text-gray-700 sm:px-5"></div>
       <div id="detailActions" class="flex flex-wrap gap-3 border-t border-gray-200 px-4 py-3 sm:px-5 sm:py-4"></div>
@@ -83,7 +83,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
     const detailCloseBtn = document.getElementById('detailCloseBtn');
 
     let adminUser = null;
-    const ui = window.AdminUi?.create({ locale: 'tr' });
+    const ui = window.AdminUi?.create({ locale: 'en' });
 
     function showToast(message, type = 'info') {
       if (ui) {
@@ -95,7 +95,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
 
     async function askText(message, placeholder = '') {
       if (ui) {
-        return ui.prompt(message, 'Girdi gerekli', placeholder);
+        return ui.prompt(message, 'Input required', placeholder);
       }
       return null;
     }
@@ -176,7 +176,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
         notifBadge.classList.toggle('hidden', unreadCount === 0);
 
         if (!data.notifications.length) {
-          notifList.innerHTML = '<p class="rounded-lg bg-gray-50 p-3 text-sm text-gray-500">Bildirim yok.</p>';
+          notifList.innerHTML = '<p class="rounded-lg bg-gray-50 p-3 text-sm text-gray-500">No notifications.</p>';
           return;
         }
 
@@ -188,7 +188,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
                   <input type="checkbox" class="notif-select mt-1" value="${item.id}" />
                   <div class="flex-1">
                     <p class="text-xs font-bold uppercase tracking-wide ${item.is_read ? 'text-gray-500' : 'text-purple-700'}">${escapeHtml(item.type)}</p>
-                    <p class="mt-1 text-sm font-semibold text-slate-900">${escapeHtml(item.title || 'Bildirim')}</p>
+                    <p class="mt-1 text-sm font-semibold text-slate-900">${escapeHtml(item.title || 'Notification')}</p>
                     <p class="mt-1 text-xs text-slate-600">${escapeHtml(item.message || '')}</p>
                   </div>
                 </div>
@@ -197,19 +197,19 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
           )
           .join('');
       } catch (error) {
-        notifList.innerHTML = '<p class="rounded-lg bg-red-50 p-3 text-sm text-red-700">Bildirimler yuklenemedi.</p>';
+        notifList.innerHTML = '<p class="rounded-lg bg-red-50 p-3 text-sm text-red-700">Notifications could not be loaded.</p>';
       }
     }
 
     async function loadApplications() {
-      applicationsTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">Basvurular yukleniyor...</p>';
+      applicationsTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">Loading applications...</p>';
       try {
         const response = await fetch('/api/admin/applications');
         const data = await response.json();
         applicationCache = Array.isArray(data) ? data : [];
 
         if (!applicationCache.length) {
-          applicationsTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">Basvuru bulunamadi.</p>';
+          applicationsTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">No applications found.</p>';
           return;
         }
 
@@ -222,7 +222,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
                 <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-purple-700">${escapeHtml(app.status)}</p>
               </div>
               <div class="shrink-0 flex flex-nowrap items-center gap-2 overflow-x-auto whitespace-nowrap pb-1">
-                <button data-id="${app.id}" class="app-detail-btn rounded-lg bg-purple-600 px-4 py-2 text-sm font-bold text-white hover:bg-purple-700">Detay</button>
+                <button data-id="${app.id}" class="app-detail-btn rounded-lg bg-purple-600 px-4 py-2 text-sm font-bold text-white hover:bg-purple-700">Details</button>
               </div>
             </div>
           </article>
@@ -236,19 +236,19 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
           });
         });
       } catch (error) {
-        applicationsTab.innerHTML = '<p class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">Basvurular yuklenemedi.</p>';
+        applicationsTab.innerHTML = '<p class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">Applications could not be loaded.</p>';
       }
     }
 
     async function loadEventProposals() {
-      eventsTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">Etkinlik onerileri yukleniyor...</p>';
+      eventsTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">Loading event proposals...</p>';
       try {
         const response = await fetch('/api/admin/event-proposals');
         const data = await response.json();
         eventCache = Array.isArray(data) ? data : [];
 
         if (!eventCache.length) {
-          eventsTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">Etkinlik onerisi bulunamadi.</p>';
+          eventsTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">No event proposals found.</p>';
           return;
         }
 
@@ -261,15 +261,15 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
                 <p class="mt-1 text-sm text-gray-600">${escapeHtml(event.province || '-')} • ${escapeHtml(event.category || '-')}</p>
                 <p class="mt-2 text-sm text-gray-700">${escapeHtml((event.description || '').slice(0, 180))}</p>
                 <div class="mt-2 flex flex-wrap gap-2 text-xs">
-                  <span class="rounded-full bg-purple-100 px-3 py-1 font-semibold text-purple-700">Durum: ${escapeHtml(event.status)}</span>
-                  <span class="rounded-full bg-gray-100 px-3 py-1 font-semibold text-gray-700">Onay: ${event.approval_summary?.approvedCount || 0}/${event.approval_summary?.adminCount || 0}</span>
-                  <span class="rounded-full bg-rose-100 px-3 py-1 font-semibold text-rose-700">Red: ${event.approval_summary?.rejectedCount || 0}</span>
+                  <span class="rounded-full bg-purple-100 px-3 py-1 font-semibold text-purple-700">Status: ${escapeHtml(event.status)}</span>
+                  <span class="rounded-full bg-gray-100 px-3 py-1 font-semibold text-gray-700">Approval: ${event.approval_summary?.approvedCount || 0}/${event.approval_summary?.adminCount || 0}</span>
+                  <span class="rounded-full bg-rose-100 px-3 py-1 font-semibold text-rose-700">Reject: ${event.approval_summary?.rejectedCount || 0}</span>
                 </div>
               </div>
               <div class="shrink-0 flex flex-nowrap items-center gap-2 overflow-x-auto whitespace-nowrap pb-1">
-                <button data-id="${event.id}" class="event-detail-btn rounded-lg border border-gray-300 px-3 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50">Detay</button>
-                <button data-id="${event.id}" class="event-approve-btn rounded-lg bg-emerald-600 px-3 py-2 text-sm font-bold text-white hover:bg-emerald-700">Onayla</button>
-                <button data-id="${event.id}" class="event-reject-btn rounded-lg bg-rose-600 px-3 py-2 text-sm font-bold text-white hover:bg-rose-700">Reddet</button>
+                <button data-id="${event.id}" class="event-detail-btn rounded-lg border border-gray-300 px-3 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50">Details</button>
+                <button data-id="${event.id}" class="event-approve-btn rounded-lg bg-emerald-600 px-3 py-2 text-sm font-bold text-white hover:bg-emerald-700">Approve</button>
+                <button data-id="${event.id}" class="event-reject-btn rounded-lg bg-rose-600 px-3 py-2 text-sm font-bold text-white hover:bg-rose-700">Reject</button>
               </div>
             </div>
           </article>
@@ -296,12 +296,12 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
           });
         });
       } catch (error) {
-        eventsTab.innerHTML = '<p class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">Etkinlik onerileri yuklenemedi.</p>';
+        eventsTab.innerHTML = '<p class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">Event proposals could not be loaded.</p>';
       }
     }
 
     async function loadArticleSubmissions() {
-      articlesTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">Yazi onaylari yukleniyor...</p>';
+      articlesTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">Loading article approvals...</p>';
       try {
         const response = await fetch('/api/admin/articles');
         const payload = await response.json();
@@ -310,7 +310,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
         const pendingArticles = allArticles.filter((item) => ['pending_approval', 'rejected'].includes(String(item.status)));
 
         if (!pendingArticles.length) {
-          articlesTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">Inceleme bekleyen yazi yok.</p>';
+          articlesTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">No articles pending review.</p>';
           return;
         }
 
@@ -319,19 +319,19 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
             <div class="flex items-start justify-between gap-4">
               <div class="min-w-0 flex-1">
                 <h3 class="text-lg font-bold text-gray-900">${escapeHtml(item.title)}</h3>
-                <p class="mt-1 text-sm text-gray-600">${escapeHtml(item.category || 'Kategori yok')} - /${escapeHtml(item.slug)}</p>
+                <p class="mt-1 text-sm text-gray-600">${escapeHtml(item.category || 'No category')} - /${escapeHtml(item.slug)}</p>
                 <p class="mt-2 text-sm text-gray-700 line-clamp-2">${escapeHtml(item.excerpt || '')}</p>
                 <div class="mt-2 flex flex-wrap gap-2 text-xs">
-                  <span class="rounded-full bg-purple-100 px-3 py-1 font-semibold text-purple-700">Durum: ${escapeHtml(item.status)}</span>
-                  <span class="rounded-full bg-gray-100 px-3 py-1 font-semibold text-gray-700">Onay: ${item.approval_summary?.approvedCount || 0}/${item.approval_summary?.adminCount || 0}</span>
-                  <span class="rounded-full bg-rose-100 px-3 py-1 font-semibold text-rose-700">Red: ${item.approval_summary?.rejectedCount || 0}</span>
+                  <span class="rounded-full bg-purple-100 px-3 py-1 font-semibold text-purple-700">Status: ${escapeHtml(item.status)}</span>
+                  <span class="rounded-full bg-gray-100 px-3 py-1 font-semibold text-gray-700">Approval: ${item.approval_summary?.approvedCount || 0}/${item.approval_summary?.adminCount || 0}</span>
+                  <span class="rounded-full bg-rose-100 px-3 py-1 font-semibold text-rose-700">Reject: ${item.approval_summary?.rejectedCount || 0}</span>
                 </div>
               </div>
               <div class="shrink-0 flex flex-nowrap items-center gap-2 overflow-x-auto whitespace-nowrap pb-1">
-                <button data-id="${item.id}" class="article-detail-btn rounded-lg border border-gray-300 px-3 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50">Detay</button>
-                <button data-id="${item.id}" class="article-comment-btn rounded-lg bg-amber-500 px-3 py-2 text-sm font-bold text-white hover:bg-amber-600">Yorum</button>
-                <button data-id="${item.id}" class="article-approve-btn rounded-lg bg-emerald-600 px-3 py-2 text-sm font-bold text-white hover:bg-emerald-700">Onayla</button>
-                <button data-id="${item.id}" class="article-reject-btn rounded-lg bg-rose-600 px-3 py-2 text-sm font-bold text-white hover:bg-rose-700">Reddet</button>
+                <button data-id="${item.id}" class="article-detail-btn rounded-lg border border-gray-300 px-3 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50">Details</button>
+                <button data-id="${item.id}" class="article-comment-btn rounded-lg bg-amber-500 px-3 py-2 text-sm font-bold text-white hover:bg-amber-600">Comment</button>
+                <button data-id="${item.id}" class="article-approve-btn rounded-lg bg-emerald-600 px-3 py-2 text-sm font-bold text-white hover:bg-emerald-700">Approve</button>
+                <button data-id="${item.id}" class="article-reject-btn rounded-lg bg-rose-600 px-3 py-2 text-sm font-bold text-white hover:bg-rose-700">Reject</button>
               </div>
             </div>
           </article>
@@ -364,12 +364,12 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
           });
         });
       } catch (error) {
-        articlesTab.innerHTML = '<p class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">Yazi onaylari yuklenemedi.</p>';
+        articlesTab.innerHTML = '<p class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">Article approvals could not be loaded.</p>';
       }
     }
 
     async function loadArchiveSubmissions() {
-      archiveTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">Arsiv kayitlari yukleniyor...</p>';
+      archiveTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">Loading archive records...</p>';
       try {
         const response = await fetch('/api/admin/archive');
         const payload = await response.json();
@@ -378,7 +378,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
         archiveCache = allArchiveRows.filter((item) => ['pending', 'reviewed'].includes(String(item.status)));
 
         if (!archiveCache.length) {
-          archiveTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">Inceleme bekleyen arsiv kaydi bulunamadi.</p>';
+          archiveTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">No archive records pending review.</p>';
           return;
         }
 
@@ -388,18 +388,18 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
               <div class="min-w-0 flex-1">
                 <h3 class="text-lg font-bold text-gray-900">${escapeHtml(item.title)}</h3>
                 <p class="mt-1 text-sm text-gray-600">${escapeHtml(item.publication_name)} • ${escapeHtml(item.publication_year)}</p>
-                <p class="mt-1 text-sm text-gray-600">${escapeHtml(item.focus_topic || 'Genel gundem')}</p>
+                <p class="mt-1 text-sm text-gray-600">${escapeHtml(item.focus_topic || 'General agenda')}</p>
                 <p class="mt-2 text-sm text-gray-700 line-clamp-2">${escapeHtml(item.summary || '')}</p>
                 <div class="mt-2 flex flex-wrap gap-2 text-xs">
-                  <span class="rounded-full bg-purple-100 px-3 py-1 font-semibold text-purple-700">Durum: ${escapeHtml(item.status)}</span>
-                  <span class="rounded-full bg-gray-100 px-3 py-1 font-semibold text-gray-700">Onay: ${item.approval_summary?.approvedCount || 0}/${item.approval_summary?.adminCount || 0}</span>
-                  <span class="rounded-full bg-rose-100 px-3 py-1 font-semibold text-rose-700">Red: ${item.approval_summary?.rejectedCount || 0}</span>
+                  <span class="rounded-full bg-purple-100 px-3 py-1 font-semibold text-purple-700">Status: ${escapeHtml(item.status)}</span>
+                  <span class="rounded-full bg-gray-100 px-3 py-1 font-semibold text-gray-700">Approval: ${item.approval_summary?.approvedCount || 0}/${item.approval_summary?.adminCount || 0}</span>
+                  <span class="rounded-full bg-rose-100 px-3 py-1 font-semibold text-rose-700">Reject: ${item.approval_summary?.rejectedCount || 0}</span>
                 </div>
               </div>
               <div class="shrink-0 flex flex-nowrap items-center gap-2 overflow-x-auto whitespace-nowrap pb-1">
-                <button data-id="${item.id}" class="archive-detail-btn rounded-lg border border-gray-300 px-3 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50">Detay</button>
-                <button data-id="${item.id}" class="archive-approve-btn rounded-lg bg-emerald-600 px-3 py-2 text-sm font-bold text-white hover:bg-emerald-700">Onayla</button>
-                <button data-id="${item.id}" class="archive-reject-btn rounded-lg bg-rose-600 px-3 py-2 text-sm font-bold text-white hover:bg-rose-700">Reddet</button>
+                <button data-id="${item.id}" class="archive-detail-btn rounded-lg border border-gray-300 px-3 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50">Details</button>
+                <button data-id="${item.id}" class="archive-approve-btn rounded-lg bg-emerald-600 px-3 py-2 text-sm font-bold text-white hover:bg-emerald-700">Approve</button>
+                <button data-id="${item.id}" class="archive-reject-btn rounded-lg bg-rose-600 px-3 py-2 text-sm font-bold text-white hover:bg-rose-700">Reject</button>
               </div>
             </div>
           </article>
@@ -424,7 +424,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
           });
         });
       } catch (error) {
-        archiveTab.innerHTML = '<p class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">Arsiv kayitlari yuklenemedi.</p>';
+        archiveTab.innerHTML = '<p class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">Archive records could not be loaded.</p>';
       }
     }
 
@@ -436,22 +436,22 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
       `).join('');
 
       showModal(
-        `${item.publication_name} - Arsiv Kaydi`,
+        `${item.publication_name} - Archive Record`,
         `
-          <p><strong>Baslik:</strong> ${escapeHtml(item.title)}</p>
-          <p><strong>Yil:</strong> ${escapeHtml(item.publication_year)} (${escapeHtml(item.decade || '-')})</p>
-          <p><strong>Odak:</strong> ${escapeHtml(item.focus_topic || '-')}</p>
-          <p><strong>Durum:</strong> ${escapeHtml(item.status)}</p>
-          <p><strong>Ozet:</strong> ${escapeHtml(item.summary || '-')}</p>
-          <p><strong>PDF:</strong> ${item.pdf_url ? `<a class="text-purple-700 underline" href="${escapeHtml(item.pdf_url)}" download>PDF indir</a>` : '-'}</p>
+          <p><strong>Title:</strong> ${escapeHtml(item.title)}</p>
+          <p><strong>Year:</strong> ${escapeHtml(item.publication_year)} (${escapeHtml(item.decade || '-')})</p>
+          <p><strong>Focus:</strong> ${escapeHtml(item.focus_topic || '-')}</p>
+          <p><strong>Status:</strong> ${escapeHtml(item.status)}</p>
+          <p><strong>Summary:</strong> ${escapeHtml(item.summary || '-')}</p>
+          <p><strong>PDF:</strong> ${item.pdf_url ? `<a class="text-purple-700 underline" href="${escapeHtml(item.pdf_url)}" download>Download PDF</a>` : '-'}</p>
           <div>
-            <p class="mb-1 text-xs font-bold uppercase tracking-wide text-gray-500">Admin karar gecmisi</p>
-            <ul class="space-y-1">${approvalItems || '<li class="rounded-lg bg-gray-50 p-2 text-xs">Henuz karar yok.</li>'}</ul>
+            <p class="mb-1 text-xs font-bold uppercase tracking-wide text-gray-500">Admin decision history</p>
+            <ul class="space-y-1">${approvalItems || '<li class="rounded-lg bg-gray-50 p-2 text-xs">No decisions yet.</li>'}</ul>
           </div>
         `,
         `
-          <button id="archiveApproveBtn" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Onayla</button>
-          <button id="archiveRejectBtn" class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-700">Reddet</button>
+          <button id="archiveApproveBtn" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Approve</button>
+          <button id="archiveRejectBtn" class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-700">Reject</button>
         `
       );
 
@@ -461,18 +461,18 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
 
     function showApplicationDetail(app) {
       showModal(
-        `${app.full_name} - Basvuru`,
+        `${app.full_name} - Application`,
         `
-          <p><strong>E-posta:</strong> ${escapeHtml(app.email)}</p>
-          <p><strong>Telefon:</strong> ${escapeHtml(app.phone || '-')}</p>
-          <p><strong>Sehir:</strong> ${escapeHtml(app.province)}</p>
-          <p><strong>Kurum:</strong> ${escapeHtml(app.organization || '-')}</p>
-          <p><strong>Mesaj:</strong> ${escapeHtml(app.message || '-')}</p>
-          <p><strong>Durum:</strong> ${escapeHtml(app.status)}</p>
+          <p><strong>Email:</strong> ${escapeHtml(app.email)}</p>
+          <p><strong>Phone:</strong> ${escapeHtml(app.phone || '-')}</p>
+          <p><strong>City:</strong> ${escapeHtml(app.province)}</p>
+          <p><strong>Organization:</strong> ${escapeHtml(app.organization || '-')}</p>
+          <p><strong>Message:</strong> ${escapeHtml(app.message || '-')}</p>
+          <p><strong>Status:</strong> ${escapeHtml(app.status)}</p>
         `,
         `
-          <button id="appApproveBtn" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Onayla</button>
-          <button id="appRejectBtn" class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-700">Reddet</button>
+          <button id="appApproveBtn" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Approve</button>
+          <button id="appRejectBtn" class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-700">Reject</button>
         `
       );
 
@@ -488,22 +488,22 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
       `).join('');
 
       showModal(
-        `${event.title} - Etkinlik Onerisi`,
+        `${event.title} - Event Proposal`,
         `
-          <p><strong>Oneren:</strong> ${escapeHtml(event.proposed_by)} (${escapeHtml(event.email)})</p>
-          <p><strong>Sehir:</strong> ${escapeHtml(event.province || '-')}</p>
-          <p><strong>Kategori:</strong> ${escapeHtml(event.category || '-')}</p>
-          <p><strong>Telefon:</strong> ${escapeHtml(event.organizer_phone || '-')}</p>
-          <p><strong>Durum:</strong> ${escapeHtml(event.status)}</p>
-          <p><strong>Aciklama:</strong> ${escapeHtml(event.description || '-')}</p>
+          <p><strong>Proposed by:</strong> ${escapeHtml(event.proposed_by)} (${escapeHtml(event.email)})</p>
+          <p><strong>City:</strong> ${escapeHtml(event.province || '-')}</p>
+          <p><strong>Category:</strong> ${escapeHtml(event.category || '-')}</p>
+          <p><strong>Phone:</strong> ${escapeHtml(event.organizer_phone || '-')}</p>
+          <p><strong>Status:</strong> ${escapeHtml(event.status)}</p>
+          <p><strong>Description:</strong> ${escapeHtml(event.description || '-')}</p>
           <div>
-            <p class="mb-1 text-xs font-bold uppercase tracking-wide text-gray-500">Admin karar gecmisi</p>
-            <ul class="space-y-1">${approvalItems || '<li class="rounded-lg bg-gray-50 p-2 text-xs">Henuz karar yok.</li>'}</ul>
+            <p class="mb-1 text-xs font-bold uppercase tracking-wide text-gray-500">Admin decision history</p>
+            <ul class="space-y-1">${approvalItems || '<li class="rounded-lg bg-gray-50 p-2 text-xs">No decisions yet.</li>'}</ul>
           </div>
         `,
         `
-          <button id="eventApproveBtn" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Onayla</button>
-          <button id="eventRejectBtn" class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-700">Reddet</button>
+          <button id="eventApproveBtn" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Approve</button>
+          <button id="eventRejectBtn" class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-700">Reject</button>
         `
       );
 
@@ -520,31 +520,31 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
 
       const commentItems = (article.comments || []).map((item) => `
         <li class="rounded-lg bg-gray-50 p-2 text-xs">
-          <strong>${escapeHtml(item.admin_email)}</strong> - ${escapeHtml(item.comment)} - ${new Date(item.created_at).toLocaleString('tr-TR')}
+          <strong>${escapeHtml(item.admin_email)}</strong> - ${escapeHtml(item.comment)} - ${new Date(item.created_at).toLocaleString('en-US')}
         </li>
       `).join('');
 
       showModal(
-        `${article.title} - Yazi Onayi`,
+        `${article.title} - Article Approval`,
         `
-          <p><strong>Kategori:</strong> ${escapeHtml(article.category || '-')}</p>
+          <p><strong>Category:</strong> ${escapeHtml(article.category || '-')}</p>
           <p><strong>Slug:</strong> /${escapeHtml(article.slug || '-')}</p>
-          <p><strong>Durum:</strong> ${escapeHtml(article.status)}</p>
-          <p><strong>Kisa metin:</strong> ${escapeHtml(article.excerpt || '-')}</p>
-          <p><strong>Uzun metin:</strong> ${escapeHtml(String(article.body || '').slice(0, 600))}${String(article.body || '').length > 600 ? '...' : ''}</p>
+          <p><strong>Status:</strong> ${escapeHtml(article.status)}</p>
+          <p><strong>Short text:</strong> ${escapeHtml(article.excerpt || '-')}</p>
+          <p><strong>Long text:</strong> ${escapeHtml(String(article.body || '').slice(0, 600))}${String(article.body || '').length > 600 ? '...' : ''}</p>
           <div>
-            <p class="mb-1 text-xs font-bold uppercase tracking-wide text-gray-500">Admin karar gecmisi</p>
-            <ul class="space-y-1">${approvalItems || '<li class="rounded-lg bg-gray-50 p-2 text-xs">Henuz karar yok.</li>'}</ul>
+            <p class="mb-1 text-xs font-bold uppercase tracking-wide text-gray-500">Admin decision history</p>
+            <ul class="space-y-1">${approvalItems || '<li class="rounded-lg bg-gray-50 p-2 text-xs">No decisions yet.</li>'}</ul>
           </div>
           <div class="mt-3">
-            <p class="mb-1 text-xs font-bold uppercase tracking-wide text-gray-500">Admin yorumlari</p>
-            <ul class="space-y-1">${commentItems || '<li class="rounded-lg bg-gray-50 p-2 text-xs">Henuz yorum yok.</li>'}</ul>
+            <p class="mb-1 text-xs font-bold uppercase tracking-wide text-gray-500">Admin comments</p>
+            <ul class="space-y-1">${commentItems || '<li class="rounded-lg bg-gray-50 p-2 text-xs">No comments yet.</li>'}</ul>
           </div>
         `,
         `
-          <button id="articleCommentBtn" class="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-white hover:bg-amber-600">Yorum Ekle</button>
-          <button id="articleApproveBtn" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Onayla</button>
-          <button id="articleRejectBtn" class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-700">Reddet</button>
+          <button id="articleCommentBtn" class="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-white hover:bg-amber-600">Add Comment</button>
+          <button id="articleApproveBtn" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Approve</button>
+          <button id="articleRejectBtn" class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-700">Reject</button>
         `
       );
 
@@ -554,7 +554,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
     }
 
     async function updateApplicationStatus(id, status) {
-      const notes = (await askText('Opsiyonel admin notu:', 'Isterseniz not ekleyin')) || null;
+      const notes = (await askText('Optional admin note:', 'Add a note if needed')) || null;
       await fetch('/api/admin/applications', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -566,13 +566,13 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
         }),
       });
       closeModal();
-      showToast('Basvuru durumu guncellendi.', 'success');
+      showToast('Application status updated.', 'success');
       await loadApplications();
       await loadNotifications();
     }
 
     async function submitEventDecision(proposalId, action) {
-      const comment = (await askText(action === 'approve' ? 'Onay notu (opsiyonel):' : 'Red sebebi (opsiyonel):', 'Isterseniz not ekleyin')) || null;
+      const comment = (await askText(action === 'approve' ? 'Approval note (optional):' : 'Rejection reason (optional):', 'Add a note if needed')) || null;
       const endpoint = `/api/admin/event-proposals/${proposalId}/${action}`;
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -585,18 +585,18 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
 
       const data = await response.json();
       if (!response.ok || !data.success) {
-        showToast(data.error || 'Islem basarisiz', 'error');
+        showToast(data.error || 'Operation failed', 'error');
         return;
       }
 
       closeModal();
-      showToast(action === 'approve' ? 'Etkinlik onaylandi.' : 'Etkinlik reddedildi.', 'success');
+      showToast(action === 'approve' ? 'Event approved.' : 'Event rejected.', 'success');
       await loadEventProposals();
       await loadNotifications();
     }
 
     async function submitArticleDecision(articleId, action) {
-      const comment = (await askText(action === 'approve' ? 'Onay notu (opsiyonel):' : 'Red sebebi (opsiyonel):', 'Isterseniz not ekleyin')) || null;
+      const comment = (await askText(action === 'approve' ? 'Approval note (optional):' : 'Rejection reason (optional):', 'Add a note if needed')) || null;
       const endpoint = `/api/admin/articles/${articleId}/${action}`;
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -609,18 +609,18 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
 
       const data = await response.json();
       if (!response.ok || !data.success) {
-        showToast(data.error || 'Islem basarisiz', 'error');
+        showToast(data.error || 'Operation failed', 'error');
         return;
       }
 
       closeModal();
-      showToast(action === 'approve' ? 'Yazi onaylandi.' : 'Yazi reddedildi.', 'success');
+      showToast(action === 'approve' ? 'Article approved.' : 'Article rejected.', 'success');
       await loadArticleSubmissions();
       await loadNotifications();
     }
 
     async function submitArticleComment(articleId) {
-      const comment = await askText('Admin yorumu:', 'Yorumunuzu yazin');
+      const comment = await askText('Admin comment:', 'Write your comment');
       if (!comment || !comment.trim()) return;
 
       const response = await fetch('/api/admin/articles', {
@@ -636,17 +636,17 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
 
       const data = await response.json();
       if (!response.ok || !data.success) {
-        showToast(data.error || 'Yorum kaydedilemedi', 'error');
+        showToast(data.error || 'Comment could not be saved', 'error');
         return;
       }
 
-      showToast('Yorum kaydedildi.', 'success');
+      showToast('Comment saved.', 'success');
       await loadArticleSubmissions();
       await loadNotifications();
     }
 
     async function submitArchiveDecision(archiveId, action) {
-      const comment = (await askText(action === 'approve' ? 'Onay notu (opsiyonel):' : 'Red sebebi (opsiyonel):', 'Isterseniz not ekleyin')) || null;
+      const comment = (await askText(action === 'approve' ? 'Approval note (optional):' : 'Rejection reason (optional):', 'Add a note if needed')) || null;
       const endpoint = `/api/admin/archive/${archiveId}/${action}`;
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -659,12 +659,12 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
 
       const data = await response.json();
       if (!response.ok || !data.success) {
-        showToast(data.error || 'Islem basarisiz', 'error');
+        showToast(data.error || 'Operation failed', 'error');
         return;
       }
 
       closeModal();
-      showToast(action === 'approve' ? 'Arsiv kaydi onaylandi.' : 'Arsiv kaydi reddedildi.', 'success');
+      showToast(action === 'approve' ? 'Archive record approved.' : 'Archive record rejected.', 'success');
       await loadArchiveSubmissions();
       await loadNotifications();
     }
@@ -675,8 +675,8 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
       const expiresAtRaw = sessionStorage.getItem('admin_auth_expires_at');
       if (!token || !rawUser) {
         clearAdminSession();
-        authBox.innerHTML = 'Yetki bulunamadi. <a class="font-semibold text-purple-700 underline" href="/admin/login-email">Giris yap</a>.';
-        setTimeout(() => window.location.replace('/admin/login-email'), 600);
+        authBox.innerHTML = 'Access not found. <a class="font-semibold text-purple-700 underline" href="/en/admin/login-email">Sign in</a>.';
+        setTimeout(() => window.location.replace('/en/admin/login-email'), 600);
         return false;
       }
 
@@ -685,8 +685,8 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
       const effectiveExpiry = tokenExpiry ? Math.min(expiresAt || tokenExpiry, tokenExpiry) : expiresAt;
       if (!effectiveExpiry || Date.now() >= effectiveExpiry) {
         clearAdminSession();
-        authBox.innerHTML = 'Oturum suresi doldu. <a class="font-semibold text-purple-700 underline" href="/admin/login-email">Tekrar giris yap</a>.';
-        setTimeout(() => window.location.replace('/admin/login-email'), 600);
+        authBox.innerHTML = 'Session expired. <a class="font-semibold text-purple-700 underline" href="/en/admin/login-email">Sign in again</a>.';
+        setTimeout(() => window.location.replace('/en/admin/login-email'), 600);
         return false;
       }
 
@@ -694,11 +694,11 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
         adminUser = JSON.parse(rawUser);
       } catch {
         clearAdminSession();
-        authBox.textContent = 'Oturum verisi okunamadi.';
+        authBox.textContent = 'Session data could not be read.';
         return false;
       }
 
-      authBox.innerHTML = `<span class="font-semibold text-gray-900">${escapeHtml(adminUser.email || 'admin')}</span> ile giris yapildi.`;
+      authBox.innerHTML = `<span class="font-semibold text-gray-900">${escapeHtml(adminUser.email || 'admin')}</span> signed in.`;
       mainContent.classList.remove('hidden');
       return true;
     }
@@ -732,7 +732,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
     notifDeleteSelectedBtn?.addEventListener('click', async () => {
       const ids = Array.from(document.querySelectorAll('.notif-select:checked')).map((el) => Number(el.value));
       if (!ids.length) {
-        showToast('Lutfen silmek icin bildirim sec.', 'warning');
+        showToast('Please select notifications to delete.', 'warning');
         return;
       }
       await fetch('/api/admin/notifications', {
@@ -759,3 +759,4 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
     }
   </script>
 </MainLayout>
+

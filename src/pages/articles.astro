@@ -1,17 +1,23 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
 import { getPublishedArticles } from '../utils/db.js';
-import { slugify } from '../utils/slugify';
+import { getCategoryDefinitions, getCategoryLabel, getCategorySlug } from '../utils/articleCategories';
 
 export const prerender = false;
 
 const allArticles = getPublishedArticles();
-const categoryMap = new Map();
+const baseCategories = getCategoryDefinitions().map((item) => ({
+  name: item.tr,
+  slug: item.slug,
+  count: 0,
+}));
+
+const categoryMap = new Map(baseCategories.map((item) => [item.slug, item]));
 
 for (const article of allArticles) {
-  const categoryName = article.category || 'Genel';
-  const key = slugify(categoryName) || 'genel';
-  const current = categoryMap.get(key) || { name: categoryName, slug: key, count: 0 };
+  const categoryName = article.category || 'Gundem ve Politika';
+  const key = getCategorySlug(categoryName);
+  const current = categoryMap.get(key) || { name: getCategoryLabel(categoryName, 'tr'), slug: key, count: 0 };
   current.count += 1;
   categoryMap.set(key, current);
 }
@@ -23,7 +29,7 @@ const categories = Array.from(categoryMap.values()).sort((a, b) => a.name.locale
   <section class="mx-auto max-w-6xl">
     <header class="rounded-[2rem] bg-gradient-to-br from-purple-700 via-fuchsia-700 to-rose-600 p-8 text-white shadow-xl">
       <p class="text-xs font-bold uppercase tracking-[0.2em] text-purple-100">Yazilar</p>
-      <h1 class="mt-3 text-4xl font-black">Admin Onayli Icerik Arsivi</h1>
+      <h1 class="app-h1 mt-3 text-4xl font-black">Admin Onayli Icerik Arsivi</h1>
       <p class="mt-4 max-w-3xl text-white/90">
         Kategoriye gore filtrele, slug bazli detay sayfaya git ve okunma sayilarini takip et.
       </p>
@@ -57,17 +63,20 @@ const categories = Array.from(categoryMap.values()).sort((a, b) => a.name.locale
       ) : (
         <>
           <div id="article-empty-warning" class="mb-4 hidden rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center">
-            <p id="article-empty-warning-text" class="text-lg font-bold text-amber-900">Bu bolume henuz yazi eklenmemistir.</p>
+            <p id="article-empty-warning-text" class="text-lg font-bold text-amber-900">Bu kategoriye ait henuz bir yazi bulunmamaktadir.</p>
           </div>
 
           <div id="article-grid" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {allArticles.map((article) => (
               <article
                 class="article-card rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-                data-category={slugify(article.category || 'genel') || 'genel'}
+                data-category={getCategorySlug(article.category || 'Gundem ve Politika')}
                 data-search={`${article.title || ''} ${(article.excerpt || '')} ${(article.body || '')}`.toLowerCase()}
               >
-                <p class="text-xs font-bold uppercase tracking-wide text-purple-700">{article.category || 'Genel'}</p>
+                {article.image_url ? (
+                  <img src={article.image_url} alt={article.title || 'Yazi gorseli'} class="mb-4 h-44 w-full rounded-xl object-cover" loading="lazy" />
+                ) : null}
+                <p class="text-xs font-bold uppercase tracking-wide text-purple-700">{getCategoryLabel(article.category || 'Gundem ve Politika', 'tr')}</p>
                 <h2 class="mt-2 line-clamp-2 text-xl font-black text-slate-900">{article.title}</h2>
                 <p class="mt-2 text-xs text-slate-500">
                   {new Date(article.created_at || Date.now()).toLocaleDateString('tr-TR')} - {(article.tracked_view_count || 0)} okunma
@@ -76,7 +85,7 @@ const categories = Array.from(categoryMap.values()).sort((a, b) => a.name.locale
                   {article.excerpt || String(article.body || '').slice(0, 180)}
                 </p>
                 <a
-                  href={`/articles/${slugify(article.category || 'genel') || 'genel'}/${article.slug}`}
+                  href={`/articles/${getCategorySlug(article.category || 'Gundem ve Politika')}/${article.slug}`}
                   class="mt-4 inline-flex text-sm font-bold text-purple-700 hover:text-purple-900"
                 >
                   Detay sayfaya git ->
@@ -118,7 +127,7 @@ const categories = Array.from(categoryMap.values()).sort((a, b) => a.name.locale
 
       if (warningText) {
         warningText.textContent = selectedCategory !== 'all'
-          ? 'Bu bolume henuz yazi eklenmemistir.'
+          ? 'Bu kategoriye ait henuz bir yazi bulunmamaktadir.'
           : 'Filtreye uygun yazi bulunamadi.';
       }
 
