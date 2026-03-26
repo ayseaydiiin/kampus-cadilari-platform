@@ -1,27 +1,44 @@
 import { getAdminUser, verifyUserCredentials, isUserAdmin } from '../../../utils/db.js';
 import jwt from 'jsonwebtoken';
-import crypto from 'node:crypto';
+import { buildAuthCookieOptions, getJwtSecret } from '../../../utils/adminAuth.js';
+import { checkRateLimit, rateLimitResponse } from '../../../utils/security.js';
 
 export const prerender = false;
 
-function getJwtSecret() {
-  const secret = process.env.JWT_SECRET;
-  if (secret && String(secret).trim().length >= 32) {
-    return String(secret);
-  }
-
-  // Local-only fallback: generate an in-memory secret per process.
-  // This avoids committing static defaults while keeping local dev usable.
-  if (!globalThis.__KAMPUS_LOCAL_JWT_SECRET__) {
-    globalThis.__KAMPUS_LOCAL_JWT_SECRET__ = crypto.randomBytes(48).toString('hex');
-  }
-  return globalThis.__KAMPUS_LOCAL_JWT_SECRET__;
-}
-
-export async function POST({ request }) {
+export async function POST({ request, cookies }) {
   try {
-    const body = await request.json();
-    const { email, password } = body;
+    const rateLimit = checkRateLimit(request, 'auth-login', { limit: 8, windowMs: 15 * 60 * 1000 });
+    if (!rateLimit.allowed) {
+      return rateLimitResponse('Cok fazla giris denemesi yapildi', rateLimit.retryAfter);
+    }
+
+    const contentType = String(request.headers.get('content-type') || '').toLowerCase();
+    let rawEmail = '';
+    let rawPassword = '';
+
+    if (contentType.includes('application/json')) {
+      const body = await request.json();
+      rawEmail = body?.email ?? body?.username ?? '';
+      rawPassword = body?.password ?? '';
+    } else if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
+      const form = await request.formData();
+      rawEmail = form.get('email') ?? form.get('username') ?? '';
+      rawPassword = form.get('password') ?? '';
+    } else {
+      // Fallback: try JSON first, then form-data.
+      try {
+        const body = await request.json();
+        rawEmail = body?.email ?? body?.username ?? '';
+        rawPassword = body?.password ?? '';
+      } catch {
+        const form = await request.formData();
+        rawEmail = form.get('email') ?? form.get('username') ?? '';
+        rawPassword = form.get('password') ?? '';
+      }
+    }
+
+    const email = String(rawEmail || '').trim().toLowerCase();
+    const password = String(rawPassword || '');
 
     if (!email || !password) {
       return new Response(JSON.stringify({
@@ -64,11 +81,14 @@ export async function POST({ request }) {
         userId: userResult.user.id,
         email: userResult.user.email,
         username: userResult.user.username,
+        fullName: effectiveName,
         role: effectiveRole
       },
       getJwtSecret(),
       { expiresIn: '24h' }
     );
+
+    cookies.set('auth_token', token, buildAuthCookieOptions());
 
     return new Response(JSON.stringify({
       success: true,

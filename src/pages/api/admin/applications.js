@@ -1,14 +1,16 @@
 import { getApplications, updateApplicationStatus, getApplicationById } from '../../../utils/db.js';
 import { sendEmail } from '../../../utils/mailer.js';
+import { requireAdmin } from '../../../utils/adminAuth.js';
 
 export const prerender = false;
 
-export async function GET({ url }) {
+export async function GET(context) {
+  const auth = requireAdmin(context);
+  if (!auth.ok) return auth.response;
+
+  const { url } = context;
   try {
-    const headers = {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    };
+    const headers = { 'Content-Type': 'application/json' };
 
     // Get filter parameters
     const province = url.searchParams.get('province');
@@ -36,15 +38,16 @@ export async function GET({ url }) {
   }
 }
 
-export async function PUT({ request }) {
+export async function PUT(context) {
+  const auth = requireAdmin(context);
+  if (!auth.ok) return auth.response;
+
+  const { request } = context;
   try {
-    const headers = {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    };
+    const headers = { 'Content-Type': 'application/json' };
 
     const data = await request.json();
-    const { id, status, notes, reviewedBy } = data;
+    const { id, status, notes } = data;
 
     if (!id || !status) {
       return new Response(
@@ -53,7 +56,7 @@ export async function PUT({ request }) {
       );
     }
 
-    const result = updateApplicationStatus(id, status, reviewedBy, notes);
+    const result = updateApplicationStatus(id, status, auth.admin.email, notes);
 
     // Send email if configured
     const application = getApplicationById(id);

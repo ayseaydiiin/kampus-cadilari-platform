@@ -1,31 +1,29 @@
 import { recordProposalDecision, getProposalApprovals, getEventProposalById } from '../../../../../utils/db.js';
+import { requireAdmin } from '../../../../../utils/adminAuth.js';
 
 export const prerender = false;
 
-export async function POST({ params, request }) {
-  const headers = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-  };
+export async function POST(context) {
+  const auth = requireAdmin(context);
+  if (!auth.ok) return auth.response;
 
-  if (request.method === 'OPTIONS') {
-    return new Response(null, { headers });
-  }
+  const { params, request } = context;
+  const headers = { 'Content-Type': 'application/json' };
 
   try {
     const { id } = params;
-    const { adminEmail, comment } = await request.json();
+    const { comment } = await request.json();
 
-    if (!id || !adminEmail) {
+    if (!id) {
       return new Response(
-        JSON.stringify({ success: false, error: 'id ve adminEmail zorunlu' }),
+        JSON.stringify({ success: false, error: 'id zorunlu' }),
         { status: 400, headers }
       );
     }
 
     const decision = recordProposalDecision({
       proposalId: Number(id),
-      adminEmail,
+      adminEmail: auth.admin.email,
       decision: 'approved',
       comment,
     });

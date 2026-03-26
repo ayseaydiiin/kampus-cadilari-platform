@@ -5,17 +5,20 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
 
 <MainLayout title="Admin Submissions - Kampus Cadilari" currentLang="tr">
   <section class="mx-auto max-w-6xl px-4 py-8">
-    <header class="rounded-2xl bg-gradient-to-r from-purple-700 to-pink-600 p-8 text-white shadow-xl">
+    <header class="rounded-2xl border border-[rgba(225,6,0,0.16)] bg-[linear-gradient(135deg,rgba(110,44,138,0.98),rgba(87,33,111,0.96)_58%,rgba(225,6,0,0.9))] p-8 text-white shadow-xl">
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p class="text-xs font-bold uppercase tracking-[0.2em] text-purple-100">Admin workflow</p>
+          <p class="text-xs font-bold uppercase tracking-[0.2em] text-white/75">Admin workflow</p>
           <h1 class="app-h1 mt-2 text-3xl font-black">Basvurular ve Etkinlik Onerileri</h1>
-          <p class="mt-3 text-sm text-white/90">Tum admin onayina dayali karar akisini buradan yonet.</p>
+          <p class="mt-3 text-sm text-white/90">Arsiv kayitlarinda tek admin onayi yeterli olacak sekilde karar akislarini buradan yonet.</p>
         </div>
-        <button id="notifToggleBtn" class="relative rounded-full bg-white px-5 py-2 font-bold text-purple-700 hover:bg-purple-50">
-          Bildirimler
-          <span id="notifBadge" class="ml-2 hidden rounded-full bg-rose-600 px-2 py-0.5 text-xs text-white">0</span>
-        </button>
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="notifToggleBtn" class="relative rounded-full bg-white px-5 py-2 font-bold text-[var(--color-purple-primary)] hover:bg-white/90">
+            Bildirimler
+            <span id="notifBadge" class="ml-2 hidden rounded-full bg-[var(--color-red-accent)] px-2 py-0.5 text-xs text-white">0</span>
+          </button>
+          <button id="logoutBtn" class="rounded-full border border-white/40 px-5 py-2 text-sm font-bold text-white hover:bg-white/10">Cikis yap</button>
+        </div>
       </div>
     </header>
 
@@ -27,9 +30,10 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
       <div class="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
         <div class="flex flex-wrap gap-2">
           <button data-tab="applications" class="tab-btn rounded-lg bg-purple-600 px-4 py-2 text-sm font-bold text-white">Bize Katil Basvurulari</button>
-          <button data-tab="events" class="tab-btn rounded-lg bg-gray-100 px-4 py-2 text-sm font-bold text-gray-700">Etkinlik Onerileri</button>
+          <button data-tab="events" class="tab-btn rounded-lg bg-gray-100 px-4 py-2 text-sm font-bold text-gray-700">Etkinlik Onerileri Onayi</button>
           <button data-tab="articles" class="tab-btn rounded-lg bg-gray-100 px-4 py-2 text-sm font-bold text-gray-700">Yazi Onaylari</button>
-          <button data-tab="archive" class="tab-btn rounded-lg bg-gray-100 px-4 py-2 text-sm font-bold text-gray-700">Gazete Arsivi</button>
+          <button data-tab="archive" class="tab-btn rounded-lg bg-gray-100 px-4 py-2 text-sm font-bold text-gray-700">Arsiv Onayi</button>
+          <button data-tab="records" class="tab-btn rounded-lg bg-gray-100 px-4 py-2 text-sm font-bold text-gray-700">Kayit Listesi</button>
         </div>
       </div>
 
@@ -37,6 +41,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
       <section id="eventsTab" class="hidden space-y-4"></section>
       <section id="articlesTab" class="hidden space-y-4"></section>
       <section id="archiveTab" class="hidden space-y-4"></section>
+      <section id="recordsTab" class="hidden space-y-4"></section>
     </div>
   </section>
 
@@ -68,8 +73,10 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
     const eventsTab = document.getElementById('eventsTab');
     const articlesTab = document.getElementById('articlesTab');
     const archiveTab = document.getElementById('archiveTab');
+    const recordsTab = document.getElementById('recordsTab');
     const tabButtons = document.querySelectorAll('.tab-btn');
     const notifToggleBtn = document.getElementById('notifToggleBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
     const notifPanel = document.getElementById('notifPanel');
     const notifList = document.getElementById('notifList');
     const notifBadge = document.getElementById('notifBadge');
@@ -105,6 +112,22 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
     let archiveCache = [];
     let archiveAllCache = [];
     let activeTab = 'applications';
+    const PAGE_SIZE = 10;
+    const pageState = {
+      applications: 1,
+      events: 1,
+      articles: 1,
+      archive: 1,
+      records: 1,
+    };
+
+    function clearAdminSession() {
+      sessionStorage.removeItem('admin_auth_token');
+      sessionStorage.removeItem('admin_auth_user');
+      sessionStorage.removeItem('admin_auth_expires_at');
+      localStorage.removeItem('admin_auth_token');
+      localStorage.removeItem('admin_auth_user');
+    }
 
     function escapeHtml(value) {
       return String(value || '')
@@ -115,32 +138,18 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
         .replaceAll("'", '&#39;');
     }
 
-    function getTokenExpiryMs(token) {
-      try {
-        const payload = JSON.parse(atob(String(token).split('.')[1] || ''));
-        if (payload?.exp) return Number(payload.exp) * 1000;
-      } catch {}
-      return null;
-    }
-
-    function clearAdminSession() {
-      sessionStorage.removeItem('admin_auth_token');
-      sessionStorage.removeItem('admin_auth_user');
-      sessionStorage.removeItem('admin_auth_expires_at');
-      localStorage.removeItem('admin_auth_token');
-      localStorage.removeItem('admin_auth_user');
-    }
-
     function setActiveTab(tabName) {
       activeTab = tabName;
       const isApplications = tabName === 'applications';
       const isEvents = tabName === 'events';
       const isArticles = tabName === 'articles';
       const isArchive = tabName === 'archive';
+      const isRecords = tabName === 'records';
       applicationsTab.classList.toggle('hidden', !isApplications);
       eventsTab.classList.toggle('hidden', !isEvents);
       articlesTab.classList.toggle('hidden', !isArticles);
       archiveTab.classList.toggle('hidden', !isArchive);
+      recordsTab.classList.toggle('hidden', !isRecords);
       tabButtons.forEach((button) => {
         const active = button.dataset.tab === tabName;
         button.classList.toggle('bg-purple-600', active);
@@ -148,6 +157,29 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
         button.classList.toggle('bg-gray-100', !active);
         button.classList.toggle('text-gray-700', !active);
       });
+    }
+
+    function getPageSlice(items, tabName) {
+      const page = Number(pageState[tabName] || 1);
+      const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+      const safePage = Math.min(Math.max(page, 1), totalPages);
+      pageState[tabName] = safePage;
+      const start = (safePage - 1) * PAGE_SIZE;
+      return {
+        page: safePage,
+        totalPages,
+        items: items.slice(start, start + PAGE_SIZE),
+      };
+    }
+
+    function renderPager(tabName, totalPages, currentPage) {
+      if (totalPages <= 1) return '';
+      const buttons = Array.from({ length: totalPages }, (_, i) => {
+        const page = i + 1;
+        const active = page === currentPage;
+        return `<button type="button" class="pager-btn rounded-lg border px-3 py-1 text-sm font-bold ${active ? 'border-purple-700 bg-purple-700 text-white' : 'border-gray-300 bg-white text-gray-700'}" data-tab="${tabName}" data-page="${page}">${page}</button>`;
+      }).join('');
+      return `<div class="mt-4 flex flex-wrap items-center justify-center gap-2">${buttons}</div>`;
     }
 
     function showModal(title, bodyHtml, actionsHtml = '') {
@@ -167,7 +199,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
     async function loadNotifications() {
       if (!adminUser?.email) return;
       try {
-        const response = await fetch(`/api/admin/notifications?adminEmail=${encodeURIComponent(adminUser.email)}&limit=40`);
+        const response = await fetch('/api/admin/notifications?limit=40');
         const data = await response.json();
         if (!data.success) return;
 
@@ -183,21 +215,81 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
         notifList.innerHTML = data.notifications
           .map(
             (item) => `
-              <label class="block rounded-xl border p-3 ${item.is_read ? 'border-slate-200 bg-white' : 'border-purple-200 bg-purple-50'}">
+              <div class="block rounded-xl border p-3 ${item.is_read ? 'border-slate-200 bg-white' : 'border-purple-200 bg-purple-50'}">
                 <div class="flex items-start gap-3">
                   <input type="checkbox" class="notif-select mt-1" value="${item.id}" />
-                  <div class="flex-1">
+                  <button
+                    type="button"
+                    class="notif-open-btn flex-1 text-left"
+                    data-id="${item.id}"
+                    data-related-table="${escapeHtml(item.related_table || '')}"
+                    data-related-id="${Number(item.related_id || 0)}"
+                  >
                     <p class="text-xs font-bold uppercase tracking-wide ${item.is_read ? 'text-gray-500' : 'text-purple-700'}">${escapeHtml(item.type)}</p>
                     <p class="mt-1 text-sm font-semibold text-slate-900">${escapeHtml(item.title || 'Bildirim')}</p>
                     <p class="mt-1 text-xs text-slate-600">${escapeHtml(item.message || '')}</p>
-                  </div>
+                  </button>
                 </div>
-              </label>
+              </div>
             `
           )
           .join('');
+
+        notifList.querySelectorAll('.notif-open-btn').forEach((button) => {
+          button.addEventListener('click', async () => {
+            const notificationId = Number(button.dataset.id || '0');
+            const relatedTable = String(button.dataset.relatedTable || '');
+            const relatedId = Number(button.dataset.relatedId || '0');
+            if (notificationId > 0) {
+              await fetch('/api/admin/notifications', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ notificationId }),
+              });
+            }
+            notifPanel.classList.add('hidden');
+            await openNotificationTarget(relatedTable, relatedId);
+            await loadNotifications();
+          });
+        });
       } catch (error) {
         notifList.innerHTML = '<p class="rounded-lg bg-red-50 p-3 text-sm text-red-700">Bildirimler yuklenemedi.</p>';
+      }
+    }
+
+    async function openNotificationTarget(relatedTable, relatedId) {
+      if (relatedTable === 'applications') {
+        setActiveTab('applications');
+        await loadApplications();
+        const app = applicationCache.find((item) => Number(item.id) === Number(relatedId));
+        if (app) showApplicationDetail(app);
+        return;
+      }
+
+      if (relatedTable === 'event_proposals') {
+        setActiveTab('events');
+        await loadEventProposals();
+        const event = eventCache.find((item) => Number(item.id) === Number(relatedId));
+        if (event) showEventDetail(event);
+        return;
+      }
+
+      if (relatedTable === 'articles') {
+        setActiveTab('articles');
+        await loadArticleSubmissions();
+        if (relatedId > 0) {
+          const result = await fetch(`/api/admin/articles?id=${relatedId}`).then((r) => r.json());
+          if (result.success && result.data) showArticleDetail(result.data);
+        }
+        return;
+      }
+
+      if (relatedTable === 'newspaper_archives') {
+        setActiveTab('archive');
+        await loadArchiveSubmissions();
+        const archive = archiveAllCache.find((item) => Number(item.id) === Number(relatedId))
+          || archiveCache.find((item) => Number(item.id) === Number(relatedId));
+        if (archive) showArchiveDetail(archive);
       }
     }
 
@@ -213,7 +305,8 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
           return;
         }
 
-        applicationsTab.innerHTML = applicationCache.map((app) => `
+        const pagination = getPageSlice(applicationCache, 'applications');
+        applicationsTab.innerHTML = pagination.items.map((app) => `
           <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
             <div class="flex items-start justify-between gap-4">
               <div class="min-w-0 flex-1">
@@ -226,13 +319,19 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
               </div>
             </div>
           </article>
-        `).join('');
+        `).join('') + renderPager('applications', pagination.totalPages, pagination.page);
 
         applicationsTab.querySelectorAll('.app-detail-btn').forEach((button) => {
           button.addEventListener('click', () => {
             const appId = Number(button.dataset.id);
             const app = applicationCache.find((item) => Number(item.id) === appId);
             if (app) showApplicationDetail(app);
+          });
+        });
+        applicationsTab.querySelectorAll('.pager-btn').forEach((button) => {
+          button.addEventListener('click', () => {
+            pageState.applications = Number(button.dataset.page || '1');
+            loadApplications();
           });
         });
       } catch (error) {
@@ -252,7 +351,8 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
           return;
         }
 
-        eventsTab.innerHTML = eventCache.map((event) => `
+        const pagination = getPageSlice(eventCache, 'events');
+        eventsTab.innerHTML = pagination.items.map((event) => `
           <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
             <div class="flex items-start justify-between gap-4">
               <div class="min-w-0 flex-1">
@@ -262,7 +362,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
                 <p class="mt-2 text-sm text-gray-700">${escapeHtml((event.description || '').slice(0, 180))}</p>
                 <div class="mt-2 flex flex-wrap gap-2 text-xs">
                   <span class="rounded-full bg-purple-100 px-3 py-1 font-semibold text-purple-700">Durum: ${escapeHtml(event.status)}</span>
-                  <span class="rounded-full bg-gray-100 px-3 py-1 font-semibold text-gray-700">Onay: ${event.approval_summary?.approvedCount || 0}/${event.approval_summary?.adminCount || 0}</span>
+                  <span class="rounded-full bg-gray-100 px-3 py-1 font-semibold text-gray-700">Onay: ${event.approval_summary?.approvedCount || 0}/${event.approval_summary?.requiredCount || 1}</span>
                   <span class="rounded-full bg-rose-100 px-3 py-1 font-semibold text-rose-700">Red: ${event.approval_summary?.rejectedCount || 0}</span>
                 </div>
               </div>
@@ -273,7 +373,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
               </div>
             </div>
           </article>
-        `).join('');
+        `).join('') + renderPager('events', pagination.totalPages, pagination.page);
 
         eventsTab.querySelectorAll('.event-detail-btn').forEach((button) => {
           button.addEventListener('click', () => {
@@ -295,6 +395,12 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
             await submitEventDecision(proposalId, 'reject');
           });
         });
+        eventsTab.querySelectorAll('.pager-btn').forEach((button) => {
+          button.addEventListener('click', () => {
+            pageState.events = Number(button.dataset.page || '1');
+            loadEventProposals();
+          });
+        });
       } catch (error) {
         eventsTab.innerHTML = '<p class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">Etkinlik onerileri yuklenemedi.</p>';
       }
@@ -314,7 +420,8 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
           return;
         }
 
-        articlesTab.innerHTML = pendingArticles.map((item) => `
+        const pagination = getPageSlice(pendingArticles, 'articles');
+        articlesTab.innerHTML = pagination.items.map((item) => `
           <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
             <div class="flex items-start justify-between gap-4">
               <div class="min-w-0 flex-1">
@@ -323,7 +430,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
                 <p class="mt-2 text-sm text-gray-700 line-clamp-2">${escapeHtml(item.excerpt || '')}</p>
                 <div class="mt-2 flex flex-wrap gap-2 text-xs">
                   <span class="rounded-full bg-purple-100 px-3 py-1 font-semibold text-purple-700">Durum: ${escapeHtml(item.status)}</span>
-                  <span class="rounded-full bg-gray-100 px-3 py-1 font-semibold text-gray-700">Onay: ${item.approval_summary?.approvedCount || 0}/${item.approval_summary?.adminCount || 0}</span>
+                  <span class="rounded-full bg-gray-100 px-3 py-1 font-semibold text-gray-700">Onay: ${item.approval_summary?.approvedCount || 0} (Gerekli: ${item.approval_summary?.requiredCount || 1})</span>
                   <span class="rounded-full bg-rose-100 px-3 py-1 font-semibold text-rose-700">Red: ${item.approval_summary?.rejectedCount || 0}</span>
                 </div>
               </div>
@@ -335,7 +442,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
               </div>
             </div>
           </article>
-        `).join('');
+        `).join('') + renderPager('articles', pagination.totalPages, pagination.page);
 
         articlesTab.querySelectorAll('.article-detail-btn').forEach((button) => {
           button.addEventListener('click', async () => {
@@ -363,6 +470,12 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
             await submitArticleDecision(Number(button.dataset.id), 'reject');
           });
         });
+        articlesTab.querySelectorAll('.pager-btn').forEach((button) => {
+          button.addEventListener('click', () => {
+            pageState.articles = Number(button.dataset.page || '1');
+            loadArticleSubmissions();
+          });
+        });
       } catch (error) {
         articlesTab.innerHTML = '<p class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">Yazi onaylari yuklenemedi.</p>';
       }
@@ -382,7 +495,8 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
           return;
         }
 
-        archiveTab.innerHTML = archiveCache.map((item) => `
+        const pagination = getPageSlice(archiveCache, 'archive');
+        archiveTab.innerHTML = pagination.items.map((item) => `
           <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
             <div class="flex items-start justify-between gap-4">
               <div class="min-w-0 flex-1">
@@ -403,7 +517,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
               </div>
             </div>
           </article>
-        `).join('');
+        `).join('') + renderPager('archive', pagination.totalPages, pagination.page);
 
         archiveTab.querySelectorAll('.archive-detail-btn').forEach((button) => {
           button.addEventListener('click', () => {
@@ -423,8 +537,175 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
             await submitArchiveDecision(Number(button.dataset.id), 'reject');
           });
         });
+        archiveTab.querySelectorAll('.pager-btn').forEach((button) => {
+          button.addEventListener('click', () => {
+            pageState.archive = Number(button.dataset.page || '1');
+            loadArchiveSubmissions();
+          });
+        });
       } catch (error) {
         archiveTab.innerHTML = '<p class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">Arsiv kayitlari yuklenemedi.</p>';
+      }
+    }
+
+    async function setEventVisibility(item, shouldPublish, reason = null) {
+      if (shouldPublish) {
+        const response = await fetch(`/api/admin/event-proposals/${item.id}/approve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ comment: 'Kayit listesi uzerinden tekrar yayina alindi.' }),
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.success) {
+          showToast(payload.error || 'Etkinlik geri yuklenemedi.', 'error');
+          return;
+        }
+        showToast('Etkinlik yeniden yayin listesine alindi.', 'success');
+        return;
+      }
+
+      const response = await fetch('/api/admin/event-proposals', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: item.id, notes: reason ? `Kayit listesinden gizlendi. Sebep: ${reason}` : 'Kayit listesinden sayfadan gizlendi.' }),
+      });
+      const payload = await response.json();
+      if (!response.ok || !payload.success) {
+        showToast(payload.error || 'Etkinlik gizlenemedi.', 'error');
+        return;
+      }
+      showToast('Etkinlik sayfadan gizlendi.', 'success');
+    }
+
+    async function setArchiveVisibility(item, shouldPublish, reason = null) {
+      const endpoint = `/api/admin/archive/${item.id}/${shouldPublish ? 'approve' : 'reject'}`;
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          comment: shouldPublish
+            ? 'Kayit listesi uzerinden tekrar yayina alindi.'
+            : (reason ? `Kayit listesinden gizlendi. Sebep: ${reason}` : 'Kayit listesinden sayfadan gizlendi.'),
+        }),
+      });
+      const payload = await response.json();
+      if (!response.ok || !payload.success) {
+        showToast(payload.error || 'Arsiv guncellenemedi.', 'error');
+        return;
+      }
+      showToast(shouldPublish ? 'Arsiv kaydi yeniden yayina alindi.' : 'Arsiv kaydi sayfadan gizlendi.', 'success');
+    }
+
+    async function loadRecordsTab() {
+      recordsTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">Kayit listesi yukleniyor...</p>';
+      try {
+        const [eventResp, archiveResp] = await Promise.all([
+          fetch('/api/admin/event-proposals'),
+          fetch('/api/admin/archive'),
+        ]);
+        const eventData = await eventResp.json();
+        const archiveData = await archiveResp.json();
+        const eventRows = Array.isArray(eventData) ? eventData : [];
+        const archiveRows = archiveData?.success && Array.isArray(archiveData.data) ? archiveData.data : [];
+
+        const eventRecords = eventRows
+          .filter((item) => ['approved', 'reviewed'].includes(String(item.status)))
+          .map((item) => ({
+            type: 'event',
+            id: Number(item.id),
+            title: item.title || 'Etkinlik',
+            status: String(item.status || 'reviewed'),
+            subtitle: `${item.province || '-'} • ${item.category || '-'}`,
+            raw: item,
+            createdAt: item.created_at || item.reviewed_at || '',
+          }));
+        const archiveRecords = archiveRows
+          .filter((item) => ['approved', 'reviewed', 'rejected'].includes(String(item.status)))
+          .map((item) => ({
+            type: 'archive',
+            id: Number(item.id),
+            title: item.title || 'Arsiv',
+            status: String(item.status || 'reviewed'),
+            subtitle: `${item.publication_name || '-'} • ${item.publication_year || '-'}`,
+            raw: item,
+            createdAt: item.created_at || item.reviewed_at || '',
+          }));
+
+        const allRecords = [...eventRecords, ...archiveRecords]
+          .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+
+        if (!allRecords.length) {
+          recordsTab.innerHTML = '<p class="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-500">Gosterilecek kayit bulunamadi.</p>';
+          return;
+        }
+
+        const pagination = getPageSlice(allRecords, 'records');
+        recordsTab.innerHTML = pagination.items.map((record) => {
+          const isVisible = record.status === 'approved';
+          const actionLabel = isVisible ? 'Sayfadan Gizle' : 'Geri Yukle';
+          const statusLabel = isVisible ? 'Yayinda' : 'Gizli';
+          return `
+            <article class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div class="min-w-0 flex-1">
+                  <p class="text-xs font-bold uppercase tracking-wide text-slate-500">${record.type === 'event' ? 'Etkinlik' : 'Gazete Arsivi'}</p>
+                  <h3 class="mt-1 text-base font-black text-slate-900">${escapeHtml(record.title)}</h3>
+                  <p class="mt-1 text-sm text-slate-600">${escapeHtml(record.subtitle)}</p>
+                  <p class="mt-2 text-xs font-semibold uppercase tracking-wide ${isVisible ? 'text-emerald-700' : 'text-amber-700'}">${statusLabel}</p>
+                </div>
+                <div class="shrink-0">
+                  <button
+                    type="button"
+                    class="record-toggle-btn rounded-lg px-3 py-2 text-sm font-bold ${isVisible ? 'bg-rose-600 text-white hover:bg-rose-700' : 'bg-emerald-600 text-white hover:bg-emerald-700'}"
+                    data-type="${record.type}"
+                    data-id="${record.id}"
+                    data-status="${record.status}"
+                  >${actionLabel}</button>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('') + renderPager('records', pagination.totalPages, pagination.page);
+
+        recordsTab.querySelectorAll('.record-toggle-btn').forEach((button) => {
+          button.addEventListener('click', async () => {
+            const type = String(button.dataset.type || '');
+            const id = Number(button.dataset.id || '0');
+            const status = String(button.dataset.status || '');
+            const item = allRecords.find((entry) => entry.type === type && entry.id === id);
+            if (!item) return;
+            const shouldPublish = status !== 'approved';
+            const confirmMessage = shouldPublish
+              ? 'Bu kaydi tekrar yayina almak istiyor musun?'
+              : 'Bu kaydi sayfadan gizlemek istiyor musun?';
+            const ok = await (ui ? ui.confirm(confirmMessage, 'Onay', 'Evet', 'Iptal') : Promise.resolve(false));
+            if (!ok) return;
+            let reason = null;
+            if (!shouldPublish) {
+              reason = await askText('Silinme/gizleme sebebi:', 'Sebep yazin');
+              if (!reason || !reason.trim()) {
+                showToast('Sebep girmek zorunlu.', 'warning');
+                return;
+              }
+            }
+            if (type === 'event') {
+              await setEventVisibility(item.raw, shouldPublish, reason ? reason.trim() : null);
+            } else {
+              await setArchiveVisibility(item.raw, shouldPublish, reason ? reason.trim() : null);
+            }
+            await loadRecordsTab();
+            await loadNotifications();
+          });
+        });
+
+        recordsTab.querySelectorAll('.pager-btn').forEach((button) => {
+          button.addEventListener('click', () => {
+            pageState.records = Number(button.dataset.page || '1');
+            loadRecordsTab();
+          });
+        });
+      } catch (error) {
+        recordsTab.innerHTML = '<p class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">Kayit listesi yuklenemedi.</p>';
       }
     }
 
@@ -443,7 +724,11 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
           <p><strong>Odak:</strong> ${escapeHtml(item.focus_topic || '-')}</p>
           <p><strong>Durum:</strong> ${escapeHtml(item.status)}</p>
           <p><strong>Ozet:</strong> ${escapeHtml(item.summary || '-')}</p>
+          <p><strong>Detayli metin:</strong></p>
+          <p class="whitespace-pre-wrap rounded-lg bg-gray-50 p-2">${escapeHtml(item.quote_text || '-')}</p>
+          <p><strong>Kapak URL:</strong> ${item.cover_image_url ? `<a class="text-purple-700 underline" href="${escapeHtml(item.cover_image_url)}" target="_blank" rel="noreferrer">Kapagi ac</a>` : '-'}</p>
           <p><strong>PDF:</strong> ${item.pdf_url ? `<a class="text-purple-700 underline" href="${escapeHtml(item.pdf_url)}" download>PDF indir</a>` : '-'}</p>
+          <p><strong>Kaynak:</strong> ${item.source_url ? `<a class="text-purple-700 underline" href="${escapeHtml(item.source_url)}" target="_blank" rel="noreferrer">Baglantiyi ac</a>` : '-'}</p>
           <div>
             <p class="mb-1 text-xs font-bold uppercase tracking-wide text-gray-500">Admin karar gecmisi</p>
             <ul class="space-y-1">${approvalItems || '<li class="rounded-lg bg-gray-50 p-2 text-xs">Henuz karar yok.</li>'}</ul>
@@ -530,6 +815,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
           <p><strong>Kategori:</strong> ${escapeHtml(article.category || '-')}</p>
           <p><strong>Slug:</strong> /${escapeHtml(article.slug || '-')}</p>
           <p><strong>Durum:</strong> ${escapeHtml(article.status)}</p>
+          <p><strong>Okunma:</strong> ${escapeHtml(article.tracked_view_count || 0)}</p>
           <p><strong>Kisa metin:</strong> ${escapeHtml(article.excerpt || '-')}</p>
           <p><strong>Uzun metin:</strong> ${escapeHtml(String(article.body || '').slice(0, 600))}${String(article.body || '').length > 600 ? '...' : ''}</p>
           <div>
@@ -562,7 +848,6 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
           id,
           status,
           notes,
-          reviewedBy: adminUser?.email || 'admin',
         }),
       });
       closeModal();
@@ -578,7 +863,6 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          adminEmail: adminUser?.email,
           comment,
         }),
       });
@@ -602,7 +886,6 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          adminEmail: adminUser?.email,
           comment,
         }),
       });
@@ -629,7 +912,6 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
         body: JSON.stringify({
           action: 'comment',
           articleId,
-          adminEmail: adminUser?.email,
           comment: comment.trim(),
         }),
       });
@@ -652,7 +934,6 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          adminEmail: adminUser?.email,
           comment,
         }),
       });
@@ -670,10 +951,9 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
     }
 
     function initAuth() {
-      const token = sessionStorage.getItem('admin_auth_token');
       const rawUser = sessionStorage.getItem('admin_auth_user');
       const expiresAtRaw = sessionStorage.getItem('admin_auth_expires_at');
-      if (!token || !rawUser) {
+      if (!rawUser) {
         clearAdminSession();
         authBox.innerHTML = 'Yetki bulunamadi. <a class="font-semibold text-purple-700 underline" href="/admin/login-email">Giris yap</a>.';
         setTimeout(() => window.location.replace('/admin/login-email'), 600);
@@ -681,9 +961,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
       }
 
       const expiresAt = Number(expiresAtRaw || '0');
-      const tokenExpiry = getTokenExpiryMs(token);
-      const effectiveExpiry = tokenExpiry ? Math.min(expiresAt || tokenExpiry, tokenExpiry) : expiresAt;
-      if (!effectiveExpiry || Date.now() >= effectiveExpiry) {
+      if (!expiresAt || Date.now() >= expiresAt) {
         clearAdminSession();
         authBox.innerHTML = 'Oturum suresi doldu. <a class="font-semibold text-purple-700 underline" href="/admin/login-email">Tekrar giris yap</a>.';
         setTimeout(() => window.location.replace('/admin/login-email'), 600);
@@ -703,8 +981,59 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
       return true;
     }
 
+    async function applyDeepLinkFromQuery() {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      const id = Number(params.get('id') || '0');
+      if (!tab) return;
+      if (tab === 'applications') {
+        setActiveTab('applications');
+        await loadApplications();
+        if (id > 0) {
+          const app = applicationCache.find((item) => Number(item.id) === id);
+          if (app) showApplicationDetail(app);
+        }
+        return;
+      }
+      if (tab === 'events') {
+        setActiveTab('events');
+        await loadEventProposals();
+        if (id > 0) {
+          const event = eventCache.find((item) => Number(item.id) === id);
+          if (event) showEventDetail(event);
+        }
+        return;
+      }
+      if (tab === 'archive') {
+        setActiveTab('archive');
+        await loadArchiveSubmissions();
+        if (id > 0) {
+          const archive = archiveAllCache.find((item) => Number(item.id) === id) || archiveCache.find((item) => Number(item.id) === id);
+          if (archive) showArchiveDetail(archive);
+        }
+        return;
+      }
+      if (tab === 'articles') {
+        setActiveTab('articles');
+        await loadArticleSubmissions();
+        if (id > 0) {
+          const result = await fetch(`/api/admin/articles?id=${id}`).then((r) => r.json());
+          if (result.success && result.data) showArticleDetail(result.data);
+        }
+        return;
+      }
+      if (tab === 'records') {
+        setActiveTab('records');
+        await loadRecordsTab();
+      }
+    }
+
     tabButtons.forEach((button) => {
-      button.addEventListener('click', () => setActiveTab(button.dataset.tab));
+      button.addEventListener('click', () => {
+        const tab = button.dataset.tab;
+        setActiveTab(tab);
+        if (tab === 'records') loadRecordsTab();
+      });
     });
 
     detailCloseBtn?.addEventListener('click', closeModal);
@@ -724,7 +1053,7 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
       await fetch('/api/admin/notifications', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ adminEmail: adminUser?.email, markAll: true }),
+        body: JSON.stringify({ markAll: true }),
       });
       await loadNotifications();
     });
@@ -738,9 +1067,15 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
       await fetch('/api/admin/notifications', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ adminEmail: adminUser?.email, notificationIds: ids }),
+        body: JSON.stringify({ notificationIds: ids }),
       });
       await loadNotifications();
+    });
+
+    logoutBtn?.addEventListener('click', async () => {
+      clearAdminSession();
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.replace('/admin/login-email');
     });
 
     document.addEventListener('click', (event) => {
@@ -755,7 +1090,9 @@ import AdminNotificationPanel from '../../components/AdminNotificationPanel.astr
       loadEventProposals();
       loadArticleSubmissions();
       loadArchiveSubmissions();
+      loadRecordsTab();
       loadNotifications();
+      applyDeepLinkFromQuery();
     }
   </script>
 </MainLayout>

@@ -6,7 +6,7 @@ import EventProposalForm from '../../components/EventProposalForm.astro';
 <MainLayout title="Etkinlikler">
   <div class="bg-gradient-to-r from-purple-600 to-purple-700 py-12 text-white">
     <div class="mx-auto max-w-6xl px-4 text-center">
-      <h1 class="app-h1 mb-4 text-4xl font-bold">Kampus Cadilari Etkinlik Takvimi</h1>
+      <h1 class="mt-3 text-4xl font-black leading-tight text-white md:text-5xl">Kampus Cadilari Etkinlik Takvimi</h1>
       <p class="text-lg text-purple-100">Onayli etkinlikleri takvimden takip et ve gun secerek sadece ad + il bilgisine hizla ulas.</p>
     </div>
   </div>
@@ -52,7 +52,7 @@ import EventProposalForm from '../../components/EventProposalForm.astro';
     <section id="proposeSection" class="py-8">
       <h2 class="mb-8 text-center text-3xl font-bold text-gray-900">Etkinlik Onerisinde Bulun</h2>
       <p class="mx-auto mb-8 max-w-2xl text-center text-gray-600">
-        Etkinlik oneriniz tum aktif adminlerin onayina gider. Tum onaylar tamamlaninca etkinlik yayina alinir.
+        Etkinlik oneriniz aktif adminlerin incelemesine gider. En az bir admin onayi ile etkinlik yayina alinir.
       </p>
       <EventProposalForm />
     </section>
@@ -208,14 +208,9 @@ import EventProposalForm from '../../components/EventProposalForm.astro';
       const todayKey = formatDateKey(new Date());
       const availableKeys = Array.from(eventsByDate.keys()).sort();
 
-      selectedDateKey = null;
-      if (eventsByDate.has(todayKey)) {
-        selectedDateKey = todayKey;
-      } else if (availableKeys.length > 0) {
-        selectedDateKey = availableKeys[0];
-        const [year, month] = selectedDateKey.split('-').map(Number);
-        activeMonth = new Date(year, month - 1, 1);
-      }
+      selectedDateKey = todayKey;
+      activeMonth = new Date();
+      activeMonth.setDate(1);
 
       renderCalendar();
       renderSelectedDay();

@@ -8,8 +8,10 @@
 
 :root {
   /* Primary Colors - Feminist Activism */
-  --color-purple-primary: #632F86;
-  --color-red-accent: #DA291C;
+  --color-purple-primary: #6e2c8a;
+  --color-red-accent: #e10600;
+  --color-purple-deep: #57216f;
+  --color-cream-soft: #fff9f4;
   
   /* Text Colors */
   --color-text-dark: #1a1a1a;
@@ -52,6 +54,17 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at top left, rgba(110, 44, 138, 0.08), transparent 28%),
+    radial-gradient(circle at top right, rgba(225, 6, 0, 0.07), transparent 24%);
+  z-index: -1;
+}
+
 .app-h1 {
   font-size: clamp(2rem, 4vw, 3.25rem);
   font-weight: 800;
@@ -59,6 +72,12 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.015em;
   color: #2b1643;
   text-wrap: balance;
+}
+
+.brand-chip {
+  border: 1px solid rgba(110, 44, 138, 0.18);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(249, 239, 244, 0.92));
+  box-shadow: 0 18px 36px rgba(64, 16, 80, 0.08);
 }
 
 h2 {
@@ -122,7 +141,7 @@ body.dark-mode .app-h1 {
 }
 
 .btn-primary:hover {
-  background-color: #4a2363;
+  background-color: #57216f;
 }
 
 .btn-secondary {
@@ -131,7 +150,132 @@ body.dark-mode .app-h1 {
 }
 
 .btn-secondary:hover {
-  background-color: #b81d12;
+  background-color: #b80000;
+}
+
+/* Brand Utility Overrides */
+.text-purple-600,
+.text-purple-700,
+.text-purple-800,
+.text-purple-900,
+.text-fuchsia-700 {
+  color: var(--color-purple-primary) !important;
+}
+
+.text-purple-100 {
+  color: #f0e6f5 !important;
+}
+
+.text-rose-700,
+.text-red-700,
+.text-red-800 {
+  color: var(--color-red-accent) !important;
+}
+
+.bg-purple-50,
+.bg-fuchsia-100 {
+  background-color: rgba(110, 44, 138, 0.08) !important;
+}
+
+.bg-purple-100 {
+  background-color: rgba(110, 44, 138, 0.14) !important;
+}
+
+.bg-purple-200 {
+  background-color: rgba(110, 44, 138, 0.2) !important;
+}
+
+.bg-purple-600,
+.bg-fuchsia-600 {
+  background-color: var(--color-purple-primary) !important;
+}
+
+.bg-rose-100,
+.bg-red-100,
+.bg-red-50 {
+  background-color: rgba(225, 6, 0, 0.08) !important;
+}
+
+.bg-rose-600,
+.bg-red-700 {
+  background-color: var(--color-red-accent) !important;
+}
+
+.border-purple-100,
+.border-purple-200,
+.border-purple-300 {
+  border-color: rgba(110, 44, 138, 0.24) !important;
+}
+
+.border-purple-500,
+.border-purple-600 {
+  border-color: var(--color-purple-primary) !important;
+}
+
+.border-red-200,
+.border-red-300,
+.border-rose-100 {
+  border-color: rgba(225, 6, 0, 0.24) !important;
+}
+
+.hover\:bg-purple-50:hover {
+  background-color: rgba(110, 44, 138, 0.1) !important;
+}
+
+.hover\:bg-purple-100:hover {
+  background-color: rgba(110, 44, 138, 0.16) !important;
+}
+
+.hover\:bg-purple-200:hover {
+  background-color: rgba(110, 44, 138, 0.22) !important;
+}
+
+.hover\:bg-purple-700:hover,
+.hover\:bg-fuchsia-700:hover {
+  background-color: var(--color-purple-deep) !important;
+}
+
+.hover\:bg-rose-200:hover {
+  background-color: rgba(225, 6, 0, 0.14) !important;
+}
+
+.hover\:bg-rose-700:hover,
+.hover\:bg-red-800:hover {
+  background-color: #b80000 !important;
+}
+
+.hover\:text-purple-600:hover,
+.hover\:text-purple-900:hover {
+  color: var(--color-purple-deep) !important;
+}
+
+.focus\:border-purple-600:focus {
+  border-color: var(--color-purple-primary) !important;
+}
+
+.focus\:ring-purple-500:focus {
+  --tw-ring-color: rgba(110, 44, 138, 0.3) !important;
+}
+
+.from-purple-600,
+.from-purple-700 {
+  --tw-gradient-from: var(--color-purple-primary) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgba(110, 44, 138, 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+.via-purple-700,
+.via-fuchsia-700 {
+  --tw-gradient-stops: var(--tw-gradient-from), var(--color-purple-deep) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
+
+.to-purple-700 {
+  --tw-gradient-to: var(--color-purple-deep) var(--tw-gradient-to-position) !important;
+}
+
+.to-pink-600,
+.to-rose-600 {
+  --tw-gradient-to: var(--color-red-accent) var(--tw-gradient-to-position) !important;
 }
 
 /* Container */

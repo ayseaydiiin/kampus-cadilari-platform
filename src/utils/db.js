@@ -361,6 +361,36 @@ export function getAdminUser(email) {
   }
 }
 
+export async function updateUserPassword(email, newPassword) {
+  const db = getDatabase();
+
+  try {
+    const safeEmail = String(email || '').trim().toLowerCase();
+    const safePassword = String(newPassword || '');
+
+    if (!safeEmail) {
+      return { success: false, error: 'Email gerekli' };
+    }
+    if (safePassword.length < 8) {
+      return { success: false, error: 'Yeni parola en az 8 karakter olmali' };
+    }
+
+    const user = db.prepare('SELECT id, email FROM users WHERE email = ?').get(safeEmail);
+    if (!user) {
+      return { success: false, error: 'Kullanici bulunamadi' };
+    }
+
+    const passwordHash = await bcrypt.hash(safePassword, 12);
+    db.prepare('UPDATE users SET password_hash = ? WHERE email = ?').run(passwordHash, safeEmail);
+    logActivity(user.id, 'password_changed', { email: safeEmail });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  } finally {
+    db.close();
+  }
+}
+
 export function getActiveAdmins() {
   const db = getDatabase();
   try {
@@ -907,13 +937,19 @@ export function getApplicationById(id) {
 export function updateApplicationStatus(id, status, reviewedBy = null, notes = null) {
   const db = getDatabase();
   try {
+    const allowedStatuses = new Set(['new', 'reviewed', 'approved', 'rejected']);
+    const safeStatus = allowedStatuses.has(status) ? status : null;
+    if (!safeStatus) {
+      return { success: false, error: 'Gecersiz basvuru durumu' };
+    }
+
     const stmt = db.prepare(`
       UPDATE applications
       SET status = ?, reviewed_at = CURRENT_TIMESTAMP, reviewed_by = ?, admin_notes = ?
       WHERE id = ?
     `);
-    stmt.run(status, reviewedBy || null, notes || null, id);
-    logActivity(null, 'application_updated', { applicationId: id, status });
+    stmt.run(safeStatus, reviewedBy || null, notes || null, id);
+    logActivity(null, 'application_updated', { applicationId: id, status: safeStatus });
     return { success: true };
   } catch (error) {
     return { success: false, error: error.message };
@@ -1167,13 +1203,19 @@ export function joinApprovedEvent({ eventId, name, email, message = null }) {
 export function updateEventProposalStatus(id, status, reviewedBy = null, notes = null) {
   const db = getDatabase();
   try {
+    const allowedStatuses = new Set(['new', 'reviewed', 'approved', 'rejected']);
+    const safeStatus = allowedStatuses.has(status) ? status : null;
+    if (!safeStatus) {
+      return { success: false, error: 'Gecersiz etkinlik durumu' };
+    }
+
     const stmt = db.prepare(`
       UPDATE event_proposals
       SET status = ?, reviewed_at = CURRENT_TIMESTAMP, reviewed_by = ?, admin_notes = ?
       WHERE id = ?
     `);
-    stmt.run(status, reviewedBy || null, notes || null, id);
-    logActivity(null, 'event_proposal_updated', { proposalId: id, status });
+    stmt.run(safeStatus, reviewedBy || null, notes || null, id);
+    logActivity(null, 'event_proposal_updated', { proposalId: id, status: safeStatus });
     return { success: true };
   } catch (error) {
     return { success: false, error: error.message };
@@ -1230,10 +1272,11 @@ export function recordProposalDecision({ proposalId, adminEmail, decision, comme
         .prepare(`SELECT COUNT(*) as count FROM event_proposal_approvals WHERE proposal_id = ? AND decision = 'approved'`)
         .get(proposalId).count;
       const adminCount = db.prepare('SELECT COUNT(*) as count FROM admin_users WHERE is_active = 1').get().count;
+      const requiredApprovals = 1;
 
       let status = 'reviewed';
-      if (hasReject) status = 'rejected';
-      else if (adminCount > 0 && approvals >= adminCount) status = 'approved';
+      if (decision === 'rejected' || hasReject) status = 'rejected';
+      else if (approvals >= requiredApprovals) status = 'approved';
 
       db.prepare(`
         UPDATE event_proposals
@@ -1246,6 +1289,7 @@ export function recordProposalDecision({ proposalId, adminEmail, decision, comme
         status,
         approvals,
         adminCount,
+        requiredApprovals,
         proposalTitle: proposal?.title || null,
       };
     });
@@ -1414,7 +1458,7 @@ export function getArchiveEntries(filters = {}) {
       params.push(filters.focus);
     }
 
-    query += ' ORDER BY publication_year DESC, created_at DESC';
+    query += ' ORDER BY datetime(created_at) DESC, id DESC';
 
     if (filters.limit) {
       const safeLimit = Math.max(1, Math.min(Number(filters.limit) || 12, 200));
@@ -1500,11 +1544,11 @@ export function recordArchiveDecision({ archiveId, adminEmail, decision, comment
       const approvals = db
         .prepare(`SELECT COUNT(*) as count FROM newspaper_archive_approvals WHERE archive_id = ? AND decision = 'approved'`)
         .get(archiveId).count;
-      const adminCount = db.prepare('SELECT COUNT(*) as count FROM admin_users WHERE is_active = 1').get().count;
+      const requiredApprovals = 1;
 
       let status = 'reviewed';
-      if (hasReject) status = 'rejected';
-      else if (adminCount > 0 && approvals >= adminCount) status = 'approved';
+      if (decision === 'rejected' || hasReject) status = 'rejected';
+      else if (approvals >= requiredApprovals) status = 'approved';
 
       db.prepare(`
         UPDATE newspaper_archives
@@ -1516,7 +1560,7 @@ export function recordArchiveDecision({ archiveId, adminEmail, decision, comment
         WHERE id = ?
       `).run(status, adminEmail, status, archiveId);
 
-      return { status, approvals, adminCount };
+      return { status, approvals, requiredApprovals };
     });
 
     const result = tx();
@@ -1610,7 +1654,14 @@ export function getParticipationStats() {
 export function getArticles(filters = {}) {
   const db = getDatabase();
   try {
-    let query = 'SELECT * FROM articles WHERE 1=1';
+    let query = `
+      SELECT
+        a.*,
+        COALESCE(v.view_count, 0) as tracked_view_count
+      FROM articles a
+      LEFT JOIN article_view_stats v ON v.slug = a.slug
+      WHERE 1=1
+    `;
     const params = [];
 
     if (filters.status && filters.status !== 'all') {
@@ -1658,14 +1709,7 @@ export function getArticles(filters = {}) {
 export function getPublishedArticles({ category = null, search = null } = {}) {
   const db = getDatabase();
   try {
-    let query = `
-      SELECT
-        a.*,
-        COALESCE(v.view_count, 0) as tracked_view_count
-      FROM articles a
-      LEFT JOIN article_view_stats v ON v.slug = a.slug
-      WHERE a.status = 'published'
-    `;
+    let query = `SELECT a.* FROM articles a WHERE a.status = 'published'`;
     const params = [];
 
     if (category) {
@@ -1688,14 +1732,7 @@ export function getPublishedArticles({ category = null, search = null } = {}) {
 export function getArticleBySlug(slug, { publishedOnly = false } = {}) {
   const db = getDatabase();
   try {
-    let query = `
-      SELECT
-        a.*,
-        COALESCE(v.view_count, 0) as tracked_view_count
-      FROM articles a
-      LEFT JOIN article_view_stats v ON v.slug = a.slug
-      WHERE a.slug = ?
-    `;
+    let query = `SELECT a.* FROM articles a WHERE a.slug = ?`;
     if (publishedOnly) {
       query += ` AND a.status = 'published'`;
     }
@@ -1708,7 +1745,14 @@ export function getArticleBySlug(slug, { publishedOnly = false } = {}) {
 export function getArticleById(id) {
   const db = getDatabase();
   try {
-    const article = db.prepare('SELECT * FROM articles WHERE id = ?').get(id);
+    const article = db.prepare(`
+      SELECT
+        a.*,
+        COALESCE(v.view_count, 0) as tracked_view_count
+      FROM articles a
+      LEFT JOIN article_view_stats v ON v.slug = a.slug
+      WHERE a.id = ?
+    `).get(id);
     if (!article) return null;
 
     const approvals = db.prepare(`
@@ -1878,17 +1922,32 @@ export function updateArticle({
   }
 }
 
-export function deleteArticle(id) {
+export function deleteArticle(id, { reason = null, adminEmail = null } = {}) {
   const db = getDatabase();
   try {
-    const article = db.prepare('SELECT slug FROM articles WHERE id = ?').get(id);
-    db.prepare('DELETE FROM article_approvals WHERE article_id = ?').run(id);
-    db.prepare('DELETE FROM article_comments WHERE article_id = ?').run(id);
-    if (article?.slug) {
-      db.prepare('DELETE FROM article_view_stats WHERE slug = ?').run(article.slug);
+    const article = db.prepare('SELECT id, title FROM articles WHERE id = ?').get(id);
+    if (!article) {
+      return { success: false, error: 'Yazi bulunamadi' };
     }
-    db.prepare('DELETE FROM articles WHERE id = ?').run(id);
-    logActivity(null, 'article_deleted', { id });
+
+    db.prepare(`
+      UPDATE articles
+      SET status = 'rejected',
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(id);
+
+    if (adminEmail) {
+      createNotificationForAllAdmins({
+        type: 'article_hidden',
+        title: `Yazi listeden kaldirildi: ${article.title}`,
+        message: `${adminEmail} yaziyi listeden kaldirdi.${reason ? ` Sebep: ${reason}` : ''}`,
+        related_table: 'articles',
+        related_id: Number(id),
+      });
+    }
+
+    logActivity(null, 'article_hidden', { id, reason: reason || null, adminEmail: adminEmail || null });
     return { success: true };
   } catch (error) {
     return { success: false, error: error.message };
@@ -1972,8 +2031,8 @@ export function recordArticleDecision({ articleId, adminEmail, decision, comment
       const adminCount = db.prepare('SELECT COUNT(*) as count FROM admin_users WHERE is_active = 1').get().count;
 
       let status = 'pending_approval';
-      if (hasReject) status = 'rejected';
-      else if (adminCount > 0 && approvals >= adminCount) status = 'published';
+      if (decision === 'rejected' || hasReject) status = 'rejected';
+      else if (approvals >= 1) status = 'published';
 
       db.prepare(`
         UPDATE articles

@@ -6,15 +6,19 @@ import {
   deleteArticle,
   addArticleComment,
 } from '../../../utils/db.js';
+import { requireAdmin } from '../../../utils/adminAuth.js';
 
 export const prerender = false;
 
 const headers = {
   'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': '*',
 };
 
-export async function GET({ url }) {
+export async function GET(context) {
+  const auth = requireAdmin(context);
+  if (!auth.ok) return auth.response;
+
+  const { url } = context;
   try {
     const id = Number(url.searchParams.get('id') || '0');
     if (id > 0) {
@@ -32,23 +36,27 @@ export async function GET({ url }) {
   }
 }
 
-export async function POST({ request }) {
+export async function POST(context) {
+  const auth = requireAdmin(context);
+  if (!auth.ok) return auth.response;
+
+  const { request } = context;
   try {
     const data = await request.json();
     const action = data.action || 'save';
 
     if (action === 'comment') {
-      const { articleId, adminEmail, comment } = data;
-      if (!articleId || !adminEmail || !comment) {
+      const { articleId, comment } = data;
+      if (!articleId || !comment) {
         return new Response(
-          JSON.stringify({ success: false, error: 'articleId, adminEmail ve comment zorunlu' }),
+          JSON.stringify({ success: false, error: 'articleId ve comment zorunlu' }),
           { status: 400, headers }
         );
       }
 
       const result = addArticleComment({
         articleId: Number(articleId),
-        adminEmail: String(adminEmail).trim(),
+        adminEmail: auth.admin.email,
         comment: String(comment).trim(),
       });
 
@@ -59,7 +67,7 @@ export async function POST({ request }) {
       return new Response(JSON.stringify({ success: true, id: result.id }), { status: 200, headers });
     }
 
-    const { id, title, slug, body, category, status, excerpt, image_url, adminEmail } = data;
+    const { id, title, slug, body, category, status, excerpt, image_url } = data;
     if (!title || !slug || !body) {
       return new Response(JSON.stringify({ success: false, error: 'title, slug ve body zorunlu' }), { status: 400, headers });
     }
@@ -75,8 +83,8 @@ export async function POST({ request }) {
     };
 
     const result = id
-      ? updateArticle({ id: Number(id), ...payload, updated_by: adminEmail || null })
-      : createArticle({ ...payload, created_by: adminEmail || null });
+      ? updateArticle({ id: Number(id), ...payload, updated_by: auth.admin.email })
+      : createArticle({ ...payload, created_by: auth.admin.email });
 
     if (!result.success) {
       return new Response(JSON.stringify(result), { status: 400, headers });
@@ -91,14 +99,18 @@ export async function POST({ request }) {
   }
 }
 
-export async function DELETE({ request }) {
+export async function DELETE(context) {
+  const auth = requireAdmin(context);
+  if (!auth.ok) return auth.response;
+
+  const { request } = context;
   try {
     const data = await request.json();
-    const { id } = data;
+    const { id, reason } = data;
     if (!id) {
       return new Response(JSON.stringify({ success: false, error: 'id zorunlu' }), { status: 400, headers });
     }
-    const result = deleteArticle(Number(id));
+    const result = deleteArticle(Number(id), { reason: reason ? String(reason).trim() : null, adminEmail: auth.admin.email });
     if (!result.success) {
       return new Response(JSON.stringify(result), { status: 500, headers });
     }

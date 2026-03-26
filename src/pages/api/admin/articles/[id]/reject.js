@@ -1,27 +1,31 @@
 import { recordArticleDecision, getArticleApprovals, getArticleById } from '../../../../../utils/db.js';
+import { requireAdmin } from '../../../../../utils/adminAuth.js';
 
 export const prerender = false;
 
 const headers = {
   'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': '*',
 };
 
-export async function POST({ params, request }) {
+export async function POST(context) {
+  const auth = requireAdmin(context);
+  if (!auth.ok) return auth.response;
+
+  const { params, request } = context;
   try {
     const articleId = Number(params.id);
-    const { adminEmail, comment } = await request.json();
+    const { comment } = await request.json();
 
-    if (!articleId || !adminEmail) {
+    if (!articleId) {
       return new Response(
-        JSON.stringify({ success: false, error: 'id ve adminEmail zorunlu' }),
+        JSON.stringify({ success: false, error: 'id zorunlu' }),
         { status: 400, headers }
       );
     }
 
     const decision = recordArticleDecision({
       articleId,
-      adminEmail: String(adminEmail).trim(),
+      adminEmail: auth.admin.email,
       decision: 'rejected',
       comment: comment ? String(comment).trim() : null,
     });

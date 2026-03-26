@@ -6,7 +6,7 @@ import EventProposalForm from '../../components/EventProposalForm.astro';
 <MainLayout title="Events" currentLang="en">
   <div class="bg-gradient-to-r from-purple-600 to-purple-700 py-12 text-white">
     <div class="mx-auto max-w-6xl px-4 text-center">
-      <h1 class="app-h1 mb-4 text-4xl font-bold">Campus Witches Event Calendar</h1>
+      <h1 class="mt-3 text-4xl font-black leading-tight text-white md:text-5xl">Campus Witches Event Calendar</h1>
       <p class="text-lg text-purple-100">Track approved events on the calendar and click a day to see only event title and province.</p>
     </div>
   </div>
@@ -52,7 +52,7 @@ import EventProposalForm from '../../components/EventProposalForm.astro';
     <section id="proposeSection" class="py-8">
       <h2 class="mb-8 text-center text-3xl font-bold text-gray-900">Submit an Event Proposal</h2>
       <p class="mx-auto mb-8 max-w-2xl text-center text-gray-600">
-        Your event proposal is sent to all active admins for approval. The event is published when all approvals are complete.
+        Your event proposal is sent to active admins for review. The event is published once at least one admin approves it.
       </p>
       <EventProposalForm lang="en" />
     </section>
@@ -208,14 +208,9 @@ import EventProposalForm from '../../components/EventProposalForm.astro';
       const todayKey = formatDateKey(new Date());
       const availableKeys = Array.from(eventsByDate.keys()).sort();
 
-      selectedDateKey = null;
-      if (eventsByDate.has(todayKey)) {
-        selectedDateKey = todayKey;
-      } else if (availableKeys.length > 0) {
-        selectedDateKey = availableKeys[0];
-        const [year, month] = selectedDateKey.split('-').map(Number);
-        activeMonth = new Date(year, month - 1, 1);
-      }
+      selectedDateKey = todayKey;
+      activeMonth = new Date();
+      activeMonth.setDate(1);
 
       renderCalendar();
       renderSelectedDay();

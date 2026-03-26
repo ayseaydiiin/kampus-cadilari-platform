@@ -5,11 +5,15 @@ import {
   getArticleCount,
   getArchiveStats,
 } from '../../../utils/db.js';
+import { requireAdmin } from '../../../utils/adminAuth.js';
 
 export const prerender = false;
 
-export async function GET() {
-  const headers = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' };
+export async function GET(context) {
+  const auth = requireAdmin(context);
+  if (!auth.ok) return auth.response;
+
+  const headers = { 'Content-Type': 'application/json' };
   try {
     const applications = getApplicationStats();
     const proposals = getEventProposalStats();

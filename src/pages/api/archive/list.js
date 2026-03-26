@@ -16,16 +16,19 @@ export async function GET({ url }) {
     const lang = url.searchParams.get('lang') === 'en' ? 'en' : 'tr';
     const limit = Number(url.searchParams.get('limit') || 0);
 
-    const filters = {};
-    if (decade && decade !== 'all') filters.decade = decade;
-    if (search) filters.search = search;
-    if (focus && focus !== 'all') filters.focus = focus;
-    if (limit > 0) filters.limit = limit;
-
-    const itemsRaw = getApprovedArchiveEntries(filters);
+    const itemsRaw = getApprovedArchiveEntries();
     const allApprovedRaw = getApprovedArchiveEntries();
-    const items = lang === 'en' ? itemsRaw.map((item) => toEnglishArchiveItem(item)) : itemsRaw;
+    const normalizedSearch = String(search || '').trim().toLowerCase();
+    const localizedItems = lang === 'en' ? itemsRaw.map((item) => toEnglishArchiveItem(item)) : itemsRaw;
+    const items = localizedItems.filter((item) => {
+      if (decade && decade !== 'all' && item.decade !== decade) return false;
+      if (focus && focus !== 'all' && item.focus_topic !== focus) return false;
+      if (!normalizedSearch) return true;
+      const haystack = `${item.publication_name || ''} ${item.title || ''} ${item.focus_topic || ''} ${item.summary || ''}`.toLowerCase();
+      return haystack.includes(normalizedSearch);
+    });
     const allApproved = lang === 'en' ? allApprovedRaw.map((item) => toEnglishArchiveItem(item)) : allApprovedRaw;
+    const limitedItems = limit > 0 ? items.slice(0, Math.min(limit, 200)) : items;
 
     const decades = [...new Set(allApproved.map((item) => item.decade).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b, lang === 'en' ? 'en' : 'tr'));
@@ -35,7 +38,7 @@ export async function GET({ url }) {
     return new Response(
       JSON.stringify({
         success: true,
-        items,
+        items: limitedItems,
         meta: {
           total: allApproved.length,
           filtered: items.length,

@@ -1,4 +1,4 @@
----
+﻿---
 // src/components/LanguageSwitcher.astro
 interface Props {
   currentLang?: 'tr' | 'en';
@@ -7,27 +7,27 @@ interface Props {
 const { currentLang = 'tr' } = Astro.props;
 ---
 
-<div class="fixed top-4 right-4 z-50 flex gap-2">
-  <a 
-    href="/" 
-    class={`px-3 py-2 rounded font-semibold transition ${
-      currentLang === 'tr' 
-        ? 'bg-purple-600 text-white' 
+<div class="fixed bottom-4 right-4 z-50 flex gap-1 rounded-full bg-white/90 p-1 shadow-lg ring-1 ring-[rgba(123,55,148,0.18)] backdrop-blur md:bottom-auto md:right-4 md:top-4 md:gap-2 md:rounded-lg md:bg-transparent md:p-0 md:shadow-none md:ring-0">
+  <a
+    href="/"
+    class={`inline-flex h-9 min-w-[3.25rem] items-center justify-center rounded-full px-2.5 text-sm font-bold transition md:h-auto md:min-w-0 md:rounded md:px-3 md:py-2 md:text-base md:font-semibold ${
+      currentLang === 'tr'
+        ? 'bg-purple-600 text-white'
         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
     }`}
-    title="Türkçe"
+    title="Turkish"
   >
-    🇹🇷 TR
+    TR
   </a>
-  <a 
-    href="/en/" 
-    class={`px-3 py-2 rounded font-semibold transition ${
-      currentLang === 'en' 
-        ? 'bg-purple-600 text-white' 
+  <a
+    href="/en/"
+    class={`inline-flex h-9 min-w-[3.25rem] items-center justify-center rounded-full px-2.5 text-sm font-bold transition md:h-auto md:min-w-0 md:rounded md:px-3 md:py-2 md:text-base md:font-semibold ${
+      currentLang === 'en'
+        ? 'bg-purple-600 text-white'
         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
     }`}
     title="English"
   >
-    🇬🇧 EN
+    EN
   </a>
 </div>

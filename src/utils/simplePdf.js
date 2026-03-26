@@ -1,4 +1,4 @@
-const A4_WIDTH = 595;
+﻿const A4_WIDTH = 595;
 const A4_HEIGHT = 842;
 const MARGIN_X = 48;
 const MARGIN_TOP = 794;
@@ -7,14 +7,52 @@ const LINE_HEIGHT = 14;
 const MAX_LINES_PER_PAGE = 50;
 const CHARS_PER_LINE = 92;
 
+const TURKISH_CP1254_MAP = {
+  'Ğ': 208,
+  'İ': 221,
+  'Ş': 222,
+  'ğ': 240,
+  'ı': 253,
+  'ş': 254,
+};
+
 function normalizeText(value) {
   return String(value || '')
     .replace(/\r\n/g, '\n')
     .replace(/\r/g, '\n')
-    .replace(/\t/g, '  ')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^\x20-\x7E\n]/g, '?');
+    .replace(/\t/g, '  ');
+}
+
+function toPdfAnsiByteString(value) {
+  const input = normalizeText(value)
+    .normalize('NFC')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/\u2026/g, '...')
+    .replace(/[\u2013\u2014]/g, '-')
+    .replace(/\u00A0/g, ' ');
+
+  let output = '';
+  for (const char of input) {
+    if (Object.prototype.hasOwnProperty.call(TURKISH_CP1254_MAP, char)) {
+      output += String.fromCharCode(TURKISH_CP1254_MAP[char]);
+      continue;
+    }
+
+    const codePoint = char.codePointAt(0);
+    if (typeof codePoint !== 'number') {
+      output += '?';
+      continue;
+    }
+
+    if (codePoint >= 0 && codePoint <= 255) {
+      output += String.fromCharCode(codePoint);
+    } else {
+      output += '?';
+    }
+  }
+
+  return output;
 }
 
 function escapePdfText(value) {
@@ -92,7 +130,7 @@ function buildContentStream(lines) {
   commands.push(`${MARGIN_X} ${MARGIN_TOP} Td`);
 
   lines.forEach((line, index) => {
-    commands.push(`(${escapePdfText(line)}) Tj`);
+    commands.push(`(${escapePdfText(toPdfAnsiByteString(line))}) Tj`);
     if (index < lines.length - 1) {
       commands.push('T*');
     }
@@ -107,11 +145,11 @@ function createObjectTable(objects, rootId, infoId) {
   const offsets = [0];
 
   for (let i = 1; i < objects.length; i += 1) {
-    offsets[i] = Buffer.byteLength(output, 'utf8');
+    offsets[i] = Buffer.byteLength(output, 'latin1');
     output += `${i} 0 obj\n${objects[i]}\nendobj\n`;
   }
 
-  const xrefOffset = Buffer.byteLength(output, 'utf8');
+  const xrefOffset = Buffer.byteLength(output, 'latin1');
   output += `xref\n0 ${objects.length}\n`;
   output += '0000000000 65535 f \n';
 
@@ -125,7 +163,7 @@ function createObjectTable(objects, rootId, infoId) {
   output += `${xrefOffset}\n`;
   output += '%%EOF';
 
-  return Buffer.from(output, 'utf8');
+  return Buffer.from(output, 'latin1');
 }
 
 export function createTextPdf({ title = 'Archive Export', lines = [], creator = 'Kampus Cadilari' } = {}) {
@@ -137,14 +175,16 @@ export function createTextPdf({ title = 'Archive Export', lines = [], creator = 
   };
 
   const pagesId = addObject('');
-  const fontId = addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
+  const fontId = addObject(
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding << /Type /Encoding /BaseEncoding /WinAnsiEncoding /Differences [208 /Gbreve 221 /Idotaccent 222 /Scedilla 240 /gbreve 253 /dotlessi 254 /scedilla] >> >>'
+  );
 
   const pageIds = [];
   const pages = buildPages(lines);
 
   pages.forEach((pageLines) => {
     const stream = buildContentStream(pageLines);
-    const contentId = addObject(`<< /Length ${Buffer.byteLength(stream, 'utf8')} >>\nstream\n${stream}\nendstream`);
+    const contentId = addObject(`<< /Length ${Buffer.byteLength(stream, 'latin1')} >>\nstream\n${stream}\nendstream`);
     const pageId = addObject(
       `<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${A4_WIDTH} ${A4_HEIGHT}] /Resources << /Font << /F1 ${fontId} 0 R >> >> /Contents ${contentId} 0 R >>`
     );
@@ -153,7 +193,9 @@ export function createTextPdf({ title = 'Archive Export', lines = [], creator = 
 
   objects[pagesId] = `<< /Type /Pages /Kids [${pageIds.map((id) => `${id} 0 R`).join(' ')}] /Count ${pageIds.length} >>`;
 
-  const infoId = addObject(`<< /Title (${escapePdfText(normalizeText(title))}) /Creator (${escapePdfText(normalizeText(creator))}) /Producer (${escapePdfText(normalizeText(creator))}) >>`);
+  const infoId = addObject(
+    `<< /Title (${escapePdfText(toPdfAnsiByteString(title))}) /Creator (${escapePdfText(toPdfAnsiByteString(creator))}) /Producer (${escapePdfText(toPdfAnsiByteString(creator))}) >>`
+  );
   const catalogId = addObject(`<< /Type /Catalog /Pages ${pagesId} 0 R >>`);
 
   return createObjectTable(objects, catalogId, infoId);
@@ -165,29 +207,29 @@ export function buildArchivePdfLines(item, lang = 'tr') {
   const generatedAt = new Date();
 
   const lines = [
-    isEn ? 'Campus Witches - Archive Record Export' : 'Kampus Cadilari - Arsiv Kaydi PDF Ciktisi',
-    isEn ? `Generated: ${generatedAt.toISOString()}` : `Olusturma: ${generatedAt.toISOString()}`,
+    isEn ? 'Campus Witches - Archive Record Export' : 'Kampüs Cadıları - Arşiv Kaydı PDF Çıktısı',
+    isEn ? `Generated: ${generatedAt.toISOString()}` : `Oluşturma: ${generatedAt.toISOString()}`,
     '',
-    `${isEn ? 'Title' : 'Baslik'}: ${item?.title || '-'}`,
-    `${isEn ? 'Publication' : 'Yayin'}: ${item?.publication_name || '-'}`,
-    `${isEn ? 'Publication Year' : 'Yayin Yili'}: ${item?.publication_year || '-'}`,
-    `${isEn ? 'Period' : 'Donem'}: ${item?.decade || '-'}`,
-    `${isEn ? 'Focus Topic' : 'Odak Noktasi'}: ${item?.focus_topic || (isEn ? 'General feminist agenda' : 'Genel feminist gundem')}`,
+    `${isEn ? 'Title' : 'Başlık'}: ${item?.title || '-'}`,
+    `${isEn ? 'Publication' : 'Yayın'}: ${item?.publication_name || '-'}`,
+    `${isEn ? 'Publication Year' : 'Yayın Yılı'}: ${item?.publication_year || '-'}`,
+    `${isEn ? 'Period' : 'Dönem'}: ${item?.decade || '-'}`,
+    `${isEn ? 'Focus Topic' : 'Odak Noktası'}: ${item?.focus_topic || (isEn ? 'General feminist agenda' : 'Genel feminist gündem')}`,
     `${isEn ? 'Status' : 'Durum'}: ${item?.status || '-'}`,
     `${isEn ? 'Source URL' : 'Kaynak URL'}: ${item?.source_url || '-'}`,
-    `${isEn ? 'Record Created At' : 'Kayit Olusturma'}: ${createdAt ? createdAt.toISOString() : '-'}`,
+    `${isEn ? 'Record Created At' : 'Kayıt Oluşturma'}: ${createdAt ? createdAt.toISOString() : '-'}`,
     '',
-    isEn ? 'Summary:' : 'Ozet:',
-    ...(textToLines(item?.summary || (isEn ? 'No summary provided.' : 'Ozet bilgisi girilmedi.'))),
+    isEn ? 'Summary:' : 'Özet:',
+    ...(textToLines(item?.summary || (isEn ? 'No summary provided.' : 'Özet bilgisi girilmedi.'))),
     '',
-    isEn ? 'Quote / Highlight:' : 'Alinti / Not:',
-    ...(textToLines(item?.quote_text || (isEn ? 'No quote provided.' : 'Alinti bilgisi girilmedi.'))),
+    isEn ? 'News Content:' : 'Haber İçeriği:',
+    ...(textToLines(item?.quote_text || item?.summary || (isEn ? 'No detailed content provided.' : 'Detaylı haber içeriği girilmedi.'))),
     '',
     isEn ? 'Additional Notes:' : 'Ek Notlar:',
     ...(textToLines(
       isEn
         ? 'This PDF is generated directly by the system as a downloadable file from the full archive record content.'
-        : 'Bu PDF, arsiv kaydinin tam govde iceriginden sistem tarafindan dogrudan indirilebilir dosya olarak olusturulmustur.'
+        : 'Bu PDF, arşiv kaydının tam gövde içeriğinden sistem tarafından doğrudan indirilebilir dosya olarak oluşturulmuştur.'
     )),
   ];
 

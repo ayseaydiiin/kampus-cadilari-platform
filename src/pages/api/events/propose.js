@@ -1,10 +1,16 @@
 import { createEventProposal, isEventProposalNameTaken } from '../../../utils/db.js';
+import { checkRateLimit, isValidEmail, rateLimitResponse } from '../../../utils/security.js';
 
 export const prerender = false;
 
 export async function POST({ request }) {
-  const headers = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' };
+  const headers = { 'Content-Type': 'application/json' };
   try {
+    const rateLimit = checkRateLimit(request, 'events-propose', { limit: 8, windowMs: 60 * 60 * 1000 });
+    if (!rateLimit.allowed) {
+      return rateLimitResponse('Etkinlik onerisi limiti asildi', rateLimit.retryAfter);
+    }
+
     const {
       title,
       category,
@@ -33,6 +39,13 @@ export async function POST({ request }) {
       );
     }
 
+    if (!isValidEmail(email)) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Gecerli bir email girin' }),
+        { status: 400, headers }
+      );
+    }
+
     if (isEventProposalNameTaken(String(title))) {
       return new Response(
         JSON.stringify({ success: false, error: 'Bu etkinlik adi daha once kullanilmis' }),
@@ -44,7 +57,7 @@ export async function POST({ request }) {
       title: String(title).trim(),
       description: String(description).trim(),
       proposed_by: String(organizerName).trim(),
-      email: String(email).trim(),
+      email: String(email).trim().toLowerCase(),
       province: provinceName ? String(provinceName).trim() : String(regionId),
       category: String(category).trim(),
       date_suggested: String(eventDate),

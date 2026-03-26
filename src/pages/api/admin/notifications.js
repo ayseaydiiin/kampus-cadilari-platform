@@ -5,22 +5,22 @@ import {
   markAllNotificationsRead,
   deleteNotifications,
 } from '../../../utils/db.js';
+import { requireAdmin } from '../../../utils/adminAuth.js';
 
 export const prerender = false;
 
-const headers = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' };
+const headers = { 'Content-Type': 'application/json' };
 
-export async function GET({ url }) {
+export async function GET(context) {
+  const auth = requireAdmin(context);
+  if (!auth.ok) return auth.response;
+
+  const { url } = context;
   try {
-    const adminEmail = url.searchParams.get('adminEmail');
-    if (!adminEmail) {
-      return new Response(JSON.stringify({ success: false, error: 'adminEmail gerekli' }), { status: 400, headers });
-    }
-
     const onlyUnread = url.searchParams.get('onlyUnread') === '1';
     const limit = Number(url.searchParams.get('limit') || '50');
-    const notifications = getNotifications(adminEmail, { onlyUnread, limit });
-    const unreadCount = getUnreadNotificationCount(adminEmail);
+    const notifications = getNotifications(auth.admin.email, { onlyUnread, limit });
+    const unreadCount = getUnreadNotificationCount(auth.admin.email);
 
     return new Response(
       JSON.stringify({ success: true, notifications, unreadCount }),
@@ -31,40 +31,42 @@ export async function GET({ url }) {
   }
 }
 
-export async function PUT({ request }) {
+export async function PUT(context) {
+  const auth = requireAdmin(context);
+  if (!auth.ok) return auth.response;
+
+  const { request } = context;
   try {
-    const { adminEmail, notificationId, markAll } = await request.json();
-    if (!adminEmail) {
-      return new Response(JSON.stringify({ success: false, error: 'adminEmail gerekli' }), { status: 400, headers });
-    }
+    const { notificationId, markAll } = await request.json();
 
     const result = markAll
-      ? markAllNotificationsRead(adminEmail)
-      : markNotificationRead(Number(notificationId), adminEmail);
+      ? markAllNotificationsRead(auth.admin.email)
+      : markNotificationRead(Number(notificationId), auth.admin.email);
     if (!result.success) {
       return new Response(JSON.stringify(result), { status: 400, headers });
     }
 
-    const unreadCount = getUnreadNotificationCount(adminEmail);
+    const unreadCount = getUnreadNotificationCount(auth.admin.email);
     return new Response(JSON.stringify({ success: true, unreadCount }), { status: 200, headers });
   } catch (error) {
     return new Response(JSON.stringify({ success: false, error: error.message }), { status: 500, headers });
   }
 }
 
-export async function DELETE({ request }) {
-  try {
-    const { adminEmail, notificationIds } = await request.json();
-    if (!adminEmail) {
-      return new Response(JSON.stringify({ success: false, error: 'adminEmail gerekli' }), { status: 400, headers });
-    }
+export async function DELETE(context) {
+  const auth = requireAdmin(context);
+  if (!auth.ok) return auth.response;
 
-    const result = deleteNotifications(adminEmail, notificationIds);
+  const { request } = context;
+  try {
+    const { notificationIds } = await request.json();
+
+    const result = deleteNotifications(auth.admin.email, notificationIds);
     if (!result.success) {
       return new Response(JSON.stringify(result), { status: 400, headers });
     }
 
-    const unreadCount = getUnreadNotificationCount(adminEmail);
+    const unreadCount = getUnreadNotificationCount(auth.admin.email);
     return new Response(JSON.stringify({ success: true, unreadCount, deleted: result.deleted }), { status: 200, headers });
   } catch (error) {
     return new Response(JSON.stringify({ success: false, error: error.message }), { status: 500, headers });

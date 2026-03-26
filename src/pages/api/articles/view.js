@@ -1,14 +1,20 @@
 import { getDatabase } from '../../../utils/db.js';
+import { checkRateLimit, rateLimitResponse } from '../../../utils/security.js';
+import { requireAdmin } from '../../../utils/adminAuth.js';
 
 export const prerender = false;
 
 const headers = {
   'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': '*',
 };
 
 export async function POST({ request }) {
   try {
+    const rateLimit = checkRateLimit(request, 'article-view', { limit: 120, windowMs: 10 * 60 * 1000 });
+    if (!rateLimit.allowed) {
+      return rateLimitResponse('Goruntuleme limiti asildi', rateLimit.retryAfter);
+    }
+
     const { slug, articleId } = await request.json();
     const resolvedSlug = String(slug || articleId || '').trim();
 
@@ -26,8 +32,7 @@ export async function POST({ request }) {
           updated_at = CURRENT_TIMESTAMP
       `).run(resolvedSlug);
 
-      const row = db.prepare('SELECT view_count FROM article_view_stats WHERE slug = ?').get(resolvedSlug);
-      return new Response(JSON.stringify({ success: true, slug: resolvedSlug, view_count: row?.view_count || 0 }), {
+      return new Response(JSON.stringify({ success: true, slug: resolvedSlug }), {
         status: 200,
         headers,
       });
@@ -39,7 +44,11 @@ export async function POST({ request }) {
   }
 }
 
-export async function GET({ url }) {
+export async function GET(context) {
+  const auth = requireAdmin(context);
+  if (!auth.ok) return auth.response;
+
+  const { url } = context;
   try {
     const slug = String(url.searchParams.get('slug') || '').trim();
     if (!slug) {

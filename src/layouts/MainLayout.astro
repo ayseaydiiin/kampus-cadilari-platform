@@ -1,4 +1,4 @@
----
+﻿---
 import '../styles/global.css';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 
@@ -11,8 +11,8 @@ interface Props {
 const { title, description, currentLang = 'tr' } = Astro.props;
 const isEn = currentLang === 'en';
 
-const siteName = isEn ? 'Campus Witches' : 'Kampus Cadilari';
-const tagline = isEn ? 'STRONG WOMEN | STRONG FUTURE' : 'GUCLU KADINLAR | GUCLU GELECEK';
+const siteName = 'Kampüs Cadıları';
+const tagline = isEn ? 'FEMINIST SOLIDARITY NETWORK' : 'FEMINIST DAYANIŞMA AĞI';
 const resolvedTitle = title || siteName;
 const resolvedDescription = description || (isEn ? 'Strong women, strong future' : 'Guclu kadinlar, guclu gelecek');
 const year = new Date().getFullYear();
@@ -31,32 +31,29 @@ const year = new Date().getFullYear();
     <LanguageSwitcher currentLang={currentLang} />
 
     <div class="flex min-h-screen flex-col">
-      <header class="sticky top-0 z-40 border-b-2 border-purple-600 bg-gradient-to-r from-white via-white to-purple-50 shadow-lg">
+      <header class="sticky top-0 z-40 border-b border-[rgba(123,55,148,0.16)] bg-[rgba(255,250,247,0.94)] shadow-lg backdrop-blur-md">
         <div class="container mx-auto px-4">
-          <div class="hidden items-center justify-between border-b border-gray-200 py-2 text-xs md:flex">
-            <nav class="flex gap-4 text-gray-600">
-              <a href="https://instagram.com/kampuscadilari" target="_blank" rel="noreferrer" class="transition hover:text-purple-600">Instagram</a>
-              <a href="https://twitter.com/kampuscadilari" target="_blank" rel="noreferrer" class="transition hover:text-purple-600">Twitter</a>
-              <a href="mailto:contact@kampuscadilari.org" class="transition hover:text-purple-600">{isEn ? 'Contact' : 'Iletisim'}</a>
-            </nav>
-            <span class="text-gray-600">EST. 2018</span>
+          <div class="hidden items-center justify-end gap-4 border-b border-[rgba(123,55,148,0.12)] py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-600 md:flex">
+            <a href="https://www.instagram.com/kampus.cadilari/" target="_blank" rel="noreferrer" class="transition hover:text-[var(--color-purple-primary)]">Instagram</a>
+            <a href="https://x.com/kamps_cadilari" target="_blank" rel="noreferrer" class="transition hover:text-[var(--color-purple-primary)]">Twitter</a>
+            <a href="https://www.youtube.com/@kampuscadilari" target="_blank" rel="noreferrer" class="transition hover:text-[var(--color-purple-primary)]">YouTube</a>
+            <a href="https://www.tiktok.com/@kampuscadilari?_r=1&_t=ZS-94SwjFYpEGL" target="_blank" rel="noreferrer" class="transition hover:text-[var(--color-purple-primary)]">TikTok</a>
+            <a href="https://t.me/kampuscadilari" target="_blank" rel="noreferrer" class="transition hover:text-[var(--color-purple-primary)]">Telegram</a>
           </div>
-
           <nav class="flex items-center justify-between py-4">
             <a href={isEn ? '/en/' : '/'} class="group flex items-center gap-3 transition hover:opacity-80">
-              <span class="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-purple-700 to-pink-600 text-sm font-black text-white shadow-lg">KM</span>
-              <div>
-                <h1 class="hidden text-3xl font-black leading-tight text-purple-700 sm:block md:text-4xl">{siteName}</h1>
-                <p class="hidden text-xs font-bold text-red-600 sm:block">{tagline}</p>
+              <img src="/logo-kampus-cadilari.svg" alt="Kampüs Cadıları logosu" class="h-14 w-14 rounded-2xl bg-white/70 p-1.5 shadow-md ring-1 ring-[rgba(123,55,148,0.12)]" />
+              <div class="min-w-0">
+                <h1 class="max-w-[11.5rem] truncate text-2xl font-black leading-tight text-[var(--color-purple-primary)] sm:max-w-none sm:text-3xl md:text-4xl">{siteName}</h1>
+                <p class="hidden text-xs font-bold text-[var(--color-red-accent)] sm:block">{tagline}</p>
               </div>
             </a>
 
             <ul class="hidden gap-8 text-sm font-bold uppercase tracking-wide lg:flex">
-              <li><a href={isEn ? '/en/' : '/'} class="text-gray-700 transition hover:text-purple-600">{isEn ? 'Home' : 'Ana Sayfa'}</a></li>
-              <li><a href={isEn ? '/en/articles' : '/articles'} class="text-gray-700 transition hover:text-purple-600">{isEn ? 'Articles' : 'Yazilar'}</a></li>
-              <li><a href={isEn ? '/en/events' : '/events'} class="text-gray-700 transition hover:text-purple-600">{isEn ? 'Events' : 'Etkinlikler'}</a></li>
-              <li><a href={isEn ? '/en/archive' : '/archive'} class="text-gray-700 transition hover:text-purple-600">{isEn ? 'Archive' : 'Arsiv'}</a></li>
-              <li><a href={isEn ? '/en/map' : '/map'} class="text-gray-700 transition hover:text-purple-600">{isEn ? 'Join Us' : 'Bize Katil'}</a></li>
+              <li><a href={isEn ? '/en/archive' : '/archive'} class="text-gray-700 transition hover:text-purple-600">{isEn ? 'Archive' : 'İsyan Kayıtları'}</a></li>
+              <li><a href={isEn ? '/en/#perspective-section' : '/#perspektif-section'} class="text-gray-700 transition hover:text-purple-600">{isEn ? 'Perspective' : 'Cadı Merceği'}</a></li>
+              <li><a href={isEn ? '/en/articles' : '/articles'} class="text-gray-700 transition hover:text-purple-600">{isEn ? 'Articles' : 'Kazandan Taşanlar'}</a></li>
+              <li><a href={isEn ? '/en/map' : '/map'} class="text-gray-700 transition hover:text-purple-600">{isEn ? 'Join Us' : 'Cadıol'}</a></li>
             </ul>
 
             <div class="flex items-center gap-3">
@@ -73,12 +70,18 @@ const year = new Date().getFullYear();
             </div>
           </nav>
 
+          <div class="flex gap-2 overflow-x-auto pb-3 lg:hidden">
+            <a href={isEn ? '/en/archive' : '/archive'} class="shrink-0 rounded-full border border-purple-200 bg-white px-3 py-1.5 text-xs font-bold text-purple-700">{isEn ? 'Archive' : 'İsyan Kayıtları'}</a>
+            <a href={isEn ? '/en/#perspective-section' : '/#perspektif-section'} class="shrink-0 rounded-full border border-purple-200 bg-white px-3 py-1.5 text-xs font-bold text-purple-700">{isEn ? 'Perspective' : 'Cadı Merceği'}</a>
+            <a href={isEn ? '/en/articles' : '/articles'} class="shrink-0 rounded-full border border-purple-200 bg-white px-3 py-1.5 text-xs font-bold text-purple-700">{isEn ? 'Articles' : 'Kazandan Taşanlar'}</a>
+            <a href={isEn ? '/en/map' : '/map'} class="shrink-0 rounded-full border border-purple-200 bg-white px-3 py-1.5 text-xs font-bold text-purple-700">{isEn ? 'Join Us' : 'Cadıol'}</a>
+          </div>
+
           <nav id="mobile-menu" class="hidden flex-col gap-3 border-t border-gray-200 pb-4">
-            <a href={isEn ? '/en/' : '/'} class="rounded px-4 py-2 hover:bg-purple-50">{isEn ? 'Home' : 'Ana Sayfa'}</a>
-            <a href={isEn ? '/en/articles' : '/articles'} class="rounded px-4 py-2 hover:bg-purple-50">{isEn ? 'Articles' : 'Yazilar'}</a>
-            <a href={isEn ? '/en/events' : '/events'} class="rounded px-4 py-2 hover:bg-purple-50">{isEn ? 'Events' : 'Etkinlikler'}</a>
-            <a href={isEn ? '/en/archive' : '/archive'} class="rounded px-4 py-2 hover:bg-purple-50">{isEn ? 'Archive' : 'Arsiv'}</a>
-            <a href={isEn ? '/en/map' : '/map'} class="rounded px-4 py-2 hover:bg-purple-50">{isEn ? 'Join Us' : 'Bize Katil'}</a>
+            <a href={isEn ? '/en/archive' : '/archive'} class="rounded px-4 py-2 hover:bg-purple-50">{isEn ? 'Archive' : 'İsyan Kayıtları'}</a>
+            <a href={isEn ? '/en/#perspective-section' : '/#perspektif-section'} class="rounded px-4 py-2 hover:bg-purple-50">{isEn ? 'Perspective' : 'Cadı Merceği'}</a>
+            <a href={isEn ? '/en/articles' : '/articles'} class="rounded px-4 py-2 hover:bg-purple-50">{isEn ? 'Articles' : 'Kazandan Taşanlar'}</a>
+            <a href={isEn ? '/en/map' : '/map'} class="rounded px-4 py-2 hover:bg-purple-50">{isEn ? 'Join Us' : 'Cadıol'}</a>
             <a href={isEn ? '/en/admin/' : '/admin/'} class="rounded bg-purple-600 px-4 py-2 font-bold text-white">Admin</a>
           </nav>
         </div>
@@ -96,7 +99,7 @@ const year = new Date().getFullYear();
               <p class="mt-4 text-sm opacity-90">
                 {isEn
                   ? 'Feminist resistance voice from campuses to the streets. Strong women, strong future.'
-                  : 'Kampuslerden sokaklara feminist direnisin sesi. Guclu kadinlar, guclu gelecek.'}
+                  : 'Kampüslerden sokaklara feminist direnişin sesi. Güçlü kadınlar, güçlü gelecek.'}
               </p>
               <p class="mt-3 text-xs opacity-75">EST. 2018</p>
             </div>
@@ -104,10 +107,10 @@ const year = new Date().getFullYear();
             <div>
               <h4 class="mb-4 text-sm font-bold uppercase tracking-wide">{isEn ? 'Pages' : 'Sayfalar'}</h4>
               <ul class="space-y-2 text-sm opacity-90">
-                <li><a href={isEn ? '/en/articles' : '/articles'} class="hover:underline">{isEn ? 'Articles' : 'Yazilar'}</a></li>
-                <li><a href={isEn ? '/en/events' : '/events'} class="hover:underline">{isEn ? 'Events' : 'Etkinlikler'}</a></li>
-                <li><a href={isEn ? '/en/archive' : '/archive'} class="hover:underline">{isEn ? 'Archive' : 'Arsiv'}</a></li>
-                <li><a href={isEn ? '/en/map' : '/map'} class="hover:underline">{isEn ? 'Join Us' : 'Bize Katil'}</a></li>
+                <li><a href={isEn ? '/en/archive' : '/archive'} class="hover:underline">{isEn ? 'Archive' : 'İsyan Kayıtları'}</a></li>
+                <li><a href={isEn ? '/en/#perspective-section' : '/#perspektif-section'} class="hover:underline">{isEn ? 'Perspective' : 'Cadı Merceği'}</a></li>
+                <li><a href={isEn ? '/en/articles' : '/articles'} class="hover:underline">{isEn ? 'Articles' : 'Kazandan Taşanlar'}</a></li>
+                <li><a href={isEn ? '/en/map' : '/map'} class="hover:underline">{isEn ? 'Join Us' : 'Cadıol'}</a></li>
                 <li><a href={isEn ? '/en/admin/login-email' : '/admin/login-email'} class="hover:underline">{isEn ? 'Admin Login' : 'Admin Giris'}</a></li>
               </ul>
             </div>
@@ -115,8 +118,10 @@ const year = new Date().getFullYear();
             <div>
               <h4 class="mb-4 text-sm font-bold uppercase tracking-wide">{isEn ? 'Contact' : 'Iletisim'}</h4>
               <ul class="space-y-2 text-sm opacity-90">
-                <li><a href="https://instagram.com/kampuscadilari" target="_blank" rel="noreferrer" class="hover:underline">Instagram</a></li>
-                <li><a href="https://twitter.com/kampuscadilari" target="_blank" rel="noreferrer" class="hover:underline">Twitter</a></li>
+                <li><a href="https://www.instagram.com/kampus.cadilari/" target="_blank" rel="noreferrer" class="hover:underline">Instagram</a></li>
+                <li><a href="https://x.com/kamps_cadilari" target="_blank" rel="noreferrer" class="hover:underline">Twitter</a></li>
+                <li><a href="https://www.youtube.com/@kampuscadilari" target="_blank" rel="noreferrer" class="hover:underline">YouTube</a></li>
+                <li><a href="https://www.tiktok.com/@kampuscadilari?_r=1&_t=ZS-94SwjFYpEGL" target="_blank" rel="noreferrer" class="hover:underline">TikTok</a></li>
                 <li><a href="https://t.me/kampuscadilari" target="_blank" rel="noreferrer" class="hover:underline">Telegram</a></li>
               </ul>
             </div>
@@ -126,15 +131,15 @@ const year = new Date().getFullYear();
               <p class="text-xs opacity-90">
                 <strong>{isEn ? 'Freedom' : 'Ozgurluk'}</strong> | <strong>{isEn ? 'Solidarity' : 'Dayanisma'}</strong> | <strong>{isEn ? 'Struggle' : 'Mucadele'}</strong>
               </p>
-              <p class="mt-4 text-xs opacity-75">{isEn ? 'Built with feminist solidarity.' : 'Feminist dayanisma ile insa edildi.'}</p>
+              <p class="mt-4 text-xs opacity-75">{isEn ? 'Built with feminist solidarity.' : 'Feminist dayanışma ile inşa edildi.'}</p>
             </div>
           </div>
 
           <div class="border-t border-purple-400 pt-6 text-center">
             <p class="text-sm opacity-75">
-              &copy; {year} {siteName}. {isEn ? 'All rights reserved.' : 'Tum haklari saklidir.'} |
-              <a href="/privacy" class="hover:underline">{isEn ? 'Privacy' : 'Gizlilik'}</a> |
-              <a href="/terms" class="hover:underline">{isEn ? 'Terms' : 'Sartlar'}</a>
+              &copy; {year} {siteName}. {isEn ? 'All rights reserved.' : 'Tüm hakları saklıdır.'} |
+              <a href={isEn ? '/en/privacy' : '/privacy'} class="hover:underline">{isEn ? 'Privacy' : 'Gizlilik'}</a> |
+              <a href={isEn ? '/en/terms' : '/terms'} class="hover:underline">{isEn ? 'Terms' : 'Şartlar'}</a>
             </p>
           </div>
         </div>
@@ -207,3 +212,4 @@ const year = new Date().getFullYear();
     </script>
   </body>
 </html>
+

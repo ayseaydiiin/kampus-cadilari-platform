@@ -1,27 +1,31 @@
 import { getArchiveApprovals, getArchiveById, recordArchiveDecision } from '../../../../../utils/db.js';
+import { requireAdmin } from '../../../../../utils/adminAuth.js';
 
 export const prerender = false;
 
 const headers = {
   'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': '*',
 };
 
-export async function POST({ params, request }) {
+export async function POST(context) {
+  const auth = requireAdmin(context);
+  if (!auth.ok) return auth.response;
+
+  const { params, request } = context;
   try {
     const archiveId = Number(params.id);
-    const { adminEmail, comment } = await request.json();
+    const { comment } = await request.json();
 
-    if (!archiveId || !adminEmail) {
+    if (!archiveId) {
       return new Response(
-        JSON.stringify({ success: false, error: 'archive id ve adminEmail zorunlu' }),
+        JSON.stringify({ success: false, error: 'archive id zorunlu' }),
         { status: 400, headers }
       );
     }
 
     const decision = recordArchiveDecision({
       archiveId,
-      adminEmail,
+      adminEmail: auth.admin.email,
       decision: 'approved',
       comment,
     });

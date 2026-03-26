@@ -1,17 +1,14 @@
 import { createApplication } from '../../utils/db.js';
+import { checkRateLimit, isValidEmail, rateLimitResponse } from '../../utils/security.js';
 
 export const prerender = false;
 
 export async function POST({ request }) {
   try {
-    // CORS headers
-    const headers = {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    };
-
-    if (request.method === 'OPTIONS') {
-      return new Response(null, { headers });
+    const headers = { 'Content-Type': 'application/json' };
+    const rateLimit = checkRateLimit(request, 'submit-application', { limit: 8, windowMs: 60 * 60 * 1000 });
+    if (!rateLimit.allowed) {
+      return rateLimitResponse('Basvuru gonderim limiti asildi', rateLimit.retryAfter);
     }
 
     const data = await request.json();
@@ -28,8 +25,7 @@ export async function POST({ request }) {
     }
 
     // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(data.email)) {
+    if (!isValidEmail(data.email)) {
       return new Response(
         JSON.stringify({
           success: false,
@@ -39,16 +35,26 @@ export async function POST({ request }) {
       );
     }
 
+    if (String(data.full_name || '').trim().length < 2 || String(data.full_name || '').trim().length > 120) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: 'Ad alani 2-120 karakter olmali',
+        }),
+        { status: 400, headers }
+      );
+    }
+
     // Save to database
     const result = createApplication({
-      full_name: data.full_name,
-      email: data.email,
-      phone: data.phone,
-      province: data.province,
-      organization: data.organization,
+      full_name: String(data.full_name).trim(),
+      email: String(data.email).trim().toLowerCase(),
+      phone: data.phone ? String(data.phone).trim() : null,
+      province: String(data.province).trim(),
+      organization: data.organization ? String(data.organization).trim() : null,
       skills: data.skills, // Array
-      social_media: data.social_media,
-      message: data.message,
+      social_media: data.social_media ? String(data.social_media).trim() : null,
+      message: data.message ? String(data.message).trim().slice(0, 5000) : null,
     });
 
     if (!result.success) {

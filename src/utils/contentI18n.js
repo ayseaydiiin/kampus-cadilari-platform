@@ -7,6 +7,57 @@ function normalizeKey(value) {
     .trim();
 }
 
+const TR_EN_PHRASE_MAP = [
+  ['kadın', 'woman'],
+  ['kadınlar', 'women'],
+  ['feminist', 'feminist'],
+  ['arşiv', 'archive'],
+  ['arsiv', 'archive'],
+  ['dayanışma', 'solidarity'],
+  ['dayanisma', 'solidarity'],
+  ['görünmeyen emek', 'invisible labor'],
+  ['gundem', 'agenda'],
+  ['gündem', 'agenda'],
+  ['hak', 'right'],
+  ['haklar', 'rights'],
+  ['yayın', 'publication'],
+  ['yayin', 'publication'],
+  ['yazı', 'article'],
+  ['yazi', 'article'],
+  ['haber', 'news'],
+  ['içerik', 'content'],
+  ['icerik', 'content'],
+  ['özet', 'summary'],
+  ['ozet', 'summary'],
+  ['detaylı', 'detailed'],
+  ['detayli', 'detailed'],
+  ['kampüs', 'campus'],
+  ['kampus', 'campus'],
+  ['mücadele', 'struggle'],
+  ['mucadele', 'struggle'],
+  ['özgürlük', 'freedom'],
+  ['ozgurluk', 'freedom'],
+];
+
+function autoTranslateTrToEn(value) {
+  const text = String(value || '').trim();
+  if (!text) return text;
+
+  let output = text;
+  for (const [tr, en] of TR_EN_PHRASE_MAP) {
+    const pattern = new RegExp(tr, 'gi');
+    output = output.replace(pattern, (match) => {
+      const first = match.charAt(0);
+      if (first === first.toUpperCase()) {
+        return en.charAt(0).toUpperCase() + en.slice(1);
+      }
+      return en;
+    });
+  }
+
+  return output;
+}
+
 const ARTICLE_OVERRIDES_BY_ID = {
   6: {
     title: "Women's Identity in Feminist Discourse: Being a Woman in a Male-Dominated Society",
@@ -99,9 +150,9 @@ export function toEnglishArticle(article) {
 
   return {
     ...article,
-    title: article.title_en || override?.title || article.title,
-    excerpt: article.excerpt_en || override?.excerpt || article.excerpt,
-    body: article.body_en || override?.body || article.body,
+    title: article.title_en || override?.title || autoTranslateTrToEn(article.title),
+    excerpt: article.excerpt_en || override?.excerpt || autoTranslateTrToEn(article.excerpt),
+    body: article.body_en || override?.body || autoTranslateTrToEn(article.body),
   };
 }
 
@@ -111,10 +162,10 @@ export function toEnglishArchiveItem(item) {
 
   return {
     ...item,
-    title: item.title_en || override?.title || item.title,
-    publication_name: item.publication_name_en || override?.publication_name || item.publication_name,
-    focus_topic: item.focus_topic_en || override?.focus_topic || item.focus_topic,
-    summary: item.summary_en || override?.summary || item.summary,
-    quote_text: item.quote_text_en || override?.quote_text || item.quote_text,
+    title: item.title_en || override?.title || autoTranslateTrToEn(item.title),
+    publication_name: item.publication_name_en || override?.publication_name || autoTranslateTrToEn(item.publication_name),
+    focus_topic: item.focus_topic_en || override?.focus_topic || autoTranslateTrToEn(item.focus_topic),
+    summary: item.summary_en || override?.summary || autoTranslateTrToEn(item.summary),
+    quote_text: item.quote_text_en || override?.quote_text || autoTranslateTrToEn(item.quote_text),
   };
 }

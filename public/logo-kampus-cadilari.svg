@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 760" role="img" aria-labelledby="title desc">
+  <title id="title">Kampus Cadilari Logo</title>
+  <desc id="desc">Mor cadi sapkasi, kirmizi yildiz ve feminist sembolden olusan Kampus Cadilari logosu</desc>
+  <defs>
+    <style>
+      .purple-fill { fill: #6e2c8a; }
+      .purple-stroke { fill: none; stroke: #6e2c8a; stroke-width: 18; stroke-linecap: square; stroke-linejoin: miter; }
+      .red-fill { fill: #e10600; }
+    </style>
+  </defs>
+
+  <g transform="translate(0 10)">
+    <path
+      class="purple-fill"
+      d="M332 74
+      c13 0 23 4 31 14
+      l7 16
+      c15 8 20 18 19 33
+      c0 8-3 13-7 18
+      l9 95
+      c5 72 20 121 43 147
+      c6 6 9 13 10 23
+      c1 8 8 11 20 10
+      c17-2 35-1 56 3
+      c16 3 31 2 45-3
+      c8 17 7 33-3 48
+      c-14 19-40 32-78 39
+      c-25 4-49 2-73-5
+      c-29-8-57-16-89-16
+      c-31 0-60 8-89 16
+      c-24 7-48 9-73 5
+      c-38-7-64-20-78-39
+      c-10-15-11-31-3-48
+      c14 5 29 6 45 3
+      c21-4 39-5 56-3
+      c12 1 19-2 20-10
+      c2-10 5-17 10-23
+      c23-26 37-75 43-147
+      l9-95
+      c-4-5-6-10-7-18
+      c-1-15 5-25 19-33
+      l7-16
+      c8-10 18-14 31-14z"
+    />
+
+    <path
+      class="purple-fill"
+      d="M154 385
+      c18 11 39 17 65 19
+      c24 2 47 0 72-6
+      c30-7 62-11 94-11
+      c33 0 64 4 95 11
+      c24 6 48 8 72 6
+      c25-2 47-8 65-19
+      c1 19-10 36-32 50
+      c-19 12-42 18-67 19
+      c-24 1-47-4-71-11
+      c-22-6-44-10-62-10
+      c-18 0-40 4-62 10
+      c-24 7-47 12-71 11
+      c-26-1-48-7-67-19
+      c-22-14-33-31-33-50z"
+    />
+
+    <path
+      class="red-fill"
+      d="M303 258
+      l12 28
+      l30 2
+      l-23 19
+      l7 30
+      l-26-15
+      l-26 15
+      l7-30
+      l-23-19
+      l30-2z"
+    />
+
+    <g transform="rotate(-8 310 550)">
+      <path class="purple-stroke" d="M310 424a80 80 0 1 1 0 160a80 80 0 0 1 0-160z" />
+      <path class="purple-stroke" d="M310 582v145" />
+      <path class="purple-stroke" d="M258 670h104" />
+    </g>
+
+  </g>
+</svg>

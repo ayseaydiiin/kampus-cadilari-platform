@@ -1,7 +1,9 @@
+import { buildAuthCookieOptions } from '../../../utils/adminAuth.js';
+
 export const prerender = false;
 
 export function POST({ cookies }) {
-  cookies.delete('auth_token', { path: '/' });
+  cookies.delete('auth_token', buildAuthCookieOptions());
 
   return new Response(JSON.stringify({
     success: true,

@@ -8,7 +8,7 @@ const SESSION_MAX_HOURS = 8;
   <section class="mx-auto flex min-h-[70vh] max-w-3xl items-center justify-center">
     <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-xl">
       <div class="text-center">
-        <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-purple-700 to-pink-600 text-sm font-black text-white">KM</div>
+        <img src="/logo-kampus-cadilari.svg" alt="Kampus Cadilari logosu" class="mx-auto h-20 w-20 object-contain" />
         <h1 class="app-h1 mt-4 text-3xl font-black text-slate-900">Admin Giris</h1>
         <p class="mt-2 text-sm text-slate-600">Yetkili paneline erismek icin e-posta ve parolanizi girin.</p>
       </div>
@@ -43,7 +43,6 @@ const SESSION_MAX_HOURS = 8;
     const loadingDiv = document.getElementById('loading');
     const SESSION_MAX_MS = Number(SESSION_MAX_HOURS || 8) * 60 * 60 * 1000;
 
-    localStorage.removeItem('admin_auth_token');
     localStorage.removeItem('admin_auth_user');
 
     function getTokenExpiryMs(token) {
@@ -61,12 +60,21 @@ const SESSION_MAX_HOURS = 8;
       submitBtn.disabled = true;
 
       try {
+        const emailValue = String(emailInput?.value || '').trim().toLowerCase();
+        const passwordValue = String(passwordInput?.value || '');
+
+        if (!emailValue || !passwordValue) {
+          messageDiv.className = 'mt-5 rounded-xl border border-red-300 bg-red-50 p-4 text-sm font-semibold text-red-700';
+          messageDiv.textContent = 'E-posta ve parola zorunludur.';
+          return;
+        }
+
         const response = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            email: emailInput.value,
-            password: passwordInput.value,
+            email: emailValue,
+            password: passwordValue,
           }),
         });
 
@@ -84,7 +92,6 @@ const SESSION_MAX_HOURS = 8;
           const clientExpiry = Date.now() + SESSION_MAX_MS;
           const expiryMs = tokenExpiry ? Math.min(tokenExpiry, clientExpiry) : clientExpiry;
 
-          sessionStorage.setItem('admin_auth_token', data.token);
           sessionStorage.setItem('admin_auth_user', JSON.stringify(data.user));
           sessionStorage.setItem('admin_auth_expires_at', String(expiryMs));
 

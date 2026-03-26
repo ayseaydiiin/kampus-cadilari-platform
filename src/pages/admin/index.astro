@@ -15,26 +15,26 @@ const articleCategories = getCategoryDefinitions();
 
 <MainLayout title="Admin Paneli - Kampus Cadilari" currentLang="tr">
   <section class="mx-auto max-w-6xl">
-    <div id="admin-loading" class="rounded-[1.75rem] bg-gradient-to-br from-purple-700 to-pink-600 p-8 text-white shadow-2xl">
-      <p class="text-sm font-bold uppercase tracking-[0.2em] text-purple-100">Dashboard</p>
+    <div id="admin-loading" class="rounded-[1.75rem] border border-[rgba(225,6,0,0.16)] bg-[linear-gradient(135deg,rgba(110,44,138,0.98),rgba(87,33,111,0.96)_58%,rgba(225,6,0,0.9))] p-8 text-white shadow-2xl">
+      <p class="text-sm font-bold uppercase tracking-[0.2em] text-white/75">Dashboard</p>
       <h1 class="app-h1 mt-3 text-4xl font-black">Dijital Karargah aciliyor</h1>
       <p class="mt-4 max-w-2xl text-white/85">Kimlik dogrulaniyor, yonetim paneli yukleniyor.</p>
     </div>
 
     <div id="admin-panel" class="hidden">
-      <section class="rounded-[1.75rem] bg-gradient-to-br from-purple-700 to-pink-600 p-8 text-white shadow-2xl">
+      <section class="rounded-[1.75rem] border border-[rgba(225,6,0,0.16)] bg-[linear-gradient(135deg,rgba(110,44,138,0.98),rgba(87,33,111,0.96)_58%,rgba(225,6,0,0.9))] p-8 text-white shadow-2xl">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p class="text-sm font-bold uppercase tracking-[0.22em] text-purple-100">Ana dashboard</p>
+            <p class="text-sm font-bold uppercase tracking-[0.22em] text-white/75">Ana dashboard</p>
             <h1 class="app-h1 mt-3 text-4xl font-black">Hos geldin, <span id="admin-name">admin</span></h1>
             <p class="mt-4 max-w-2xl text-white/85">Icerik kutucuklari ve admin bildirimlerini buradan yonet.</p>
           </div>
           <div class="flex flex-wrap gap-3">
-            <button id="notif-toggle-btn" class="relative rounded-full border border-white/40 bg-white/15 px-5 py-3 font-bold text-white transition hover:bg-white/25">
+            <button id="notif-toggle-btn" class="relative rounded-full border border-white/35 bg-white/12 px-5 py-3 font-bold text-white transition hover:bg-white/22">
               Bildirimler
-              <span id="notif-badge" class="ml-2 hidden rounded-full bg-amber-300 px-2 py-0.5 text-xs font-bold text-amber-900">0</span>
+              <span id="notif-badge" class="ml-2 hidden rounded-full bg-[var(--color-red-accent)] px-2 py-0.5 text-xs font-bold text-white">0</span>
             </button>
-            <button id="logout-button" class="rounded-full bg-white px-6 py-3 font-bold text-purple-700 transition hover:bg-amber-100">Cikis yap</button>
+            <button id="logout-button" class="rounded-full bg-white px-6 py-3 font-bold text-[var(--color-purple-primary)] transition hover:bg-white/90">Cikis yap</button>
           </div>
         </div>
       </section>
@@ -50,11 +50,11 @@ const articleCategories = getCategoryDefinitions();
           <p id="stat-articles" class="mt-3 text-4xl font-black text-slate-900">{articleCount}</p>
         </article>
         <article class="rounded-[1.5rem] bg-white p-6 shadow-lg ring-1 ring-slate-200">
-          <p class="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Toplam arsiv kaydi</p>
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-purple-700">Toplam arsiv kaydi</p>
           <p id="stat-archive" class="mt-3 text-4xl font-black text-slate-900">{archiveCount}</p>
         </article>
         <article class="rounded-[1.5rem] bg-white p-6 shadow-lg ring-1 ring-slate-200">
-          <p class="text-xs font-bold uppercase tracking-[0.18em] text-rose-600">Toplam etkinlik</p>
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-red-accent)]">Toplam etkinlik</p>
           <p id="stat-events" class="mt-3 text-4xl font-black text-slate-900">{eventCount}</p>
         </article>
       </section>
@@ -64,10 +64,10 @@ const articleCategories = getCategoryDefinitions();
           <article class="rounded-[1.75rem] bg-white p-6 shadow-lg ring-1 ring-slate-200">
             <div class="flex items-start justify-between gap-4">
               <div>
-                <p class="text-sm font-bold uppercase tracking-[0.2em] text-fuchsia-700">Icerik Yonetimi</p>
+                <p class="text-sm font-bold uppercase tracking-[0.2em] text-purple-700">Icerik Yonetimi</p>
                 <p class="mt-1 text-sm text-slate-600">Yeni yazi icin kutucuk ac, tum alanlari doldur ve kaydet.</p>
               </div>
-              <button id="article-add-btn" class="rounded-full bg-fuchsia-600 px-4 py-2 font-bold text-white hover:bg-fuchsia-700">Yeni Yazi Kutucugu</button>
+              <button id="article-add-btn" class="rounded-full bg-purple-600 px-4 py-2 font-bold text-white hover:bg-purple-700">Yeni Yazi Kutucugu</button>
             </div>
             <div id="article-list" class="mt-5 space-y-3"></div>
           </article>
@@ -75,11 +75,12 @@ const articleCategories = getCategoryDefinitions();
 
         <div class="grid gap-6">
           <article class="rounded-[1.75rem] bg-white p-6 shadow-lg ring-1 ring-slate-200">
-            <p class="text-sm font-bold uppercase tracking-[0.2em] text-rose-600">Hizli erisim</p>
+            <p class="text-sm font-bold uppercase tracking-[0.2em] text-[var(--color-red-accent)]">Hizli erisim</p>
             <div class="mt-5 grid gap-3">
               <a href="/articles" class="rounded-2xl bg-slate-50 px-4 py-4 font-semibold text-slate-800 transition hover:bg-purple-50">Icerik arsivine git</a>
               <a href="/archive" class="rounded-2xl bg-slate-50 px-4 py-4 font-semibold text-slate-800 transition hover:bg-purple-50">Gazete arsivini ac</a>
               <a href="/events" class="rounded-2xl bg-slate-50 px-4 py-4 font-semibold text-slate-800 transition hover:bg-purple-50">Etkinlik takvimini ac</a>
+              <button id="password-open-btn" type="button" class="rounded-2xl bg-slate-50 px-4 py-4 text-left font-semibold text-slate-800 transition hover:bg-purple-50">Sifre Degistir</button>
               <a href="/admin/submissions" class="rounded-2xl bg-purple-100 px-4 py-4 font-semibold text-purple-800 transition hover:bg-purple-200">-> Basvurular ve onay akislari</a>
             </div>
           </article>
@@ -137,8 +138,38 @@ const articleCategories = getCategoryDefinitions();
         </div>
         <div class="md:col-span-2 flex justify-end gap-3">
           <button id="article-modal-cancel" type="button" class="rounded-xl border border-slate-300 px-4 py-2 font-semibold text-slate-700">Vazgec</button>
-          <button type="submit" class="rounded-xl bg-fuchsia-600 px-4 py-2 font-semibold text-white hover:bg-fuchsia-700">Kaydet</button>
+          <button type="submit" class="rounded-xl bg-purple-600 px-4 py-2 font-semibold text-white hover:bg-purple-700">Kaydet</button>
         </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="password-modal" class="fixed inset-0 z-50 hidden items-end justify-center bg-black/60 p-3 sm:items-center sm:p-4">
+    <div class="w-[min(94vw,30rem)] rounded-2xl bg-white p-5 shadow-2xl sm:p-6">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xl font-black text-slate-900">Sifre Degistir</h3>
+        <button id="password-close-btn" type="button" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">Kapat</button>
+      </div>
+      <form id="password-form" class="mt-4 space-y-3">
+        <div>
+          <label for="password-current" class="text-xs font-bold uppercase tracking-wide text-slate-500">Mevcut sifre</label>
+          <input id="password-current" type="password" required class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2 text-sm" />
+        </div>
+        <div>
+          <label for="password-new" class="text-xs font-bold uppercase tracking-wide text-slate-500">Yeni sifre</label>
+          <input id="password-new" type="password" required class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2 text-sm" />
+          <p id="password-policy-error" class="mt-1 hidden text-xs font-semibold text-red-600">Yeni sifrede en az 1 buyuk harf, 1 rakam ve 1 ozel karakter (+ gibi) olmali.</p>
+        </div>
+        <div>
+          <label for="password-confirm" class="text-xs font-bold uppercase tracking-wide text-slate-500">Yeni sifre tekrar</label>
+          <input id="password-confirm" type="password" required class="mt-1 w-full rounded-xl border border-slate-300 px-4 py-2 text-sm" />
+          <p id="password-match-error" class="mt-1 hidden text-xs font-semibold text-red-600">Girdigin sifreler birbiriyle ayni degil.</p>
+          <p id="password-old-error" class="mt-1 hidden text-xs font-semibold text-red-600">Eski sifreyi tekrar kullanamazsin.</p>
+        </div>
+        <div class="pt-2">
+          <button id="password-submit-btn" type="submit" class="rounded-xl bg-purple-700 px-4 py-2 text-sm font-bold text-white hover:bg-purple-800">Sifreyi Guncelle</button>
+        </div>
+        <p id="password-api-error" class="hidden text-xs font-semibold text-red-600"></p>
       </form>
     </div>
   </div>
@@ -168,6 +199,18 @@ const articleCategories = getCategoryDefinitions();
     const statArticles = document.getElementById('stat-articles');
     const statArchive = document.getElementById('stat-archive');
     const statEvents = document.getElementById('stat-events');
+    const passwordOpenBtn = document.getElementById('password-open-btn');
+    const passwordModal = document.getElementById('password-modal');
+    const passwordCloseBtn = document.getElementById('password-close-btn');
+    const passwordForm = document.getElementById('password-form');
+    const passwordCurrentInput = document.getElementById('password-current');
+    const passwordNewInput = document.getElementById('password-new');
+    const passwordConfirmInput = document.getElementById('password-confirm');
+    const passwordPolicyError = document.getElementById('password-policy-error');
+    const passwordMatchError = document.getElementById('password-match-error');
+    const passwordOldError = document.getElementById('password-old-error');
+    const passwordSubmitBtn = document.getElementById('password-submit-btn');
+    const passwordApiError = document.getElementById('password-api-error');
 
     let currentAdmin = null;
     const ui = window.AdminUi?.create({ locale: 'tr' });
@@ -206,14 +249,6 @@ const articleCategories = getCategoryDefinitions();
       return String(value || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
     }
 
-    function getTokenExpiryMs(token) {
-      try {
-        const payload = JSON.parse(atob(String(token).split('.')[1] || ''));
-        if (payload?.exp) return Number(payload.exp) * 1000;
-      } catch {}
-      return null;
-    }
-
     function clearAdminSession() {
       sessionStorage.removeItem('admin_auth_token');
       sessionStorage.removeItem('admin_auth_user');
@@ -232,19 +267,38 @@ const articleCategories = getCategoryDefinitions();
       node?.classList.remove('flex');
     }
 
+    function isStrongPassword(value) {
+      const hasUpper = /[A-Z]/.test(value);
+      const hasNumber = /\d/.test(value);
+      const hasSpecial = /[^A-Za-z0-9]/.test(value);
+      return value.length >= 8 && hasUpper && hasNumber && hasSpecial;
+    }
+
+    function syncPasswordValidation() {
+      const currentValue = String(passwordCurrentInput?.value || '');
+      const newValue = String(passwordNewInput?.value || '');
+      const confirmValue = String(passwordConfirmInput?.value || '');
+      const strong = isStrongPassword(newValue);
+      const match = !confirmValue || newValue === confirmValue;
+      const oldReuse = !!newValue && newValue === currentValue;
+
+      passwordPolicyError?.classList.toggle('hidden', strong || !newValue);
+      passwordMatchError?.classList.toggle('hidden', match);
+      passwordOldError?.classList.toggle('hidden', !oldReuse);
+
+      return { strong, match, oldReuse };
+    }
+
     function bootAdminPanel() {
-      const token = sessionStorage.getItem('admin_auth_token');
       const userRaw = sessionStorage.getItem('admin_auth_user');
       const expiresAtRaw = sessionStorage.getItem('admin_auth_expires_at');
-      if (!token || !userRaw) {
+      if (!userRaw) {
         clearAdminSession();
         return window.location.replace('/admin/login-email');
       }
 
       const expiresAt = Number(expiresAtRaw || '0');
-      const tokenExpiry = getTokenExpiryMs(token);
-      const effectiveExpiry = tokenExpiry ? Math.min(expiresAt || tokenExpiry, tokenExpiry) : expiresAt;
-      if (!effectiveExpiry || Date.now() >= effectiveExpiry) {
+      if (!expiresAt || Date.now() >= expiresAt) {
         clearAdminSession();
         return window.location.replace('/admin/login-email');
       }
@@ -282,7 +336,7 @@ const articleCategories = getCategoryDefinitions();
 
     async function loadNotifications() {
       if (!currentAdmin?.email) return;
-      const res = await fetch(`/api/admin/notifications?adminEmail=${encodeURIComponent(currentAdmin.email)}&limit=40`);
+      const res = await fetch('/api/admin/notifications?limit=40');
       const json = await res.json();
       if (!json.success) return;
 
@@ -301,16 +355,39 @@ const articleCategories = getCategoryDefinitions();
             <label class="block rounded-xl border p-3 ${item.is_read ? 'border-slate-200 bg-white' : 'border-purple-200 bg-purple-50'}">
               <div class="flex items-start gap-3">
                 <input type="checkbox" class="notif-select mt-1" value="${item.id}" />
-                <div class="flex-1">
+                <button type="button" class="notif-open-btn flex-1 text-left" data-id="${item.id}" data-related-table="${escapeHtml(item.related_table || '')}" data-related-id="${Number(item.related_id || 0)}">
                   <p class="text-xs font-bold uppercase tracking-wide">${escapeHtml(item.type)}</p>
                   <p class="mt-1 text-sm font-semibold text-slate-900">${escapeHtml(item.title || 'Bildirim')}</p>
                   <p class="mt-1 text-xs text-slate-600">${escapeHtml(item.message || '')}</p>
-                </div>
+                </button>
               </div>
             </label>
           `
         )
         .join('');
+
+      notifList.querySelectorAll('.notif-open-btn').forEach((button) => {
+        button.addEventListener('click', async () => {
+          const notificationId = Number(button.dataset.id || '0');
+          const relatedTable = String(button.dataset.relatedTable || '');
+          const relatedId = Number(button.dataset.relatedId || '0');
+          if (notificationId > 0) {
+            await fetch('/api/admin/notifications', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ notificationId }),
+            });
+          }
+          const targetTab = relatedTable === 'applications'
+            ? 'applications'
+            : relatedTable === 'event_proposals'
+              ? 'events'
+              : relatedTable === 'newspaper_archives'
+                ? 'archive'
+                : 'articles';
+          window.location.href = `/admin/submissions?tab=${encodeURIComponent(targetTab)}&id=${encodeURIComponent(relatedId)}`;
+        });
+      });
     }
 
     notifToggleBtn?.addEventListener('click', () => notifPanel.classList.toggle('hidden'));
@@ -319,7 +396,7 @@ const articleCategories = getCategoryDefinitions();
       await fetch('/api/admin/notifications', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ adminEmail: currentAdmin?.email, markAll: true }),
+        body: JSON.stringify({ markAll: true }),
       });
       loadNotifications();
     });
@@ -332,7 +409,7 @@ const articleCategories = getCategoryDefinitions();
       await fetch('/api/admin/notifications', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ adminEmail: currentAdmin?.email, notificationIds: ids }),
+        body: JSON.stringify({ notificationIds: ids }),
       });
       loadNotifications();
     });
@@ -354,20 +431,20 @@ const articleCategories = getCategoryDefinitions();
         .map(
           (a) => `
             <article class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <div class="flex items-start justify-between gap-4">
-                <div class="min-w-0 flex-1">
-                  <p class="font-bold text-slate-900">${escapeHtml(a.title)}</p>
-                  <p class="mt-1 text-xs text-slate-500">/${escapeHtml(a.slug)} - ${escapeHtml(a.status)}</p>
-                  <p class="text-xs text-slate-500">${escapeHtml(a.category || 'Kategori yok')}</p>
-                  <p class="mt-1 text-[11px] font-semibold text-slate-500">Onay: ${a.approval_summary?.approvedCount || 0}/${a.approval_summary?.adminCount || 0} - Red: ${a.approval_summary?.rejectedCount || 0}</p>
-                </div>
-                <div class="shrink-0 flex flex-nowrap items-center gap-2 overflow-x-auto whitespace-nowrap pb-1">
+              <div class="flex flex-col gap-3">
+                <div class="flex flex-wrap items-center gap-2">
                   <button data-id="${a.id}" class="article-detail rounded border border-slate-300 bg-white px-3 py-1 text-xs font-bold text-slate-700">Detay</button>
                   <button data-id="${a.id}" class="article-comment rounded bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">Yorum</button>
                   <button data-id="${a.id}" class="article-approve rounded bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">Onayla</button>
                   <button data-id="${a.id}" class="article-reject rounded bg-rose-100 px-3 py-1 text-xs font-bold text-rose-800">Reddet</button>
                   <button data-id="${a.id}" class="article-edit rounded bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">Duzenle</button>
                   <button data-id="${a.id}" class="article-del rounded bg-red-100 px-3 py-1 text-xs font-bold text-red-700">Sil</button>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-base font-black leading-snug text-slate-900">${escapeHtml(a.title)}</p>
+                  <p class="mt-1 text-xs text-slate-500">/${escapeHtml(a.slug)} - ${escapeHtml(a.status)}</p>
+                  <p class="mt-1 text-xs text-slate-500">${escapeHtml(a.category || 'Kategori yok')}</p>
+                  <p class="mt-1 text-[11px] font-semibold text-slate-500">Onay: ${a.approval_summary?.approvedCount || 0}/${a.approval_summary?.adminCount || 0} - Red: ${a.approval_summary?.rejectedCount || 0} - Okunma: ${a.tracked_view_count || 0}</p>
                 </div>
               </div>
             </article>
@@ -386,7 +463,7 @@ const articleCategories = getCategoryDefinitions();
               .join('\n') || 'Henuz karar yok';
           const comments = (item.comments || []).map((entry) => `${entry.admin_email}: ${entry.comment}`).join('\n') || 'Henuz yorum yok';
           await showDetails(
-            `Yazi: ${item.title}\nDurum: ${item.status}\nSlug: /${item.slug}\n\nAdmin kararlari:\n${approvals}\n\nAdmin yorumlari:\n${comments}`,
+            `Yazi: ${item.title}\nDurum: ${item.status}\nSlug: /${item.slug}\nOkunma: ${item.tracked_view_count || 0}\n\nAdmin kararlari:\n${approvals}\n\nAdmin yorumlari:\n${comments}`,
             'Yazi detayi'
           );
         });
@@ -399,12 +476,11 @@ const articleCategories = getCategoryDefinitions();
           const response = await fetch('/api/admin/articles', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'comment',
-              articleId: Number(btn.dataset.id),
-              adminEmail: currentAdmin?.email,
-              comment: comment.trim(),
-            }),
+              body: JSON.stringify({
+                action: 'comment',
+                articleId: Number(btn.dataset.id),
+                comment: comment.trim(),
+              }),
           });
           const payload = await response.json();
           if (!response.ok || !payload.success) {
@@ -423,7 +499,7 @@ const articleCategories = getCategoryDefinitions();
           const response = await fetch(`/api/admin/articles/${btn.dataset.id}/approve`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ adminEmail: currentAdmin?.email, comment }),
+            body: JSON.stringify({ comment }),
           });
           const payload = await response.json();
           if (!response.ok || !payload.success) {
@@ -443,7 +519,7 @@ const articleCategories = getCategoryDefinitions();
           const response = await fetch(`/api/admin/articles/${btn.dataset.id}/reject`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ adminEmail: currentAdmin?.email, comment }),
+            body: JSON.stringify({ comment }),
           });
           const payload = await response.json();
           if (!response.ok || !payload.success) {
@@ -478,14 +554,20 @@ const articleCategories = getCategoryDefinitions();
         btn.addEventListener('click', async () => {
           const confirmed = await askConfirm('Bu yaziyi silmek istiyor musun?');
           if (!confirmed) return;
+          const reason = await askText('Silinme sebebi:', 'Sebep yazin');
+          if (!reason || !reason.trim()) {
+            showToast('Silinme sebebi zorunlu.', 'warning');
+            return;
+          }
           await fetch('/api/admin/articles', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: Number(btn.dataset.id) }),
+            body: JSON.stringify({ id: Number(btn.dataset.id), reason: reason.trim() }),
           });
-          showToast('Yazi silindi.', 'success');
+          showToast('Yazi listeden kaldirildi.', 'success');
           loadArticles();
           loadStats();
+          loadNotifications();
         });
       });
     }
@@ -516,7 +598,6 @@ const articleCategories = getCategoryDefinitions();
         status: articleForm.elements.status.value,
         excerpt: articleForm.elements.excerpt.value,
         body: articleForm.elements.body.value,
-        adminEmail: currentAdmin?.email,
       };
 
       const res = await fetch('/api/admin/articles', {
@@ -539,6 +620,64 @@ const articleCategories = getCategoryDefinitions();
       node?.addEventListener('click', (event) => {
         if (event.target === node) closeModal(node);
       });
+    });
+
+    passwordOpenBtn?.addEventListener('click', () => {
+      passwordForm?.reset();
+      if (passwordApiError) {
+        passwordApiError.textContent = '';
+        passwordApiError.classList.add('hidden');
+      }
+      syncPasswordValidation();
+      openModal(passwordModal);
+    });
+    passwordCloseBtn?.addEventListener('click', () => closeModal(passwordModal));
+    passwordModal?.addEventListener('click', (event) => {
+      if (event.target === passwordModal) closeModal(passwordModal);
+    });
+
+    passwordCurrentInput?.addEventListener('input', syncPasswordValidation);
+    passwordNewInput?.addEventListener('input', syncPasswordValidation);
+    passwordConfirmInput?.addEventListener('input', syncPasswordValidation);
+
+    passwordForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const { strong, match, oldReuse } = syncPasswordValidation();
+      if (!strong || !match || oldReuse) {
+        showToast('Lutfen sifre kurallarini duzelt.', 'warning');
+        return;
+      }
+      passwordSubmitBtn.disabled = true;
+      try {
+        const response = await fetch('/api/auth/change-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            currentPassword: passwordCurrentInput.value,
+            newPassword: passwordNewInput.value,
+            confirmPassword: passwordConfirmInput.value,
+          }),
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.success) {
+          if (passwordApiError) {
+            passwordApiError.textContent = payload.error || 'Sifre guncellenemedi';
+            passwordApiError.classList.remove('hidden');
+          }
+          showToast(payload.error || 'Sifre guncellenemedi', 'error');
+          return;
+        }
+        showToast('Sifre basariyla guncellendi.', 'success');
+        if (passwordApiError) {
+          passwordApiError.textContent = '';
+          passwordApiError.classList.add('hidden');
+        }
+        closeModal(passwordModal);
+      } catch {
+        showToast('Sifre guncellenirken baglanti hatasi olustu.', 'error');
+      } finally {
+        passwordSubmitBtn.disabled = false;
+      }
     });
 
     bootAdminPanel();

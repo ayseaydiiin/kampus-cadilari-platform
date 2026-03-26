@@ -1,10 +1,16 @@
 import { joinApprovedEvent } from '../../../../utils/db.js';
+import { checkRateLimit, isValidEmail, rateLimitResponse } from '../../../../utils/security.js';
 
 export const prerender = false;
 
 export async function POST({ params, request }) {
-  const headers = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' };
+  const headers = { 'Content-Type': 'application/json' };
   try {
+    const rateLimit = checkRateLimit(request, 'events-join', { limit: 12, windowMs: 60 * 60 * 1000 });
+    if (!rateLimit.allowed) {
+      return rateLimitResponse('Katilim gonderim limiti asildi', rateLimit.retryAfter);
+    }
+
     const eventId = Number(params.id);
     const { email, name, message } = await request.json();
 
@@ -15,9 +21,16 @@ export async function POST({ params, request }) {
       );
     }
 
+    if (!isValidEmail(email)) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Gecerli bir email girin' }),
+        { status: 400, headers }
+      );
+    }
+
     const result = joinApprovedEvent({
       eventId,
-      email: String(email).trim(),
+      email: String(email).trim().toLowerCase(),
       name: String(name).trim(),
       message: message ? String(message).trim() : null,
     });

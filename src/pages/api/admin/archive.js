@@ -4,15 +4,19 @@ import {
   getArchiveEntries,
   getActiveAdmins,
 } from '../../../utils/db.js';
+import { requireAdmin } from '../../../utils/adminAuth.js';
 
 export const prerender = false;
 
 const headers = {
   'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': '*',
 };
 
-export async function GET({ url }) {
+export async function GET(context) {
+  const auth = requireAdmin(context);
+  if (!auth.ok) return auth.response;
+
+  const { url } = context;
   try {
     const status = url.searchParams.get('status');
     const decade = url.searchParams.get('decade');
@@ -27,6 +31,7 @@ export async function GET({ url }) {
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
     const adminCount = getActiveAdmins().length;
+    const requiredCount = 1;
 
     const data = entries.map((entry) => {
       const approvals = getArchiveApprovals(entry.id);
@@ -37,9 +42,10 @@ export async function GET({ url }) {
         approvals,
         approval_summary: {
           adminCount,
+          requiredCount,
           approvedCount,
           rejectedCount,
-          pendingCount: Math.max(adminCount - approvedCount - rejectedCount, 0),
+          pendingCount: Math.max(requiredCount - approvedCount - rejectedCount, 0),
         },
       };
     });
@@ -50,7 +56,11 @@ export async function GET({ url }) {
   }
 }
 
-export async function POST({ request }) {
+export async function POST(context) {
+  const auth = requireAdmin(context);
+  if (!auth.ok) return auth.response;
+
+  const { request } = context;
   try {
     const body = await request.json();
 
@@ -72,10 +82,10 @@ export async function POST({ request }) {
       cover_image_url: body.cover_image_url || null,
       pdf_url: body.pdf_url || null,
       source_url: body.source_url || null,
-      submitted_by: body.submitted_by || 'Admin',
+      submitted_by: body.submitted_by || auth.admin.fullName || auth.admin.email,
       submitted_email: body.submitted_email || null,
-      status: body.status || 'pending',
-      reviewed_by: body.reviewed_by || null,
+      status: 'pending',
+      reviewed_by: null,
     });
 
     if (!result.success) {
