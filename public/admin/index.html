@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" translate="no">
+<html lang="tr">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
-    <meta name="google" content="notranslate" />
-    <title>Dijital Mor Karargah - Admin Paneli</title>
-    <base href="/admin/" />
+    <meta http-equiv="refresh" content="0; url=/admin/login-email" />
+    <title>Admin Girise Yonlendiriliyor</title>
     <style>
       html,
       body {
@@ -16,22 +15,37 @@
       }
 
       body {
+        display: grid;
+        place-items: center;
+        font-family: Arial, sans-serif;
         background: linear-gradient(135deg, #632f86 0%, #da291c 100%);
+        color: #fff;
+        text-align: center;
+      }
+
+      .card {
+        width: min(92vw, 30rem);
+        padding: 2rem;
+        border-radius: 1.25rem;
+        background: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+        backdrop-filter: blur(12px);
+      }
+
+      a {
+        color: #fff;
+        font-weight: 700;
       }
     </style>
   </head>
   <body>
+    <div class="card">
+      <h1>Admin girise yonlendiriliyorsun</h1>
+      <p>Bu proje artik Decap CMS yerine uygulama ici admin girisini kullaniyor.</p>
+      <p><a href="/admin/login-email">Giris sayfasini ac</a></p>
+    </div>
     <script>
-      window.CMS_MANUAL_INIT = true;
-    </script>
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-    <script src="https://unpkg.com/decap-cms-editor-preview@^1.0.0"></script>
-    <script>
-      window.addEventListener('load', () => {
-        if (window.CMS) {
-          window.CMS.init({ config: { load_config_file: true } });
-        }
-      });
+      window.location.replace('/admin/login-email');
     </script>
   </body>
 </html>

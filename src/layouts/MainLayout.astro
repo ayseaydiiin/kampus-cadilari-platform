@@ -63,7 +63,7 @@ const year = new Date().getFullYear();
                   <span id="theme-label" class="hidden sm:inline">{isEn ? 'Light' : 'Acik'}</span>
                 </button>
               </div>
-              <a href={isEn ? '/en/admin/' : '/admin/'} class="hidden rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 text-sm font-bold text-white transition hover:shadow-lg md:block">
+              <a href={isEn ? '/en/admin/' : '/admin/panel'} class="hidden rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 text-sm font-bold text-white transition hover:shadow-lg md:block">
                 ADMIN
               </a>
               <button class="text-2xl text-purple-600 lg:hidden" id="menu-toggle" aria-label={isEn ? 'Menu' : 'Menu'}>=</button>
@@ -82,7 +82,7 @@ const year = new Date().getFullYear();
             <a href={isEn ? '/en/#perspective-section' : '/#perspektif-section'} class="rounded px-4 py-2 hover:bg-purple-50">{isEn ? 'Perspective' : 'Cadı Merceği'}</a>
             <a href={isEn ? '/en/articles' : '/articles'} class="rounded px-4 py-2 hover:bg-purple-50">{isEn ? 'Articles' : 'Kazandan Taşanlar'}</a>
             <a href={isEn ? '/en/map' : '/map'} class="rounded px-4 py-2 hover:bg-purple-50">{isEn ? 'Join Us' : 'Cadıol'}</a>
-            <a href={isEn ? '/en/admin/' : '/admin/'} class="rounded bg-purple-600 px-4 py-2 font-bold text-white">Admin</a>
+            <a href={isEn ? '/en/admin/' : '/admin/panel'} class="rounded bg-purple-600 px-4 py-2 font-bold text-white">Admin</a>
           </nav>
         </div>
       </header>

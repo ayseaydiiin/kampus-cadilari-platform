@@ -341,3 +341,17 @@ body.dark-mode .app-h1 {
     padding: 0 var(--spacing-sm);
   }
 }
+
+/* Admin article modal must keep readable form text in all themes */
+#article-modal input:not([type='hidden']),
+#article-modal textarea,
+#article-modal select {
+  color: #0f172a !important;
+  background-color: #ffffff;
+  caret-color: #0f172a;
+}
+
+#article-modal input:not([type='hidden'])::placeholder,
+#article-modal textarea::placeholder {
+  color: #94a3b8;
+}

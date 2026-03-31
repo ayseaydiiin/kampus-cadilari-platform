@@ -250,11 +250,15 @@ const articleCategories = getCategoryDefinitions();
     }
 
     function clearAdminSession() {
-      sessionStorage.removeItem('admin_auth_token');
-      sessionStorage.removeItem('admin_auth_user');
-      sessionStorage.removeItem('admin_auth_expires_at');
-      localStorage.removeItem('admin_auth_token');
-      localStorage.removeItem('admin_auth_user');
+      try {
+        sessionStorage.removeItem('admin_auth_token');
+        sessionStorage.removeItem('admin_auth_user');
+        sessionStorage.removeItem('admin_auth_expires_at');
+      } catch {}
+      try {
+        localStorage.removeItem('admin_auth_token');
+        localStorage.removeItem('admin_auth_user');
+      } catch {}
     }
 
     function openModal(node) {
@@ -289,23 +293,47 @@ const articleCategories = getCategoryDefinitions();
       return { strong, match, oldReuse };
     }
 
-    function bootAdminPanel() {
-      const userRaw = sessionStorage.getItem('admin_auth_user');
-      const expiresAtRaw = sessionStorage.getItem('admin_auth_expires_at');
-      if (!userRaw) {
-        clearAdminSession();
-        return window.location.replace('/admin/login-email');
-      }
+    function setPasswordFeedback(message = '', tone = 'error') {
+      if (!passwordApiError) return;
+      const isSuccess = tone === 'success';
+      passwordApiError.textContent = message;
+      passwordApiError.classList.toggle('hidden', !message);
+      passwordApiError.classList.toggle('text-red-600', !isSuccess);
+      passwordApiError.classList.toggle('text-emerald-600', isSuccess);
+    }
+
+    async function bootAdminPanel() {
+      let userRaw = null;
+      let expiresAtRaw = null;
+      try {
+        userRaw = sessionStorage.getItem('admin_auth_user');
+        expiresAtRaw = sessionStorage.getItem('admin_auth_expires_at');
+      } catch {}
 
       const expiresAt = Number(expiresAtRaw || '0');
-      if (!expiresAt || Date.now() >= expiresAt) {
-        clearAdminSession();
-        return window.location.replace('/admin/login-email');
+      if (userRaw && expiresAt && Date.now() < expiresAt) {
+        try {
+          currentAdmin = JSON.parse(userRaw);
+        } catch {
+          currentAdmin = null;
+        }
       }
 
-      try {
-        currentAdmin = JSON.parse(userRaw);
-      } catch {
+      if (!currentAdmin) {
+        try {
+          const response = await fetch('/api/auth/me');
+          const payload = await response.json();
+          if (response.ok && payload?.authenticated && payload?.user) {
+            currentAdmin = payload.user;
+            try {
+              sessionStorage.setItem('admin_auth_user', JSON.stringify(payload.user));
+              sessionStorage.setItem('admin_auth_expires_at', String(Date.now() + 8 * 60 * 60 * 1000));
+            } catch {}
+          }
+        } catch {}
+      }
+
+      if (!currentAdmin) {
         clearAdminSession();
         return window.location.replace('/admin/login-email');
       }
@@ -624,10 +652,7 @@ const articleCategories = getCategoryDefinitions();
 
     passwordOpenBtn?.addEventListener('click', () => {
       passwordForm?.reset();
-      if (passwordApiError) {
-        passwordApiError.textContent = '';
-        passwordApiError.classList.add('hidden');
-      }
+      setPasswordFeedback('');
       syncPasswordValidation();
       openModal(passwordModal);
     });
@@ -660,29 +685,29 @@ const articleCategories = getCategoryDefinitions();
         });
         const payload = await response.json();
         if (!response.ok || !payload.success) {
-          if (passwordApiError) {
-            passwordApiError.textContent = payload.error || 'Sifre guncellenemedi';
-            passwordApiError.classList.remove('hidden');
-          }
+          setPasswordFeedback(payload.error || 'Sifre guncellenemedi');
           showToast(payload.error || 'Sifre guncellenemedi', 'error');
           return;
         }
+        setPasswordFeedback('Sifre guncellendi.', 'success');
         showToast('Sifre basariyla guncellendi.', 'success');
-        if (passwordApiError) {
-          passwordApiError.textContent = '';
-          passwordApiError.classList.add('hidden');
-        }
-        closeModal(passwordModal);
+        window.setTimeout(() => {
+          setPasswordFeedback('');
+          closeModal(passwordModal);
+        }, 900);
       } catch {
+        setPasswordFeedback('Sifre guncellenirken baglanti hatasi olustu.');
         showToast('Sifre guncellenirken baglanti hatasi olustu.', 'error');
       } finally {
         passwordSubmitBtn.disabled = false;
       }
     });
 
-    bootAdminPanel();
-    loadStats();
-    loadArticles();
-    loadNotifications();
+    bootAdminPanel().then(() => {
+      if (!currentAdmin) return;
+      loadStats();
+      loadArticles();
+      loadNotifications();
+    });
   </script>
 </MainLayout>

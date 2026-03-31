@@ -8,6 +8,10 @@ function getJwtSecret() {
     return String(secret);
   }
 
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET must be set to at least 32 characters in production');
+  }
+
   if (!globalThis.__KAMPUS_LOCAL_JWT_SECRET__) {
     globalThis.__KAMPUS_LOCAL_JWT_SECRET__ = crypto.randomBytes(48).toString('hex');
   }
@@ -71,13 +75,44 @@ export function getAuthenticatedAdmin(request, cookies) {
   }
 }
 
+function isLocalHostname(hostname) {
+  const value = String(hostname || '').toLowerCase();
+  return new Set([
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0',
+    '::1',
+    '[::1]',
+    '::ffff:127.0.0.1',
+  ]).has(value) || value.startsWith('127.');
+}
+
+function isLoopbackOrigin(originValue) {
+  try {
+    return isLocalHostname(new URL(originValue).hostname);
+  } catch {
+    return false;
+  }
+}
+
+function normalizeOrigin(originValue) {
+  try {
+    const url = new URL(originValue);
+    const normalizedHost = isLocalHostname(url.hostname) ? 'localhost' : url.hostname;
+    return `${url.protocol}//${normalizedHost}${url.port ? `:${url.port}` : ''}`;
+  } catch {
+    return originValue;
+  }
+}
+
 export function requireAdmin(context) {
   const method = String(context.request.method || 'GET').toUpperCase();
   if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
     const origin = context.request.headers.get('origin');
     if (origin) {
       const requestOrigin = new URL(context.request.url).origin;
-      if (origin !== requestOrigin) {
+      const bothLoopback = isLoopbackOrigin(origin) && isLoopbackOrigin(requestOrigin);
+      if (!bothLoopback && normalizeOrigin(origin) !== normalizeOrigin(requestOrigin)) {
         return {
           ok: false,
           response: new Response(

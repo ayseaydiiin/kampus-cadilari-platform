@@ -1,10 +1,28 @@
 import Database from 'better-sqlite3';
 import bcrypt from 'bcrypt';
+import fs from 'node:fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dbPath = path.join(__dirname, '../../kampus_cadilari.db');
+function resolveDatabasePath() {
+  const configuredPath = String(process.env.DATABASE_URL || '').trim();
+  if (!configuredPath) {
+    return path.join(process.cwd(), 'kampus_cadilari.db');
+  }
+
+  if (configuredPath === ':memory:') {
+    return configuredPath;
+  }
+
+  return path.isAbsolute(configuredPath)
+    ? configuredPath
+    : path.resolve(process.cwd(), configuredPath);
+}
+
+const dbPath = resolveDatabasePath();
+
+if (dbPath !== ':memory:') {
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+}
 
 function ensureColumn(db, table, name, definition) {
   const columns = db.prepare(`PRAGMA table_info(${table})`).all();

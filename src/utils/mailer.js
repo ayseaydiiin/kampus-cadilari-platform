@@ -2,9 +2,13 @@ const {
   SMTP_HOST,
   SMTP_PORT,
   SMTP_USER,
-  SMTP_PASS,
-  SMTP_FROM,
+  SMTP_PASS: smtpPassPrimary,
+  SMTP_PASSWORD: smtpPassFallback,
+  SMTP_FROM: smtpFromPrimary,
 } = process.env;
+
+const SMTP_PASS = smtpPassPrimary || smtpPassFallback || '';
+const SMTP_FROM = smtpFromPrimary || SMTP_USER || '';
 
 function isConfigured() {
   return SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASS && SMTP_FROM;

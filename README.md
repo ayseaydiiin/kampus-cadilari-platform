@@ -109,6 +109,12 @@ Guvenlik nedeniyle sifreler repoda tutulmaz.
 - `DATABASE_SCHEMA.sql` -> tablo yapilari
 - `KURULUM.md` -> kurulum adimlari
 
+## Kurulum ve Canliya Alma
+
+Sunucu kurulumu, ortam degiskenleri, build/start komutlari, domain yonlendirme ve SQLite kalicilik notlari icin:
+
+- `KURULUM.md`
+
 ## Not
 
 Bu repo aktif gelistirme asamasindadir. Uretim ortami oncesi adapter/deployment ve guvenlik sertlestirmeleri tamamlanmalidir.

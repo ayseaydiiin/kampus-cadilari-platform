@@ -43,7 +43,25 @@ const SESSION_MAX_HOURS = 8;
     const loadingDiv = document.getElementById('loading');
     const SESSION_MAX_MS = Number(SESSION_MAX_HOURS || 8) * 60 * 60 * 1000;
 
-    localStorage.removeItem('admin_auth_user');
+    function safeStorage(storageName) {
+      try {
+        return window[storageName];
+      } catch {
+        return null;
+      }
+    }
+
+    const localStore = safeStorage('localStorage');
+    const sessionStore = safeStorage('sessionStorage');
+    localStore?.removeItem('admin_auth_user');
+
+    function showMessage(text, tone = 'error') {
+      messageDiv.className =
+        tone === 'success'
+          ? 'mt-5 rounded-xl border border-green-300 bg-green-50 p-4 text-sm font-semibold text-green-700'
+          : 'mt-5 rounded-xl border border-red-300 bg-red-50 p-4 text-sm font-semibold text-red-700';
+      messageDiv.textContent = text;
+    }
 
     function getTokenExpiryMs(token) {
       try {
@@ -53,7 +71,7 @@ const SESSION_MAX_HOURS = 8;
       return null;
     }
 
-    form.addEventListener('submit', async (event) => {
+    async function handleLogin(event) {
       event.preventDefault();
       messageDiv.className = 'hidden mt-5 rounded-xl p-4 text-sm font-semibold';
       loadingDiv.classList.remove('hidden');
@@ -64,8 +82,7 @@ const SESSION_MAX_HOURS = 8;
         const passwordValue = String(passwordInput?.value || '');
 
         if (!emailValue || !passwordValue) {
-          messageDiv.className = 'mt-5 rounded-xl border border-red-300 bg-red-50 p-4 text-sm font-semibold text-red-700';
-          messageDiv.textContent = 'Email and password are required.';
+          showMessage('Email and password are required.');
           return;
         }
 
@@ -92,26 +109,25 @@ const SESSION_MAX_HOURS = 8;
           const clientExpiry = Date.now() + SESSION_MAX_MS;
           const expiryMs = tokenExpiry ? Math.min(tokenExpiry, clientExpiry) : clientExpiry;
 
-          sessionStorage.setItem('admin_auth_user', JSON.stringify(data.user));
-          sessionStorage.setItem('admin_auth_expires_at', String(expiryMs));
+          sessionStore?.setItem('admin_auth_user', JSON.stringify(data.user));
+          sessionStore?.setItem('admin_auth_expires_at', String(expiryMs));
 
-          messageDiv.className = 'mt-5 rounded-xl border border-green-300 bg-green-50 p-4 text-sm font-semibold text-green-700';
-          messageDiv.textContent = 'Login successful. Opening dashboard...';
+          showMessage('Login successful. Opening dashboard...', 'success');
           setTimeout(() => window.location.replace('/en/admin/'), 400);
           return;
         }
 
-        messageDiv.className = 'mt-5 rounded-xl border border-red-300 bg-red-50 p-4 text-sm font-semibold text-red-700';
-        messageDiv.textContent = data?.error || `Login failed (HTTP ${response.status})`;
+        showMessage(data?.error || `Login failed (HTTP ${response.status})`);
         passwordInput.value = '';
         passwordInput.focus();
       } catch {
-        messageDiv.className = 'mt-5 rounded-xl border border-red-300 bg-red-50 p-4 text-sm font-semibold text-red-700';
-        messageDiv.textContent = 'Connection error. Please try again.';
+        showMessage('Connection error. Please try again.');
       } finally {
         loadingDiv.classList.add('hidden');
         submitBtn.disabled = false;
       }
-    });
+    }
+
+    form?.addEventListener('submit', handleLogin);
   </script>
 </MainLayout>
