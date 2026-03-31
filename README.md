@@ -137,4 +137,4 @@ node dist/server/entry.mjs
 
 ## Not
 
-Bu repo aktif gelistirme asamasindadir. Uretim ortami oncesi adapter/deployment ve guvenlik sertlestirmeleri tamamlanmalidir.
+Bu repo gelistirilmeye aciktir; ancak mevcut haliyle uygun ortam degiskenleri, kalici SQLite dizini, SSL ve duzenli yedekleme ile canliya alinabilir.
