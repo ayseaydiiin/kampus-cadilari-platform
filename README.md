@@ -115,6 +115,16 @@ Sunucu kurulumu, ortam degiskenleri, build/start komutlari, domain yonlendirme v
 
 - `KURULUM.md`
 
+Terminale yazilacak temel komutlar:
+
+```bash
+git clone <repo-url>
+cd dijital-mor-karargah
+npm install
+npm run build
+node dist/server/entry.mjs
+```
+
 ## Not
 
 Bu repo aktif gelistirme asamasindadir. Uretim ortami oncesi adapter/deployment ve guvenlik sertlestirmeleri tamamlanmalidir.

@@ -46,6 +46,62 @@ node dist/server/entry.mjs
 7. Domain, sunucuya yonlendirilerek aktif hale getirilmelidir.
 8. SSL (`https`) aktif edilmelidir.
 
+## Terminale Yazilacak Komutlar
+
+Sunucuda ya da hosting terminalinde sirasiyla su komutlar calistirilabilir:
+
+```bash
+git clone <repo-url>
+cd dijital-mor-karargah
+npm install
+npm run build
+node dist/server/entry.mjs
+```
+
+Eger repo zaten sunucuda varsa:
+
+```bash
+cd dijital-mor-karargah
+git pull
+npm install
+npm run build
+node dist/server/entry.mjs
+```
+
+## Localde Web Siteyi Calistirma
+
+Projeyi kendi bilgisayarinizda calistirmak icin:
+
+```bash
+git clone <repo-url>
+cd dijital-mor-karargah
+npm install
+npm run dev -- --host 0.0.0.0 --port 4321
+```
+
+Ardindan tarayicidan su adres acilir:
+
+```text
+http://localhost:4321
+```
+
+Windows PowerShell kullaniyorsaniz ve `npm` dogrudan calismiyorsa:
+
+```powershell
+cd C:\path\to\dijital-mor-karargah
+& 'C:\Program Files\nodejs\npm.cmd' install
+& 'C:\Program Files\nodejs\npm.cmd' run dev -- --host 0.0.0.0 --port 4321
+```
+
+Canli ortama yakin sekilde production build ile calistirmak icin:
+
+```bash
+cd dijital-mor-karargah
+npm install
+npm run build
+node dist/server/entry.mjs
+```
+
 ## Ornek Ortam Degiskenleri
 
 `.env.example` dosyasini referans alip `.env` veya platformun destekledigi environment variables alanina su degerleri girilmelidir:
