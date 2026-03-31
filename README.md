@@ -108,6 +108,7 @@ Guvenlik nedeniyle sifreler repoda tutulmaz.
 - `TEST_GUIDE.md` -> adim adim manuel test plani
 - `DATABASE_SCHEMA.sql` -> tablo yapilari
 - `KURULUM.md` -> kurulum adimlari
+- `MUSTERI_CANLIYA_ALMA_REHBERI.md` -> teknik olmayan kullanicilar icin sade canliya alma rehberi
 
 ## Kurulum ve Canliya Alma
 
