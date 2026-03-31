@@ -11,6 +11,31 @@ Projenin kurulumu icin asagidaki adimlari takip etmeniz yeterlidir.
 - Git erisimi
 - SSL destekli bir domain yonlendirmesi
 
+## Yuklenmesi Gereken Uygulamalar
+
+Kurulum yapacak kisinin ya da sunucunun asagidaki araclara sahip olmasi gerekir:
+
+- `Node.js` `22.12.0` veya uzeri
+- `npm` (Node.js ile birlikte gelir)
+- `Git`
+
+Canli sunucu icin tavsiye edilen ek araclar:
+
+- `PM2` veya benzeri bir process manager
+- `Nginx` veya benzeri bir reverse proxy
+
+Veritabani tarafi icin onemli not:
+
+- Bu proje `SQLite` kullaniyor.
+- Yani ayrica `MySQL`, `PostgreSQL`, `phpMyAdmin` veya ayri bir database sunucusu kurmak zorunlu degildir.
+- Veritabani, uygulamanin olusturdugu `.db` dosyasi uzerinden calisir.
+- Sadece `DATABASE_URL` ile belirtilen klasorun kalici (`persistent`) olmasi gerekir.
+
+Isterlerse veritabani dosyasini gormek icin opsiyonel olarak su tarz araclar kullanabilirler:
+
+- `DB Browser for SQLite`
+- `SQLiteStudio`
+
 Bu proje Astro `server output` ile calisir. Yani statik hosting degil, Node.js calistirabilen bir ortam gerekir.
 
 Uygun ortam ornekleri:
@@ -58,6 +83,13 @@ npm run build
 node dist/server/entry.mjs
 ```
 
+Eger `pm2` kuruluysa uygulamayi arka planda su sekilde de calistirabilirler:
+
+```bash
+pm2 start dist/server/entry.mjs --name dijital-mor-karargah
+pm2 save
+```
+
 Eger repo zaten sunucuda varsa:
 
 ```bash
@@ -100,6 +132,15 @@ cd dijital-mor-karargah
 npm install
 npm run build
 node dist/server/entry.mjs
+```
+
+PM2 ile local production testi yapmak isterlerse:
+
+```bash
+cd dijital-mor-karargah
+npm install
+npm run build
+pm2 start dist/server/entry.mjs --name dijital-mor-karargah
 ```
 
 ## Ornek Ortam Degiskenleri

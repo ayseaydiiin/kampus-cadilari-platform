@@ -115,6 +115,16 @@ Sunucu kurulumu, ortam degiskenleri, build/start komutlari, domain yonlendirme v
 
 - `KURULUM.md`
 
+Kurulum icin temel gereksinimler:
+
+- `Node.js`
+- `npm`
+- `Git`
+
+Database notu:
+
+- Proje `SQLite` kullandigi icin ayrica `MySQL` veya `PostgreSQL` kurulmasi zorunlu degildir.
+
 Terminale yazilacak temel komutlar:
 
 ```bash
